@@ -1,0 +1,291 @@
+---
+import { format, isBefore } from 'date-fns';
+import { it } from 'date-fns/locale';
+import {
+  Container,
+  TextCardSection,
+  Button,
+} from '@components/odyssey-theme';
+import Layout from '../../layouts/Page.astro';
+import NewsletterForm from '../../components/forms/NewsletterForm.astro';
+
+import {
+  WINDDOC_URL,
+  TOKEN_APP,
+  TOKEN_KEY,
+  toFormUrlEncoded,
+} from '../../lib/winddoc'; // 👈 percorso da src/pages/blog
+
+function stripHtml(html: string): string {
+  if (!html) return '';
+  return html.replace(/<[^>]*>/g, '').trim();
+}
+
+async function fetchEventi({ pagina = 1 } = {}) {
+  const bodyObj = {
+    method: 'associazioni_eventi_lista',
+    request: {
+      token_key: {
+        token: TOKEN_KEY,
+        token_app: TOKEN_APP,
+      },
+      // query: 'data_evento > NOW()', // ❌ togli il filtro qui
+      pagina,
+    },
+  };
+
+  const res = await fetch(WINDDOC_URL, {
+    method: 'POST',
+    headers: {
+      Accept: 'application/json',
+      'Content-Type': 'application/x-www-form-urlencoded',
+    },
+    body: toFormUrlEncoded(bodyObj),
+  });
+
+  if (!res.ok) {
+    throw new Error(`Errore richiesta WindDoc lista: ${res.status}`);
+  }
+
+  const data = await res.json();
+  return data;
+}
+
+let eventiLista: any[] = [];
+
+try {
+  const data = await fetchEventi({ pagina: 1 });
+  if (data && data.success && Array.isArray(data.lista)) {
+    eventiLista = data.lista;
+  } else {
+    console.warn('[WindDoc lista] struttura inattesa:', data);
+  }
+} catch (err) {
+  console.error('[WindDoc lista] errore chiamando API:', err);
+}
+
+const eventiRaw = eventiLista.map((evento) => {
+  const id = evento.id_associazione_evento;
+  const titolo = evento.nome ?? 'Evento senza titolo';
+  const descrizioneHtml = evento.descrizione ?? '';
+  const descrizioneTesto = stripHtml(descrizioneHtml);
+  const luogo = evento.indirizzo ?? '';
+  const rawDate = evento.data_evento;
+  const dateObj = rawDate ? new Date(rawDate) : null;
+
+  // TODO: qui mappiamo l'immagine se l'API la fornisce
+  const image = evento.immagine ?? evento.image ?? null;
+
+  return {
+    id,
+    title: titolo,
+    descriptionHtml: descrizioneHtml,
+    descriptionText: descrizioneTesto,
+    place: luogo,
+    date: dateObj,
+    image,
+    href: id ? `/blog/eventi/${id}` : null,
+  };
+});
+
+// Filtra solo quelli con una data valida
+const now = new Date();
+
+const eventiFuturi = eventiRaw
+  .filter((e) => e.date && e.date >= now)
+  .sort((a, b) => (a.date! > b.date! ? 1 : -1)); // dal più vicino al più lontano
+
+const eventiPassati = eventiRaw
+  .filter((e) => e.date && e.date < now)
+  .sort((a, b) => (a.date! > b.date! ? -1 : 1)); // dal più recente al più vecchio
+
+const seo = {
+  title: 'Blog & Eventi | Corpo Bandistico di Castelcovati',
+  description:
+    'Notizie ed eventi del Corpo Bandistico di Castelcovati, aggiornati automaticamente tramite WindDoc.',
+};
+---
+
+<Layout {seo}>
+  <Container>
+    <TextCardSection>
+      <h1>Eventi</h1>
+      <p>
+        Qui trovi tutti gli eventi del Corpo Bandistico di Catelcovati
+      </p>
+    </TextCardSection>
+
+    <section class="blog-posts-list__section">
+      <h2>Prossimi eventi</h2>
+
+      {eventiFuturi.length === 0 && (
+        <p>Al momento non ci sono eventi futuri.</p>
+      )}
+
+      {eventiFuturi.length > 0 && (
+        <div class="eventi-grid">
+          {eventiFuturi.map((evento) => (
+          <article class="evento-card">
+            {evento.image && (
+              <div class="evento-card__image">
+                <img
+                  src={evento.image}
+                  alt={evento.title}
+                  loading="lazy"
+                  decoding="async"
+                />
+              </div>
+            )}
+
+            <div class="evento-card__body">
+              <h3>{evento.title}</h3>
+
+              {evento.date && (
+                <p class="evento-card__meta">
+                  {format(
+                    evento.date,
+                    "EEEE d MMMM yyyy 'alle' HH:mm",
+                    { locale: it }
+                  )}
+                  {evento.place && ` · ${evento.place}`}
+                </p>
+              )}
+
+              {evento.descriptionText && (
+                <p class="evento-card__description">
+                  {evento.descriptionText.length > 200
+                    ? evento.descriptionText.slice(0, 200) + '…'
+                    : evento.descriptionText}
+                </p>
+              )}
+
+              {evento.href && (
+                <div class="evento-card__actions">
+                  <Button href={evento.href} unelevated>
+                    Dettagli
+                  </Button>
+                </div>
+              )}
+            </div>
+          </article>
+          ))}
+        </div>
+      )}
+    </section>
+
+    <section class="blog-posts-list__section blog-posts-list__section--past">
+      <h2>Eventi passati</h2>
+
+      {eventiPassati.length === 0 && (
+        <p>Non ci sono ancora eventi passati.</p>
+      )}
+
+      {eventiPassati.length > 0 && (
+        <div class="eventi-grid">
+          {eventiPassati.map((evento) => (
+            <article class="evento-card evento-card--past">
+              <div class="evento-card__body">
+                <h3>{evento.title}</h3>
+
+                {evento.date && (
+                  <p class="evento-card__meta">
+                    {format(
+                      evento.date,
+                      "EEEE d MMMM yyyy",
+                      { locale: it }
+                    )}
+                    {evento.place && ` · ${evento.place}`}
+                  </p>
+                )}
+
+                {evento.description && (
+                  <p class="evento-card__description">
+                    {evento.description.length > 220
+                      ? evento.description.slice(0, 220) + '…'
+                      : evento.description}
+                  </p>
+                )}
+
+                {evento.href && (
+                  <div class="evento-card__actions">
+                    <Button href={evento.href} outlined>
+                      Dettagli
+                    </Button>
+                  </div>
+                )}
+              </div>
+            </article>
+          ))}
+        </div>
+      )}
+    </section>
+  </Container>
+</Layout>
+
+<style>
+    .blog-posts-list__section--past {
+    margin-top: 3rem;
+    }
+
+    .evento-card--past {
+    opacity: 0.7;
+    }
+
+  .blog-posts-list__section {
+    margin: var(--section-margin) auto;
+  }
+
+  .eventi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 1.5rem;
+    margin-top: 1.5rem;
+  }
+
+  .evento-card {
+    background: var(--theme-surface-1, #fff);
+    color: var(--theme-on-surface-1, inherit);
+    border-radius: var(--theme-shape-radius);
+    box-shadow: var(--theme-elevation-1);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .evento-card__image img {
+    display: block;
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+  }
+
+  .evento-card__body {
+    padding: 1.25rem 1.5rem 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    height: 100%;
+  }
+
+  .evento-card__meta {
+    font-size: 0.9rem;
+    color: var(--theme-on-surface-2);
+  }
+
+  .evento-card__description {
+    font-size: 0.95rem;
+    color: var(--theme-on-surface-1);
+    flex-grow: 1;
+  }
+
+  .evento-card__actions {
+    margin-top: 1rem;
+  }
+
+  .evento-card__image img {
+    display: block;
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+  }
+</style>

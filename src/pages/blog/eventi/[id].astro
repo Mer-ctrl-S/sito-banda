@@ -1,0 +1,223 @@
+---
+import Layout from '../../../layouts/Page.astro';
+import { Container, Button } from '@components/odyssey-theme';
+import { format } from 'date-fns';
+import { it } from 'date-fns/locale';
+
+import {
+  WINDDOC_URL,
+  TOKEN_APP,
+  TOKEN_KEY,
+  toFormUrlEncoded,
+} from '../../../lib/winddoc';
+
+// 1) getStaticPaths: genera le route /blog/eventi/[id_associazione_evento]
+export async function getStaticPaths() {
+  const bodyLista = {
+    method: 'associazioni_eventi_lista',
+    request: {
+      token_key: {
+        token: TOKEN_KEY,
+        token_app: TOKEN_APP,
+      },
+      // niente query qui → prende tutti gli eventi
+      pagina: 1,
+    },
+  };
+
+  const res = await fetch(WINDDOC_URL, {
+    method: 'POST',
+    headers: {
+      Accept: 'application/json',
+      'Content-Type': 'application/x-www-form-urlencoded',
+    },
+    body: toFormUrlEncoded(bodyLista),
+  });
+
+  if (!res.ok) {
+    throw new Error(
+      `Errore richiesta WindDoc lista (getStaticPaths): ${res.status}`
+    );
+  }
+
+  const data = await res.json();
+  const lista =
+    data && data.success && Array.isArray(data.lista) ? data.lista : [];
+
+  const paths = lista
+    .map((evento: any) => {
+      const id = evento.id_associazione_evento?.toString();
+      if (!id) return null;
+      return { params: { id } };
+    })
+    .filter(Boolean);
+
+  console.log('[getStaticPaths] paths generati:', paths);
+  return paths;
+}
+
+// 2) frontmatter: usa Astro.params.id per chiamare il DETTAGLIO
+const { id } = Astro.params;
+
+async function fetchEventoDettaglio(id: string) {
+  const bodyObj = {
+    method: 'associazioni_eventi_dettaglio',
+    request: {
+      token_key: {
+        token: TOKEN_KEY,
+        token_app: TOKEN_APP,
+      },
+      id,
+    },
+  };
+
+  const res = await fetch(WINDDOC_URL, {
+    method: 'POST',
+    headers: {
+      Accept: 'application/json',
+      'Content-Type': 'application/x-www-form-urlencoded',
+    },
+    body: toFormUrlEncoded(bodyObj),
+  });
+
+  if (!res.ok) {
+    throw new Error(`Errore richiesta WindDoc dettaglio: ${res.status}`);
+  }
+
+  const data = await res.json();
+  return data;
+}
+
+let eventoDettaglio: any = null;
+
+try {
+  const data = await fetchEventoDettaglio(id);
+  console.log('[WindDoc dettaglio] payload:', data);
+
+  // ✅ il dettaglio è l'oggetto stesso, senza data.success
+  eventoDettaglio = data;
+} catch (err) {
+  console.error('[WindDoc dettaglio] errore:', err);
+}
+
+if (!eventoDettaglio) {
+  eventoDettaglio = {
+    id_associazione_evento: id,
+    nome: 'Evento non trovato',
+    descrizione: '',
+    indirizzo: '',
+    data_evento: null,
+  };
+}
+
+const titolo =
+  eventoDettaglio.nome ?? eventoDettaglio.titolo ?? 'Evento senza titolo';
+const descrizione = eventoDettaglio.descrizione ?? '';
+const luogo = eventoDettaglio.indirizzo ?? '';
+const rawDate = eventoDettaglio.data_evento;
+const dateObj = rawDate ? new Date(rawDate) : null;
+
+// nessun campo immagine al momento
+const image = null;
+
+const seo = {
+  title: `${titolo} | Evento`,
+  description:
+    descrizione
+      ? descrizione.slice(0, 150) + (descrizione.length > 150 ? '…' : '')
+      : `Dettaglio evento ${titolo}`,
+};
+---
+
+<Layout {seo}>
+  <Container>
+    <section class="evento-dettaglio">
+      <header class="evento-dettaglio__header">
+        <Button href="/blog" outlined>
+          ← Torna al blog
+        </Button>
+
+        <h1>{titolo}</h1>
+
+        {dateObj && (
+          <p class="evento-dettaglio__meta">
+            {format(
+              dateObj,
+              "EEEE d MMMM yyyy",
+              { locale: it }
+            )}
+            {luogo && ` · ${luogo}`}
+          </p>
+        )}
+
+        {!dateObj && (luogo || id) && (
+          <p class="evento-dettaglio__meta">
+            {luogo && luogo}
+            {id && !luogo && `ID evento: ${id}`}
+          </p>
+        )}
+      </header>
+
+      {image && (
+        <div class="evento-dettaglio__image">
+          <img src={image} alt={titolo} loading="lazy" decoding="async" />
+        </div>
+      )}
+
+      {descrizione && (
+        <div class="evento-dettaglio__content">
+          <h2>Descrizione</h2>
+          <div
+            class="evento-dettaglio__description"
+            set:html={descrizione}
+          />
+        </div>
+      )}
+    </section>
+  </Container>
+</Layout>
+
+<style>
+  .evento-dettaglio {
+    margin: var(--section-margin) auto;
+    max-width: 768px;
+  }
+
+  .evento-dettaglio__header {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .evento-dettaglio__meta {
+    font-size: 0.95rem;
+    color: var(--theme-on-surface-2);
+  }
+
+  .evento-dettaglio__image {
+    margin: 1.5rem 0;
+    border-radius: var(--theme-shape-radius);
+    overflow: hidden;
+    box-shadow: var(--theme-elevation-1);
+  }
+
+  .evento-dettaglio__image img {
+    display: block;
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+  }
+
+  .evento-dettaglio__content {
+    margin-top: 1rem;
+  }
+
+  .evento-dettaglio__content h2 {
+    margin-bottom: 0.5rem;
+  }
+
+  .evento-dettaglio__content p {
+    line-height: 1.6;
+  }
+</style>

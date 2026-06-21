@@ -1,0 +1,70 @@
+export const footerSocials = [
+	{
+		name: 'Instagram',
+		url: 'https://instagram.com/banda.castelcovati',
+		icon: 'mdi:instagram',
+	},
+	{
+		name: 'Facebook',
+		url: 'https://facebook.com/share/18VJaa2uSm',
+		icon: 'mdi:facebook',
+	},
+];
+
+export const footerLists = [
+	// {
+	// 	title: 'Landing Pages',
+	// 	items: [
+	// 		{
+	// 			title: 'Landing Page 1',
+	// 			slug: '/landing-pages/landing-1',
+	// 		},
+	// 		{
+	// 			title: 'Landing Page 2',
+	// 			slug: '/landing-pages/landing-2',
+	// 		},
+	// 		// {
+	// 		// 	title: 'Landing Page 3',
+	// 		// 	slug: '/landing-pages/landing-3',
+	// 		// },
+	// 	],
+	// },
+	{
+		title: 'La Banda',
+		items: [
+			{
+				title: 'Chi siamo',
+				slug: '/company/about',
+			},
+			{
+				title: 'Blog',
+				slug: '/blog',
+			},
+			{
+				title: 'Contatti',
+				slug: '/company/contact',
+			},
+		],
+	},
+	{
+		title: 'Theme',
+		items: [
+			{
+				title: 'Get Started',
+				slug: '/theme/get-started',
+			},
+			{
+				title: 'Style Guide',
+				slug: '/theme/style-guide',
+			},
+			{
+				title: 'Theme Setup',
+				slug: '/theme/theme-setup',
+			},
+			{
+				title: 'Customizing Odyssey',
+				slug: '/theme/customizing-odyssey',
+			},
+		],
+	},
+];

@@ -1,0 +1,130 @@
+---
+import { Icon } from 'astro-icon/components';
+import {
+	AnnouncementBar,
+	Button,
+	CustomerQuoteSection,
+	ThreeColumnTextSection,
+	YouTubeEmbedSection,
+	StickyTextImageSection,
+	CtaCardSection,
+} from '@components/odyssey-theme';
+import Layout from '../layouts/Page.astro';
+import TextAndImageHero from '../components/sections/heros/TextAndImageHero.astro';
+import HeroSlider from '../components/sections/heros/HeroSlider.astro';
+
+const seo = {
+	title: 'Landing Page | Corpo Bandistico di Castelcovati',
+	description:
+		'Landing Page | Corpo Bandistico di Castelcovati pagina di benvenuto',
+};
+
+const heroImages = [
+	{
+		src: '/assets/images/home/banda-hero.webp',
+		alt: 'Banda hero 1',
+	},
+	{
+		src: '/assets/images/home/HERO-IMG1.jpg',
+		alt: 'Banda Hero 2 - foto storica',
+	},
+	{
+		src: '/assets/images/home/HERO-IMG2.jpg',
+		alt: 'Banda Hero 3 - foto storica',
+	},
+	{
+		src: '/assets/images/home/HERO-IMG3.jpg',
+		alt: 'Banda Hero 4',
+	},
+	{
+		src: '/assets/images/home/HERO-IMG4.jpg',
+		alt: 'Hero 2',
+	},
+	{
+		src: '/assets/images/home/HERO-IMG5.jpeg',
+		alt: 'Hero 2',
+	},
+	{
+		src: '/assets/images/home/HERO-IMG6.jpg',
+		alt: 'Hero 2',
+	},
+	{
+		src: '/assets/images/home/HERO-IMG7.jpg',
+		alt: 'Hero 2',
+	},
+];
+---
+
+<AnnouncementBar
+	text="Non perderti i nostri eventi. Visita il Blog!"
+	href="/blog/"
+	slot="announcement-bar"
+/>
+
+<Layout {seo}>
+	<TextAndImageHero reversed>
+		<div slot="text-container">
+			<h1>La musica per tutti!</h1>
+			<p>
+				Entra a far parte della nostra grande famiglia, composta da grandi e
+				piccini!
+			</p>
+		</div>
+
+		<div slot="btns-container">
+			<Button href="/theme/get-started" customIcon>
+				Maggiori informazioni
+				<Icon slot="icon" name="ic:baseline-chevron-right" />
+			</Button>
+		</div>
+
+		<HeroSlider slot="image-container" images={heroImages} interval={10000} />
+	</TextAndImageHero>
+
+	<CustomerQuoteSection
+		quoteText="A volte, qualcuno sostiene amaramente, la gente avverte la funzione della banda solo quando manca, come succede per le persone il cui affetto si dà per scontato per lunga consuetudine, e poi, quando ci lasciano, ci consegnano a una incolmabile solitudine. Non cadiamo in questo pericolo: sosteniamo con costanza la nostra banda con lo stimolo, ai nostri giovani, perché si formino musicalmente e ne facciano parte."
+		customerName="Giuliano Gritti"
+	/>
+
+	<ThreeColumnTextSection>
+		<div slot="column-1-body">
+			<h2>Perchè?</h2>
+			<p>
+				Se ti piace la musica o hai sempre desiderato provare a suonare uno
+				strumento. Il Corpo Bandistico di Castelcovati è una grande famiglia,
+				c'è posto anche per te.
+			</p>
+		</div>
+		<Button slot="column-1-cta">Scopri i nostri corsi</Button>
+
+		<div slot="column-2-body">
+			<h2>Come?</h2>
+			<p>
+				Ti basta compilare il form online e potrai diventare socio, neanche il
+				tempo di un caffè!
+			</p>
+			<p>
+				In alternativa passa a trovarci presso la nostra sede, ti aspettiamo!
+			</p>
+		</div>
+		<Button slot="column-2-cta" outlined>Vai al form</Button>
+
+		<div slot="column-3-body">
+			<h2>Cosa mi serve?</h2>
+			<p>Tanta voglia di imparare qualcosa di nuovo, ma senza stress!</p>
+		</div>
+		<Button slot="column-3-cta">Maggiori informazioni</Button>
+	</ThreeColumnTextSection>
+
+	<CtaCardSection
+		background="var(--theme-surface-2)"
+		color="var(--theme-on-surface-2)"
+	>
+		<h2>Non indugiare oltre</h2>
+		<p>Con pochi click puoi diventare socio</p>
+		<Button href="/theme/get-started" customIcon>
+			Iscriviti
+			<Icon slot="icon" name="ic:baseline-chevron-right" />
+		</Button>
+	</CtaCardSection>
+</Layout>

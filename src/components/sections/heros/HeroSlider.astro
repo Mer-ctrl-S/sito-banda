@@ -1,0 +1,112 @@
+---
+import { Container, Button } from '@components/odyssey-theme';
+import { Icon } from 'astro-icon/components';
+import settings from '../../../config/settings.js';
+import { ThemeSwitcher } from '../../theme-switcher/theme-switcher';
+
+interface HeroImage {
+  src: string;
+  alt?: string;
+}
+
+interface Props {
+  images?: HeroImage[];
+  interval?: number;
+}
+
+const {
+  images = [
+    {
+      src: '/assets/images/home/classic-hero.jpg',
+      alt: 'Astro Odyssey',
+    },
+  ],
+  interval = 10000,
+} = Astro.props;
+---
+
+<div
+  class="hero-section__image"
+  data-hero-slider
+  data-interval={interval}
+>
+  {images.map((image, index) => (
+    <picture class={`hero-slide ${index === 0 ? 'is-active' : ''}`}>
+      <img
+        src={image.src}
+        alt={image.alt ?? 'Hero image'}
+        loading={index === 0 ? 'eager' : 'lazy'}
+        decoding="async"
+      />
+    </picture>
+  ))}
+</div>
+
+<script>
+  const sliders = document.querySelectorAll('[data-hero-slider]');
+
+  sliders.forEach((slider) => {
+    const slides = slider.querySelectorAll('.hero-slide');
+
+    if (slides.length <= 1) return;
+
+    const interval =
+      Number(slider.getAttribute('data-interval')) || 10000;
+
+    let currentIndex = 0;
+
+    setInterval(() => {
+      slides[currentIndex].classList.remove('is-active');
+
+      currentIndex = (currentIndex + 1) % slides.length;
+
+      slides[currentIndex].classList.add('is-active');
+    }, interval);
+  });
+</script>
+
+<style>
+  .hero-section__image {
+    position: relative;
+    width: 100%;
+    min-height: 500px;
+    border-radius: var(--theme-shape-radius);
+    overflow: hidden;
+  }
+
+  .hero-slide {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    transform: scale(1.02);
+    transition:
+      opacity 1s ease,
+      transform 1.2s ease;
+    pointer-events: none;
+  }
+
+  .hero-slide.is-active {
+    opacity: 1;
+    transform: scale(1);
+    z-index: 1;
+  }
+
+  .hero-slide img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    max-height: 80vh;
+    object-fit: cover;
+    border-radius: var(--theme-shape-radius);
+  }
+
+  @media (max-width: 768px) {
+    .hero-section__image {
+      min-height: 320px;
+    }
+
+    .hero-slide img {
+      max-height: 50vh;
+    }
+  }
+</style>

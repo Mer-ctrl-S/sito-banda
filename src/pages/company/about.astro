@@ -1,0 +1,79 @@
+---
+import { TextSection } from '@components/odyssey-theme';
+import Layout from '../../layouts/Page.astro';
+import HeroSection from '../../components/sections/heros/HeroSection.astro';
+import VerticalTimeline from '../../components/VerticalTimeline/VerticalTimeline.astro';
+const seo = {
+	title: 'About | Astro Odyssey Theme',
+	description: 'About Page',
+};
+const timelineItems = [
+	{
+		date: '06-2026',
+		title: 'Entrata nel R.U.N.T.S',
+		content:
+			"Come richiesto dalle recenti modifiche normative, il Consiglio Direttivo ha ufficialmente iscritto l'associazione al Registro Unico Nazionale per gli Enti del Terzo Settore",
+	},
+	{
+		date: '04-2026',
+		title: 'Modifiche Statutarie',
+		content:
+			"Il 2026 è un anno di stravolgimenti per l'associazione. Per questo per il Consiglio Direttivo ha convocato un Consiglio straordinario dei Soci per approvare importanti modifiche statutarie richieste dalle recenti norme introdotte.",
+	},
+	{
+		date: '2023',
+		title: 'Team Expansion',
+		content:
+			'Grew the team from 3 to 15 members, adding developers, designers, and product managers.',
+		image: '/images/team.jpg',
+		imageAlt: 'Team photo',
+	},
+	{
+		date: '2022',
+		title: 'Company Founded',
+		content:
+			'Started the company in a small garage with big dreams and a laptop.',
+		// No image for this entry (optional)
+	},
+	{
+		date: '2021',
+		title: 'Initial Idea',
+		content: 'The concept was born during a hackathon weekend.',
+	},
+	{
+		date: '1985',
+		title: 'Fondazione',
+		content:
+			'Fondazione del Corpo Bandistico di Castelcovati per volontà del parroco Don Lino Toninelli. Direzione iniziale del Maestro L. Chiari.',
+		image: '/assets/images/donL.jpg',
+	},
+];
+---
+
+<Layout {seo}>
+	<HeroSection>
+		<div slot="text-container">
+			<h1>Corpo Bandistico di Castelcovati</h1>
+			<p>
+				Il Corpo Bandistico di Castelcovati, è un'associazione di promozione
+				sociale, iscritta ufficialmente al R.U.N.T.S. da giugno 2026, operante
+				sul territorio di Castelcovati e nei comuni limitrofi. L'associazione è
+				formata da un gruppo di persone volenterose che dedicano il proprio
+				tempo alla promozione musicale. Da diversi anni è attiva una
+				collaborzione con l'Amministrazione Comunale e con la scuola locale per
+				la realizzazione di un progetto a tema musicale presso la scuola
+				elementare.
+			</p>
+		</div>
+		<picture slot="image-container">
+			<img
+				src="/assets/images/banda-hero.webp"
+				alt="Astro Odyssee"
+				id="home-hero-image"
+			/>
+		</picture>
+	</HeroSection>
+	<TextSection narrow>
+		<VerticalTimeline items={timelineItems} />
+	</TextSection>
+</Layout>
