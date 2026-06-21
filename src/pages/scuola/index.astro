@@ -1,0 +1,240 @@
+---
+import { Container, Button, CustomerQuoteSection, CtaCardSection, ThreeColumnTextSection } from '@components/odyssey-theme';
+import Layout from '../../layouts/Page.astro';
+import TextAndImageHero from '../../components/sections/heros/TextAndImageHero.astro';
+import HeroSlider from '../../components/sections/heros/HeroSlider.astro';
+import RotatingCustomerQuotes from '../../components/sections/RotatingCustomerQuotes.astro';
+
+const quotes = [
+  {
+    text: 'La musica mi ha dato la possibilità di fare nuove amicizie',
+    name: 'Giulia F.',
+  },
+  {
+    text: 'La musica è espressione di sé. Suonare insieme è il modo più bello per condividerla',
+    name: 'Luca B.',
+  },
+  {
+    text: 'Suonare, la cosa migliore che potessi imparare',
+    name: 'Gaia R.',
+  },
+  {
+    text:"Le percussioni sono i migliori strumenti",
+    name: "Libero F.",
+  },
+  {
+    text:"Suonare con le altre persone mi fa viaggiare con la mente distogliendomi da tutti i pensieri",
+    name:'Matteo S.',
+  },
+  {
+    text: 'Suonare uno strumento è come dare voce alle proprie emozioni liberando la mente',
+    name: 'Efrem R.',
+  },
+];
+
+const seo = {
+  title: 'Scuola | Corpo Bandistico di Castelcovati',
+  description:
+    'La scuola di musica del Corpo Bandistico di Castelcovati',
+};
+
+// riuso ESATTO del blocco heroImages della home
+const heroImages = [
+  {
+    src: '/assets/images/home/banda-hero.webp',
+    alt: 'Banda hero 1',
+  },
+  {
+    src: '/assets/images/home/HERO-IMG1.jpg',
+    alt: 'Banda Hero 2 - foto storica',
+  },
+  {
+    src: '/assets/images/home/HERO-IMG2.jpg',
+    alt: 'Banda Hero 3 - foto storica',
+  },
+  {
+    src: '/assets/images/home/HERO-IMG3.jpg',
+    alt: 'Banda Hero 4',
+  },
+  {
+    src: '/assets/images/home/HERO-IMG4.jpg',
+    alt: 'Hero 2',
+  },
+  {
+    src: '/assets/images/home/HERO-IMG5.jpeg',
+    alt: 'Hero 2',
+  },
+  {
+    src: '/assets/images/home/HERO-IMG6.jpg',
+    alt: 'Hero 2',
+  },
+  {
+    src: '/assets/images/home/HERO-IMG7.jpg',
+    alt: 'Hero 2',
+  },
+];
+
+// Per ora metto un array statico di esempio.
+// In seguito puoi caricarlo da JSON/API o da file CSV.
+---
+
+<Layout {seo}>
+  <TextAndImageHero reversed>
+    <div slot="text-container">
+      <h1>La scuola</h1>
+      <p>
+          Una seplice <strong>MISSION</strong>: Offrire percorsi musicali per ogni età e livello, coniugando qualità, umanità e innovazione educativa.
+          <br></br>
+          Tutti i soci partecipano al raggiongimento di questo obiettivo, con lo scopo finale di essere un punto di riferimento culturale che trasforma la passione per la musica in crescita personale e comunitaria.
+      </p>
+    </div>
+
+    <div slot="btns-container">
+      <Button href="/scuola/corsi" outlined>
+          Scopri i nostri corsi
+      </Button>
+    </div>
+
+    <HeroSlider slot="image-container" images={heroImages} interval={10000} />
+  </TextAndImageHero>
+
+  <Container>
+      <h2>La nostra storia</h2>
+      <p>Nel <strong>1989</strong>, il Corpo Bandistico di Castelcovati – <italic>in accordo con gli enti locali</italic> – ha istituito l'<strong>Accademia Musicale di Castelcovati</strong> per rispondere alle esigenze didattiche emergenti nell'educazione musicale dei suoi allievi. Il progetto, ambizioso e innovativo per quel periodo, ha introdotto per la prima volta l'insegnamento individualizzato degli strumenti musicali della banda, affidato a insegnanti diplomati al Conservatorio con specifiche competenze strumentali.<br></br>
+
+          Negli anni di attività, l'Accademia ha formato <strong>diverse centinaia di alunni</strong>, principalmente tra i 7 e i 20 anni di età, con la presenza anche di studenti adulti che continuano a frequentare i corsi tuttora.
+          <br></br>
+          Nel suo percorso, la scuola ha affrontato diverse sfide, ultima tra queste la pandemia COVID. Nonostante le restrizioni, l'Accademia ha mantenuto la sua attività didattica, introducendo lezioni adattate per rispettare i regolamenti vigenti e garantendo così la continuità dell'educazione musicale ai suoi allievi.</p>
+  </Container>
+  <RotatingCustomerQuotes quotes={quotes} interval={4000} />
+
+  <Container>
+      <h2>I nostri valori</h2>
+      <CtaCardSection
+		background="var(--theme-surface-2)"
+		color="var(--theme-on-surface-2)"
+		>
+    	<ThreeColumnTextSection>
+    		<div slot="column-1-body">
+    			<h3>Crescita</h3>
+    			<p>Accompagnamo ogni allievo in un percorso personale e condiviso di miglioramento.</p>
+    		</div>
+
+    		<div slot="column-2-body">
+    			<h3>Espressività</h3>
+    			<p>
+    			Favoriamo l’espressione di sé attraverso la musica, in tutte le sue forme.
+    			</p>
+    		</div>
+
+    		<div slot="column-3-body">
+    			<h3>Relazione</h3>
+    			<p>
+    			Crediamo nella forza del gruppo e nella comunità musicale che si crea.
+    			</p>
+    		</div>
+    	</ThreeColumnTextSection>
+	</CtaCardSection>
+
+	<h2>Competenza alla base di tutto</h2>
+            <ThreeColumnTextSection>
+              		<div slot="column-1-body">
+                    <CtaCardSection
+              		background="var(--theme-surface-1)"
+              		color="var(--theme-on-surface-1)"
+              		>
+              			<h3>Insegnanti</h3>
+                        <p>Qualificati e professionisti del settore</p>
+                    </CtaCardSection>
+              		</div>
+              		<div slot="column-2-body">
+                    <CtaCardSection
+              		background="var(--theme-surface-2)"
+              		color="var(--theme-on-surface-2)"
+              		>
+              			<h3>Metodi</h3>
+                        <p>Aggiornati e rivisti annualmente</p>
+                    </CtaCardSection>
+              		</div>
+
+              		<div slot="column-3-body">
+                    <CtaCardSection
+              		background="var(--theme-surface-1)"
+              		color="var(--theme-on-surface-1)"
+              		>
+              			<h3>Obiettivi</h3>
+                 <p>Chiari e definiti anno per anno</p>
+                    </CtaCardSection>
+              		</div>
+           	</ThreeColumnTextSection>
+  </Container>
+</Layout>
+
+<style>
+  .trasparenza {
+    margin: var(--section-margin) auto;
+  }
+
+  .trasparenza__header {
+    margin-bottom: 1.5rem;
+    max-width: 56rem;
+  }
+
+  .trasparenza__header h2 {
+    margin-bottom: 0.5rem;
+  }
+
+  .trasparenza__header p {
+    color: var(--theme-on-surface-2);
+    line-height: 1.6;
+  }
+
+  .trasparenza__table-wrapper {
+    margin-top: 1rem;
+    border-radius: var(--theme-shape-radius);
+    background: var(--theme-surface-1);
+    box-shadow: var(--theme-elevation-1);
+    padding: 1rem 1.25rem;
+    overflow-x: auto; /* per mobile */
+  }
+
+  .trasparenza__table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.95rem;
+  }
+
+  .trasparenza__table thead {
+    background: var(--theme-surface-2);
+  }
+
+  .trasparenza__table th,
+  .trasparenza__table td {
+    padding: 0.5rem 0.75rem;
+    text-align: left;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  }
+
+  .trasparenza__table th {
+    font-weight: 600;
+    white-space: nowrap;
+  }
+
+  .trasparenza__table tbody tr:nth-child(even) {
+    background: rgba(0, 0, 0, 0.02);
+  }
+
+  .trasparenza__note {
+    margin-top: 0.75rem;
+    font-size: 0.9rem;
+    color: var(--theme-on-surface-2);
+  }
+
+  @media (max-width: 768px) {
+    .trasparenza__table th,
+    .trasparenza__table td {
+      padding: 0.4rem 0.5rem;
+      font-size: 0.9rem;
+    }
+  }
+</style>

@@ -1,0 +1,212 @@
+---
+import { Container, Button } from '@components/odyssey-theme';
+import Layout from '../../layouts/Page.astro';
+import TextAndImageHero from '../../components/sections/heros/TextAndImageHero.astro';
+import HeroSlider from '../../components/sections/heros/HeroSlider.astro';
+
+const seo = {
+  title: 'Trasparenza | Corpo Bandistico di Castelcovati',
+  description:
+    'Elenco dei contributi e finanziamenti pubblici ricevuti dal Corpo Bandistico di Castelcovati, ai sensi della normativa sulla trasparenza.',
+};
+
+// riuso ESATTO del blocco heroImages della home
+const heroImages = [
+  {
+    src: '/assets/images/home/banda-hero.webp',
+    alt: 'Banda hero 1',
+  },
+  {
+    src: '/assets/images/home/HERO-IMG1.jpg',
+    alt: 'Banda Hero 2 - foto storica',
+  },
+  {
+    src: '/assets/images/home/HERO-IMG2.jpg',
+    alt: 'Banda Hero 3 - foto storica',
+  },
+  {
+    src: '/assets/images/home/HERO-IMG3.jpg',
+    alt: 'Banda Hero 4',
+  },
+  {
+    src: '/assets/images/home/HERO-IMG4.jpg',
+    alt: 'Hero 2',
+  },
+  {
+    src: '/assets/images/home/HERO-IMG5.jpeg',
+    alt: 'Hero 2',
+  },
+  {
+    src: '/assets/images/home/HERO-IMG6.jpg',
+    alt: 'Hero 2',
+  },
+  {
+    src: '/assets/images/home/HERO-IMG7.jpg',
+    alt: 'Hero 2',
+  },
+];
+
+// Per ora metto un array statico di esempio.
+// In seguito puoi caricarlo da JSON/API o da file CSV.
+const contributiPubblici = [
+  {
+    anno: 2024,
+    enteErogante: 'Comune di Castelcovati',
+    causale: 'Contributo annuale attività musicale',
+    importo: 3000.0,
+    dataIncasso: '2024-03-15',
+    estremiAtto: 'Delibera n. 12 del 10/03/2024',
+  },
+  {
+    anno: 2024,
+    enteErogante: 'Regione Lombardia',
+    causale: 'Bando cultura per bande musicali',
+    importo: 5000.0,
+    dataIncasso: '2024-07-20',
+    estremiAtto: 'Decreto n. 1234 del 30/06/2024',
+  },
+];
+---
+
+<Layout {seo}>
+  <TextAndImageHero reversed>
+    <div slot="text-container">
+      <h1>Trasparenza</h1>
+      <p>
+        In questa pagina pubblichiamo i contributi e i finanziamenti pubblici
+        ricevuti dal Corpo Bandistico di Castelcovati, in ottemperanza agli
+        obblighi di trasparenza e pubblicità.
+      </p>
+    </div>
+
+    <div slot="btns-container">
+      <Button href="/company/about" outlined>
+        Chi siamo
+      </Button>
+    </div>
+
+    <HeroSlider slot="image-container" images={heroImages} interval={10000} />
+  </TextAndImageHero>
+
+  <Container>
+    <section class="trasparenza">
+      <header class="trasparenza__header">
+        <h2>Contributi e finanziamenti pubblici</h2>
+        <p>
+          Di seguito sono riportate le informazioni relative a sovvenzioni,
+          contributi, incarichi retribuiti e comunque vantaggi economici di
+          qualunque genere ricevuti da pubbliche amministrazioni e soggetti
+          assimilati.
+        </p>
+      </header>
+
+      <div class="trasparenza__table-wrapper">
+        <table class="trasparenza__table">
+          <thead>
+            <tr>
+              <th>Anno</th>
+              <th>Ente erogante</th>
+              <th>Causale</th>
+              <th>Importo</th>
+              <th>Data incasso</th>
+              <th>Estremi atto</th>
+            </tr>
+          </thead>
+          <tbody>
+            {contributiPubblici.map((riga) => (
+              <tr>
+                <td>{riga.anno}</td>
+                <td>{riga.enteErogante}</td>
+                <td>{riga.causale}</td>
+                <td>
+                  {riga.importo.toLocaleString('it-IT', {
+                    style: 'currency',
+                    currency: 'EUR',
+                  })}
+                </td>
+                <td>
+                  {new Date(riga.dataIncasso).toLocaleDateString('it-IT')}
+                </td>
+                <td>{riga.estremiAtto}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      <p class="trasparenza__note">
+        I dati sopra riportati sono aggiornati alla data indicata
+        nell&apos;ultimo bilancio approvato.
+      </p>
+    </section>
+  </Container>
+</Layout>
+
+<style>
+  .trasparenza {
+    margin: var(--section-margin) auto;
+  }
+
+  .trasparenza__header {
+    margin-bottom: 1.5rem;
+    max-width: 56rem;
+  }
+
+  .trasparenza__header h2 {
+    margin-bottom: 0.5rem;
+  }
+
+  .trasparenza__header p {
+    color: var(--theme-on-surface-2);
+    line-height: 1.6;
+  }
+
+  .trasparenza__table-wrapper {
+    margin-top: 1rem;
+    border-radius: var(--theme-shape-radius);
+    background: var(--theme-surface-1);
+    box-shadow: var(--theme-elevation-1);
+    padding: 1rem 1.25rem;
+    overflow-x: auto; /* per mobile */
+  }
+
+  .trasparenza__table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.95rem;
+  }
+
+  .trasparenza__table thead {
+    background: var(--theme-surface-2);
+  }
+
+  .trasparenza__table th,
+  .trasparenza__table td {
+    padding: 0.5rem 0.75rem;
+    text-align: left;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  }
+
+  .trasparenza__table th {
+    font-weight: 600;
+    white-space: nowrap;
+  }
+
+  .trasparenza__table tbody tr:nth-child(even) {
+    background: rgba(0, 0, 0, 0.02);
+  }
+
+  .trasparenza__note {
+    margin-top: 0.75rem;
+    font-size: 0.9rem;
+    color: var(--theme-on-surface-2);
+  }
+
+  @media (max-width: 768px) {
+    .trasparenza__table th,
+    .trasparenza__table td {
+      padding: 0.4rem 0.5rem;
+      font-size: 0.9rem;
+    }
+  }
+</style>

@@ -41,29 +41,29 @@ export const footerLists = [
 				slug: '/blog',
 			},
 			{
+				title: 'I nostri corsi',
+				slug: '/scuola/corsi',
+			},
+			{
+				title: 'La scuola',
+				slug: '/scuola',
+			},
+			{
 				title: 'Contatti',
 				slug: '/company/contact',
 			},
 		],
 	},
 	{
-		title: 'Theme',
+		title: 'Terzo settore',
 		items: [
 			{
-				title: 'Get Started',
-				slug: '/theme/get-started',
+				title: 'Trasparenza',
+				slug: '/trasparenza',
 			},
 			{
-				title: 'Style Guide',
+				title: '5 per mille',
 				slug: '/theme/style-guide',
-			},
-			{
-				title: 'Theme Setup',
-				slug: '/theme/theme-setup',
-			},
-			{
-				title: 'Customizing Odyssey',
-				slug: '/theme/customizing-odyssey',
 			},
 		],
 	},

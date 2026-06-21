@@ -1,6 +1,6 @@
 ---
 import { format, isBefore } from 'date-fns';
-import { it } from 'date-fns/locale';
+import it from 'date-fns/locale/it/index.js';
 import {
   Container,
   TextCardSection,
@@ -8,6 +8,7 @@ import {
 } from '@components/odyssey-theme';
 import Layout from '../../layouts/Page.astro';
 import NewsletterForm from '../../components/forms/NewsletterForm.astro';
+import HeroSection from '../../components/sections/heros/HeroSection.astro';
 
 import {
   WINDDOC_URL,
@@ -73,8 +74,12 @@ const eventiRaw = eventiLista.map((evento) => {
   const rawDate = evento.data_evento;
   const dateObj = rawDate ? new Date(rawDate) : null;
 
-  // TODO: qui mappiamo l'immagine se l'API la fornisce
-  const image = evento.immagine ?? evento.image ?? null;
+  const image =
+      evento.logo &&
+      typeof evento.logo === 'object' &&
+      'link' in evento.logo
+        ? (evento.logo as any).link
+        : null;
 
   return {
     id,
@@ -107,185 +112,218 @@ const seo = {
 ---
 
 <Layout {seo}>
-  <Container>
-    <TextCardSection>
+  <HeroSection>
+    <div slot="text-container">
       <h1>Eventi</h1>
       <p>
-        Qui trovi tutti gli eventi del Corpo Bandistico di Catelcovati
+        Scopri i prossimi appuntamenti del Corpo Bandistico di Castelcovati
+        e ripercorri gli eventi passati.
       </p>
-    </TextCardSection>
+    </div>
 
-    <section class="blog-posts-list__section">
-      <h2>Prossimi eventi</h2>
+    <div slot="image-container">
+      <img
+        src="assets/images/hero-event-list.jpeg"
+        alt="Concerto del Corpo Bandistico di Castelcovati"
+        loading="lazy"
+        decoding="async"
+      />
+    </div>
+  </HeroSection>
 
-      {eventiFuturi.length === 0 && (
-        <p>Al momento non ci sono eventi futuri.</p>
-      )}
-
+  <Container>
+    <section class="eventi-lista">
       {eventiFuturi.length > 0 && (
-        <div class="eventi-grid">
+        <>
+          <h2>Prossimi eventi</h2>
+
           {eventiFuturi.map((evento) => (
-          <article class="evento-card">
-            {evento.image && (
-              <div class="evento-card__image">
-                <img
-                  src={evento.image}
-                  alt={evento.title}
-                  loading="lazy"
-                  decoding="async"
-                />
-              </div>
-            )}
-
-            <div class="evento-card__body">
-              <h3>{evento.title}</h3>
-
-              {evento.date && (
-                <p class="evento-card__meta">
-                  {format(
-                    evento.date,
-                    "EEEE d MMMM yyyy 'alle' HH:mm",
-                    { locale: it }
-                  )}
-                  {evento.place && ` · ${evento.place}`}
-                </p>
-              )}
-
-              {evento.descriptionText && (
-                <p class="evento-card__description">
-                  {evento.descriptionText.length > 200
-                    ? evento.descriptionText.slice(0, 200) + '…'
-                    : evento.descriptionText}
-                </p>
-              )}
-
-              {evento.href && (
-                <div class="evento-card__actions">
-                  <Button href={evento.href} unelevated>
-                    Dettagli
-                  </Button>
-                </div>
-              )}
-            </div>
-          </article>
-          ))}
-        </div>
-      )}
-    </section>
-
-    <section class="blog-posts-list__section blog-posts-list__section--past">
-      <h2>Eventi passati</h2>
-
-      {eventiPassati.length === 0 && (
-        <p>Non ci sono ancora eventi passati.</p>
-      )}
-
-      {eventiPassati.length > 0 && (
-        <div class="eventi-grid">
-          {eventiPassati.map((evento) => (
-            <article class="evento-card evento-card--past">
-              <div class="evento-card__body">
-                <h3>{evento.title}</h3>
-
-                {evento.date && (
-                  <p class="evento-card__meta">
-                    {format(
-                      evento.date,
-                      "EEEE d MMMM yyyy",
-                      { locale: it }
-                    )}
-                    {evento.place && ` · ${evento.place}`}
-                  </p>
-                )}
-
-                {evento.description && (
-                  <p class="evento-card__description">
-                    {evento.description.length > 220
-                      ? evento.description.slice(0, 220) + '…'
-                      : evento.description}
-                  </p>
-                )}
-
-                {evento.href && (
-                  <div class="evento-card__actions">
-                    <Button href={evento.href} outlined>
-                      Dettagli
-                    </Button>
+            <article class="evento-card">
+              <div class="evento-card__inner">
+                {evento.image && (
+                  <div class="evento-card__media">
+                    <img
+                      src={evento.image}
+                      alt={evento.title}
+                      loading="lazy"
+                      decoding="async"
+                    />
                   </div>
                 )}
+
+                <div class="evento-card__body">
+                  <h3 class="evento-card__title">{evento.title}</h3>
+
+                  {evento.date && (
+                    <p class="evento-card__meta">
+                      {format(
+                        evento.date,
+                        "EEEE d MMMM yyyy",
+                        { locale: it }
+                      )}
+                      {evento.place && ` · ${evento.place}`}
+                    </p>
+                  )}
+
+                  {evento.descriptionText && (
+                    <p class="evento-card__description">
+                      {evento.descriptionText.length > 200
+                        ? evento.descriptionText.slice(0, 200) + '…'
+                        : evento.descriptionText}
+                    </p>
+                  )}
+
+                  {evento.href && (
+                    <div class="evento-card__actions">
+                      <Button href={evento.href} outlined>
+                        Dettagli
+                      </Button>
+                    </div>
+                  )}
+                </div>
               </div>
             </article>
           ))}
-        </div>
+        </>
+      )}
+
+      {eventiPassati.length > 0 && (
+        <>
+          <h2>Eventi passati</h2>
+
+          {eventiPassati.map((evento) => (
+            <article class="evento-card">
+              <div class="evento-card__inner">
+                {evento.image && (
+                  <div class="evento-card__media">
+                    <img
+                      src={evento.image}
+                      alt={evento.title}
+                      loading="lazy"
+                      decoding="async"
+                    />
+                  </div>
+                )}
+
+                <div class="evento-card__body">
+                  <h3 class="evento-card__title">{evento.title}</h3>
+
+                  {evento.date && (
+                    <p class="evento-card__meta">
+                      {format(
+                        evento.date,
+                        "EEEE d MMMM yyyy",
+                        { locale: it }
+                      )}
+                      {evento.place && ` · ${evento.place}`}
+                    </p>
+                  )}
+
+                  {evento.descriptionText && (
+                    <p class="evento-card__description">
+                      {evento.descriptionText.length > 200
+                        ? evento.descriptionText.slice(0, 200) + '…'
+                        : evento.descriptionText}
+                    </p>
+                  )}
+
+                  {evento.href && (
+                    <div class="evento-card__actions">
+                      <Button href={evento.href} outlined>
+                        Dettagli
+                      </Button>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </article>
+          ))}
+        </>
       )}
     </section>
   </Container>
 </Layout>
 
 <style>
-    .blog-posts-list__section--past {
-    margin-top: 3rem;
-    }
+.evento-card {
+  border-radius: var(--theme-shape-radius);
+  background: var(--theme-surface);
+  box-shadow: var(--theme-elevation-1);
+  padding: 1.5rem;
+  margin: 0 0 1.5rem;
+}
 
-    .evento-card--past {
-    opacity: 0.7;
-    }
+.evento-card__inner {
+  display: flex;
+  gap: 1.5rem;
+}
 
-  .blog-posts-list__section {
-    margin: var(--section-margin) auto;
-  }
+/* colonna immagine */
+.evento-card__media {
+  flex: 0 0 180px;
+  max-width: 180px;
+  border-radius: var(--theme-shape-radius);
+  overflow: hidden;
+  align-self: flex-start;
+}
 
-  .eventi-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-    gap: 1.5rem;
-    margin-top: 1.5rem;
-  }
+.evento-card__media img {
+  display: block;
+  width: 100%;
+  height: 180px;
+  object-fit: cover;  /* usa contain se vuoi l'immagine intera */
+}
 
-  .evento-card {
-    background: var(--theme-surface-1, #fff);
-    color: var(--theme-on-surface-1, inherit);
-    border-radius: var(--theme-shape-radius);
-    box-shadow: var(--theme-elevation-1);
-    overflow: hidden;
-    display: flex;
+/* colonna testo */
+.evento-card__body {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.evento-card__title {
+  margin: 0;
+}
+
+.evento-card__meta {
+  font-size: 0.95rem;
+  color: var(--theme-on-surface-2);
+  margin: 0;
+}
+
+.evento-card__description {
+  margin: 0.25rem 0 0.75rem;
+}
+
+.evento-card__actions {
+  margin-top: auto;
+}
+
+/* Responsive */
+@media (max-width: 700px) {
+  .evento-card__inner {
     flex-direction: column;
   }
 
-  .evento-card__image img {
-    display: block;
+  .evento-card__media {
+    flex: 0 0 auto;
+    max-width: 100%;
+  }
+
+  .evento-card__media img {
     width: 100%;
-    height: 180px;
-    object-fit: cover;
+    height: auto;
+    object-fit: contain;
   }
+}
 
-  .evento-card__body {
-    padding: 1.25rem 1.5rem 1.5rem;
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-    height: 100%;
-  }
-
-  .evento-card__meta {
-    font-size: 0.9rem;
-    color: var(--theme-on-surface-2);
-  }
-
-  .evento-card__description {
-    font-size: 0.95rem;
-    color: var(--theme-on-surface-1);
-    flex-grow: 1;
-  }
-
-  .evento-card__actions {
-    margin-top: 1rem;
-  }
-
-  .evento-card__image img {
-    display: block;
-    width: 100%;
-    height: 180px;
-    object-fit: cover;
-  }
+.evento-card {
+  border-radius: var(--theme-shape-radius);
+  background: var(--theme-surface-1);       /* 👈 livello diverso dallo sfondo */
+  box-shadow: var(--theme-elevation-1);
+  padding: 1.5rem;
+  margin: 0 0 1.5rem;
+  border: 1px solid rgba(0, 0, 0, 0.03);    /* leggero bordo per staccare */
+}
 </style>

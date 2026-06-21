@@ -12,6 +12,10 @@ export const nav = [
 		slug: '/company/about',
 	},
 	{
+		title: 'La scuola',
+		slug: '/scuola',
+	},
+	{
 		title: 'Contatti',
 		slug: '/company/contact',
 	},

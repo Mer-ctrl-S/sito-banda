@@ -2,8 +2,7 @@
 import Layout from '../../../layouts/Page.astro';
 import { Container, Button } from '@components/odyssey-theme';
 import { format } from 'date-fns';
-import { it } from 'date-fns/locale';
-
+import it from 'date-fns/locale/it/index.js';
 import {
   WINDDOC_URL,
   TOKEN_APP,
@@ -13,6 +12,8 @@ import {
 
 // 1) getStaticPaths: genera le route /blog/eventi/[id_associazione_evento]
 export async function getStaticPaths() {
+  const modules = import.meta.glob('../../pages/jobs/*.md', { eager: true });
+
   const bodyLista = {
     method: 'associazioni_eventi_lista',
     request: {
@@ -20,7 +21,6 @@ export async function getStaticPaths() {
         token: TOKEN_KEY,
         token_app: TOKEN_APP,
       },
-      // niente query qui → prende tutti gli eventi
       pagina: 1,
     },
   };
@@ -92,10 +92,24 @@ let eventoDettaglio: any = null;
 
 try {
   const data = await fetchEventoDettaglio(id);
-  console.log('[WindDoc dettaglio] payload:', data);
+  console.log('[WindDoc dettaglio] raw payload:', data);
 
-  // ✅ il dettaglio è l'oggetto stesso, senza data.success
   eventoDettaglio = data;
+
+  console.log(
+    '[WindDoc dettaglio] evento:',
+    'id:',
+    eventoDettaglio?.id_associazione_evento,
+    'nome:',
+    eventoDettaglio?.nome,
+  );
+  console.log('[WindDoc dettaglio] logo:', eventoDettaglio?.logo);
+  console.log(
+    '[WindDoc dettaglio] logo.link:',
+    eventoDettaglio?.logo && typeof eventoDettaglio.logo === 'object'
+      ? (eventoDettaglio.logo as any).link
+      : null
+  );
 } catch (err) {
   console.error('[WindDoc dettaglio] errore:', err);
 }
@@ -117,8 +131,50 @@ const luogo = eventoDettaglio.indirizzo ?? '';
 const rawDate = eventoDettaglio.data_evento;
 const dateObj = rawDate ? new Date(rawDate) : null;
 
-// nessun campo immagine al momento
-const image = null;
+// 🖼 immagine dal logo, se presente
+const image =
+  eventoDettaglio.logo &&
+  typeof eventoDettaglio.logo === 'object' &&
+  'link' in eventoDettaglio.logo
+    ? (eventoDettaglio.logo as any).link
+    : null;
+
+console.log('[WindDoc dettaglio] image:', image, 'typeof image:', typeof image);
+
+// 🔎 informazioni su iscrizione e quota
+const iscrizioneEvento = eventoDettaglio.iscrizione_evento;  // es. "0", "1", "2"
+const quotaRaw = eventoDettaglio.quota;                      // stringa "0.0000", "15.0000", ecc.
+const tipoQuota = eventoDettaglio.tipo_quota;                // es. "0" o "1" (non usato ma tenuto per futuro)
+
+const quotaNumber = quotaRaw ? Number.parseFloat(quotaRaw) : 0;
+
+let tipoPartecipazione = 'Partecipazione libera';
+let dettaglioQuota = 'Evento gratuito';
+
+if (quotaNumber > 0) {
+  dettaglioQuota = `Quota di partecipazione: ${quotaNumber.toFixed(2)} €`;
+} else {
+  dettaglioQuota = 'Evento gratuito';
+}
+
+// Adatta questi testi ai significati reali di iscrizione_evento in WindDoc
+switch (iscrizioneEvento) {
+  case '0':
+    tipoPartecipazione = 'Riservato ai soci tesserati (senza iscrizione obbligatoria)';
+    break;
+  case '1':
+    tipoPartecipazione = 'Partecipazione libera (senza iscrizione obbligatoria)';
+    break;
+  case '2':
+    tipoPartecipazione = 'Partecipazione libera (Iscrizione obbligatoria)';
+    break;
+  case '3':
+    tipoPartecipazione = 'Riservato ai soci tesserati (iscrizione obbligatoria)';
+    break;
+  default:
+    tipoPartecipazione = 'Partecipazione libera';
+    break;
+}
 
 const seo = {
   title: `${titolo} | Evento`,
@@ -173,6 +229,18 @@ const seo = {
           />
         </div>
       )}
+
+      <div class="evento-dettaglio__content evento-dettaglio__tipo">
+        <h2>Tipo di evento</h2>
+
+        <p class="evento-dettaglio__tipo-partecipazione">
+          {tipoPartecipazione}
+        </p>
+
+        <p class="evento-dettaglio__tipo-quota">
+          {dettaglioQuota}
+        </p>
+      </div>
     </section>
   </Container>
 </Layout>
@@ -219,5 +287,19 @@ const seo = {
 
   .evento-dettaglio__content p {
     line-height: 1.6;
+  }
+
+  .evento-dettaglio__tipo {
+    margin-top: 2rem;
+    padding: 1rem 1.25rem;
+    border-radius: var(--theme-shape-radius);
+    background: rgba(0, 0, 0, 0.02);
+  }
+
+  .evento-dettaglio__tipo-partecipazione,
+  .evento-dettaglio__tipo-quota {
+    margin: 0.25rem 0;
+    line-height: 1.5;
+    font-size: 0.98rem;
   }
 </style>
