@@ -1,0 +1,103 @@
+---
+interface Section {
+  id: string;
+  label: string;
+  ring: 1 | 2 | 3;   // 1 = interno, 3 = esterno
+  startDeg: number;  // angolo iniziale in gradi
+  endDeg: number;    // angolo finale in gradi
+}
+
+interface Props {
+  sections: Section[];
+}
+
+const { sections } = Astro.props as Props;
+
+// impostazioni geometriche di base
+const centerX = 500;
+const centerY = 500;
+const ringWidths = {
+  1: 100,
+  2: 100,
+  3: 100,
+} as const;
+
+function polarToCartesian(
+  cx: number,
+  cy: number,
+  radius: number,
+  angleInDegrees: number
+) {
+  const angleInRadians = (angleInDegrees * Math.PI) / 180;
+  return {
+    x: cx + radius * Math.cos(angleInRadians),
+    y: cy + radius * Math.sin(angleInRadians),
+  };
+}
+
+function describeArcRing(
+  ring: 1 | 2 | 3,
+  startAngle: number,
+  endAngle: number
+) {
+  const innerRadius = 200 + (ring - 1) * ringWidths[ring];
+  const outerRadius = innerRadius + ringWidths[ring];
+
+  const startInner = polarToCartesian(centerX, centerY, innerRadius, startAngle);
+  const endInner = polarToCartesian(centerX, centerY, innerRadius, endAngle);
+  const startOuter = polarToCartesian(centerX, centerY, outerRadius, startAngle);
+  const endOuter = polarToCartesian(centerX, centerY, outerRadius, endAngle);
+
+  const largeArcFlag = endAngle - startAngle <= 180 ? 0 : 1;
+
+  // path di un “settore ad anello” (ring slice)
+  const d = [
+    `M ${startInner.x} ${startInner.y}`,
+    `A ${innerRadius} ${innerRadius} 0 ${largeArcFlag} 1 ${endInner.x} ${endInner.y}`,
+    `L ${endOuter.x} ${endOuter.y}`,
+    `A ${outerRadius} ${outerRadius} 0 ${largeArcFlag} 0 ${startOuter.x} ${startOuter.y}`,
+    'Z',
+  ].join(' ');
+
+  // punto medio per il label
+  const midAngle = (startAngle + endAngle) / 2;
+  const labelRadius = innerRadius + ringWidths[ring] / 2;
+  const labelPos = polarToCartesian(centerX, centerY, labelRadius, midAngle);
+
+  return { d, labelX: labelPos.x, labelY: labelPos.y };
+}
+---
+
+<svg
+  id="bandaSvg"
+  viewBox="0 0 1000 550"
+  xmlns="http://www.w3.org/2000/svg"
+>
+  <defs>
+    <style>
+      .sector { fill: #e5e5e5; stroke: #ccc; cursor: pointer; }
+      .sector:hover { fill: #d8d8d8; }
+      .label { font-size: 18px; text-anchor: middle; dominant-baseline: middle; }
+    </style>
+  </defs>
+
+  <!-- anello “invisibile” sotto per avere il semicerchio -->
+  <path
+    d="M 1000 500 A 500 500 0 0 0 0 500"
+    fill="#f2f2f2"
+  />
+
+  {sections.map((s) => {
+    const { d, labelX, labelY } = describeArcRing(s.ring, s.startDeg, s.endDeg);
+    return (
+      <>
+        <path
+          class="sector"
+          data-instrument={s.id}
+          d={d}
+        />
+        <text class="label" x={labelX} y={labelY}>{s.label}</text>
+      </>
+    );
+  })}
+</svg>

@@ -1,212 +1,186 @@
 ---
-import { Container, Button } from '@components/odyssey-theme';
 import Layout from '../../../layouts/Page.astro';
-import TextAndImageHero from '../../../components/sections/heros/TextAndImageHero.astro';
-import HeroSlider from '../../../components/sections/heros/HeroSlider.astro';
+import { Container } from '@components/odyssey-theme';
+import BandaChart from '../../../components/BandaChart.astro';
 
 const seo = {
-  title: 'Corsi | Corpo Bandistico di Castelcovati',
-  description:
-    'Elenco dei corsi disponibili.',
+	title: 'Scelta Corsi | Accademia Musicale',
+	description:
+		'Scopri gli strumenti della banda e ascolta il suono di ogni sezione.',
 };
 
-// riuso ESATTO del blocco heroImages della home
-const heroImages = [
-  {
-    src: '/assets/images/home/banda-hero.webp',
-    alt: 'Banda hero 1',
-  },
-  {
-    src: '/assets/images/home/HERO-IMG1.jpg',
-    alt: 'Banda Hero 2 - foto storica',
-  },
-  {
-    src: '/assets/images/home/HERO-IMG2.jpg',
-    alt: 'Banda Hero 3 - foto storica',
-  },
-  {
-    src: '/assets/images/home/HERO-IMG3.jpg',
-    alt: 'Banda Hero 4',
-  },
-  {
-    src: '/assets/images/home/HERO-IMG4.jpg',
-    alt: 'Hero 2',
-  },
-  {
-    src: '/assets/images/home/HERO-IMG5.jpeg',
-    alt: 'Hero 2',
-  },
-  {
-    src: '/assets/images/home/HERO-IMG6.jpg',
-    alt: 'Hero 2',
-  },
-  {
-    src: '/assets/images/home/HERO-IMG7.jpg',
-    alt: 'Hero 2',
-  },
+// definizione settori (angoli in gradi, 180° = lato sinistro, 0° = lato destro)
+// layout pensato per assomigliare il più possibile allo screenshot:
+// - anello 1: cerchio più vicino al direttore
+// - anello 2: sedie intermedie
+// - anello 3: arco esterno (percussioni, ottoni grossi, sax...)
+const sections = [
+	// ANELLO 1 (interno, vicino al direttore)
+	// partirò dal centro e ruoto verso destra/sinistra per imitare la foto
+	{ id: 'C1', label: 'C1', ring: 1, startDeg: 175, endDeg: 185 },
+	{ id: 'OB', label: 'OB', ring: 1, startDeg: 185, endDeg: 200 },
+	{ id: 'CB', label: 'CB', ring: 1, startDeg: 200, endDeg: 220 },
+	{ id: 'BSN', label: 'BSN', ring: 1, startDeg: 220, endDeg: 240 },
+	{ id: 'Clar2', label: 'Clarinetto 2', ring: 1, startDeg: 240, endDeg: 260 },
+	{ id: 'Clar3', label: 'Clarinetto 3', ring: 1, startDeg: 260, endDeg: 280 },
+	{ id: 'OTT', label: 'OTT', ring: 1, startDeg: 150, endDeg: 165 },
+	{ id: 'Flute1', label: 'Flute1', ring: 1, startDeg: 280, endDeg: 340 },
+	{ id: 'Ottavino', label: 'Ottavino', ring: 1, startDeg: 340, endDeg: 360 },
+
+	// ANELLO 2 (medio, legni/ottoni centrali)
+	{
+		id: 'Flauto2',
+		label: 'Flauto Traverso 2',
+		ring: 2,
+		startDeg: 150,
+		endDeg: 170,
+	},
+	{ id: 'Corno', label: 'Corno Francese', ring: 2, startDeg: 190, endDeg: 210 },
+	{
+		id: 'SaxContr',
+		label: 'Sax Contralto',
+		ring: 2,
+		startDeg: 210,
+		endDeg: 230,
+	},
+	{ id: 'SaxTen', label: 'Sax Tenore', ring: 2, startDeg: 230, endDeg: 250 },
+	{ id: 'SAXB', label: 'SAXB', ring: 2, startDeg: 250, endDeg: 270 },
+	{ id: 'Tuba', label: 'Tuba', ring: 2, startDeg: 270, endDeg: 290 },
+	{ id: 'Euph', label: 'Euphonium', ring: 2, startDeg: 290, endDeg: 310 },
+
+	// ANELLO 3 (esterno, grande ventaglio come in screenshot)
+	{ id: 'Perc', label: 'Percussioni', ring: 3, startDeg: 180, endDeg: 215 },
+	{ id: 'Tromba', label: 'Tromba', ring: 3, startDeg: 215, endDeg: 240 },
+	{ id: 'Trombone', label: 'Trombone', ring: 3, startDeg: 240, endDeg: 270 },
+	// chiudo il lato destro con una zona trombe/tromboni “larga” come in immagine
 ];
 
-// Per ora metto un array statico di esempio.
-// In seguito puoi caricarlo da JSON/API o da file CSV.
-const contributiPubblici = [
-  {
-    anno: 2024,
-    enteErogante: 'Comune di Castelcovati',
-    causale: 'Contributo annuale attività musicale',
-    importo: 3000.0,
-    dataIncasso: '2024-03-15',
-    estremiAtto: 'Delibera n. 12 del 10/03/2024',
-  },
-  {
-    anno: 2024,
-    enteErogante: 'Regione Lombardia',
-    causale: 'Bando cultura per bande musicali',
-    importo: 5000.0,
-    dataIncasso: '2024-07-20',
-    estremiAtto: 'Decreto n. 1234 del 30/06/2024',
-  },
-];
+// mappa strumento -> file audio
+const soundMap = {
+	C1: '/audio/clarinetto1.mp3',
+	OB: '/audio/oboe.mp3',
+	CB: '/audio/clarinetto-basso.mp3',
+	BSN: '/audio/fagotto.mp3',
+	Clar2: '/audio/clarinetto2.mp3',
+	Clar3: '/audio/clarinetto3.mp3',
+	OTT: '/audio/ottoni.mp3',
+	Flute1: '/audio/flauto1.mp3',
+	Flauto2: '/audio/flauto2.mp3',
+	Corno: '/audio/corno.mp3',
+	Tromba: '/audio/tromba.mp3',
+	Trombone: '/audio/trombone.mp3',
+	SaxContr: '/audio/sax-contralto.mp3',
+	SaxTen: '/audio/sax-tenore.mp3',
+	SAXB: '/audio/sax-baritono.mp3',
+	Perc: '/audio/percussioni.mp3',
+	Tuba: '/audio/tuba.mp3',
+	Euph: '/audio/euphonium.mp3',
+};
 ---
 
 <Layout {seo}>
-  <TextAndImageHero reversed>
-    <div slot="text-container">
-      <h1>I nostri corsi</h1>
-      <p>
-        In questa pagina pubblichiamo i contributi e i finanziamenti pubblici
-        ricevuti dal Corpo Bandistico di Castelcovati, in ottemperanza agli
-        obblighi di trasparenza e pubblicità.
-      </p>
-    </div>
+	<Container>
+		<header class="scelta-header">
+			<p class="scelta-header__eyebrow">Accademia Musicale</p>
+			<h1>del Corpo Bandistico di Castelcovati</h1>
+			<p class="scelta-header__subtitle">
+				Un percorso formativo completo per musicisti di ogni età e livello.
+			</p>
+		</header>
 
-    <div slot="btns-container">
-      <Button href="/company/about" outlined>
-        Chi siamo
-      </Button>
-    </div>
+		<section class="banda-section">
+			<div class="banda-section__text">
+				<h2>Scopri la Banda Musicale</h2>
+				<p class="banda-section__eyebrow">È disposta come da concerto!</p>
+				<p>Clicca sulle sezioni ed ascolta gli strumenti 🎧</p>
+			</div>
 
-    <HeroSlider slot="image-container" images={heroImages} interval={10000} />
-  </TextAndImageHero>
+			<div class="banda-svg-wrapper">
+				<BandaChart {sections} />
+			</div>
+		</section>
+	</Container>
 
-  <Container>
-    <section class="trasparenza">
-      <header class="trasparenza__header">
-        <h2>Contributi e finanziamenti pubblici</h2>
-        <p>
-          Di seguito sono riportate le informazioni relative a sovvenzioni,
-          contributi, incarichi retribuiti e comunque vantaggi economici di
-          qualunque genere ricevuti da pubbliche amministrazioni e soggetti
-          assimilati.
-        </p>
-      </header>
+	<script>
+		const soundMap = {
+			C1: '/audio/clarinetto1.mp3',
+			OB: '/audio/oboe.mp3',
+			CB: '/audio/clarinetto-basso.mp3',
+			BSN: '/audio/fagotto.mp3',
+			Clar2: '/audio/clarinetto2.mp3',
+			Clar3: '/audio/clarinetto3.mp3',
+			OTT: '/audio/ottoni.mp3',
+			Flute1: '/audio/flauto1.mp3',
+			Flauto2: '/audio/flauto2.mp3',
+			Corno: '/audio/corno.mp3',
+			Tromba: '/audio/tromba.mp3',
+			Trombone: '/audio/trombone.mp3',
+			SaxContr: '/audio/sax-contralto.mp3',
+			SaxTen: '/audio/sax-tenore.mp3',
+			SAXB: '/audio/sax-baritono.mp3',
+			Perc: '/audio/percussioni.mp3',
+			Tuba: '/audio/tuba.mp3',
+			Euph: '/audio/euphonium.mp3',
+		};
 
-      <div class="trasparenza__table-wrapper">
-        <table class="trasparenza__table">
-          <thead>
-            <tr>
-              <th>Anno</th>
-              <th>Ente erogante</th>
-              <th>Causale</th>
-              <th>Importo</th>
-              <th>Data incasso</th>
-              <th>Estremi atto</th>
-            </tr>
-          </thead>
-          <tbody>
-            {contributiPubblici.map((riga) => (
-              <tr>
-                <td>{riga.anno}</td>
-                <td>{riga.enteErogante}</td>
-                <td>{riga.causale}</td>
-                <td>
-                  {riga.importo.toLocaleString('it-IT', {
-                    style: 'currency',
-                    currency: 'EUR',
-                  })}
-                </td>
-                <td>
-                  {new Date(riga.dataIncasso).toLocaleDateString('it-IT')}
-                </td>
-                <td>{riga.estremiAtto}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-
-      <p class="trasparenza__note">
-        I dati sopra riportati sono aggiornati alla data indicata
-        nell&apos;ultimo bilancio approvato.
-      </p>
-    </section>
-  </Container>
+		const svg = document.getElementById('bandaSvg');
+		if (svg) {
+			const audio = new Audio();
+			svg.querySelectorAll('.sector').forEach(sector => {
+				sector.addEventListener('click', () => {
+					const id = sector.getAttribute('data-instrument');
+					const src = id && soundMap[id];
+					if (!src) return;
+					audio.src = src;
+					audio.currentTime = 0;
+					audio.play();
+				});
+			});
+		}
+	</script>
 </Layout>
 
 <style>
-  .trasparenza {
-    margin: var(--section-margin) auto;
-  }
+	.scelta-header__eyebrow {
+		text-transform: uppercase;
+		letter-spacing: 0.08em;
+		font-size: 0.8rem;
+		margin-bottom: 0.25rem;
+	}
 
-  .trasparenza__header {
-    margin-bottom: 1.5rem;
-    max-width: 56rem;
-  }
+	.scelta-header h1 {
+		margin-bottom: 0.25rem;
+	}
 
-  .trasparenza__header h2 {
-    margin-bottom: 0.5rem;
-  }
+	.scelta-header__subtitle {
+		margin-top: 0.5rem;
+		max-width: 32rem;
+		color: var(--theme-on-surface-2);
+	}
 
-  .trasparenza__header p {
-    color: var(--theme-on-surface-2);
-    line-height: 1.6;
-  }
+	.banda-section {
+		margin: 2.5rem 0;
+	}
 
-  .trasparenza__table-wrapper {
-    margin-top: 1rem;
-    border-radius: var(--theme-shape-radius);
-    background: var(--theme-surface-1);
-    box-shadow: var(--theme-elevation-1);
-    padding: 1rem 1.25rem;
-    overflow-x: auto; /* per mobile */
-  }
+	.banda-section__text {
+		text-align: center;
+		margin-bottom: 1rem;
+	}
 
-  .trasparenza__table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 0.95rem;
-  }
+	.banda-section__eyebrow {
+		font-weight: 600;
+		margin: 0 0 0.25rem;
+	}
 
-  .trasparenza__table thead {
-    background: var(--theme-surface-2);
-  }
+	.banda-svg-wrapper {
+		max-width: 800px;
+		margin: 0 auto;
+	}
 
-  .trasparenza__table th,
-  .trasparenza__table td {
-    padding: 0.5rem 0.75rem;
-    text-align: left;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
-  }
-
-  .trasparenza__table th {
-    font-weight: 600;
-    white-space: nowrap;
-  }
-
-  .trasparenza__table tbody tr:nth-child(even) {
-    background: rgba(0, 0, 0, 0.02);
-  }
-
-  .trasparenza__note {
-    margin-top: 0.75rem;
-    font-size: 0.9rem;
-    color: var(--theme-on-surface-2);
-  }
-
-  @media (max-width: 768px) {
-    .trasparenza__table th,
-    .trasparenza__table td {
-      padding: 0.4rem 0.5rem;
-      font-size: 0.9rem;
-    }
-  }
+	#bandaSvg {
+		width: 100%;
+		height: auto;
+		display: block;
+		margin: 0 auto;
+	}
 </style>
