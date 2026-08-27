@@ -1,7 +1,17 @@
 ---
 import Layout from '../../../layouts/Page.astro';
 import { Container, Button } from '@components/odyssey-theme';
-import { corsi, daConfermare, etichettaFamiglia } from '../../../config/corsi.js';
+import {
+	corsi,
+	daConfermare,
+	etichettaFamiglia,
+	scalaPrezzi,
+	formattaPrezzo,
+	DURATA_PREDEFINITA,
+	DURATE,
+	SCONTO_BANDA,
+	PERIODO_PREZZO,
+} from '../../../config/corsi.js';
 import { soundMap } from '../../../config/suoni.js';
 
 export function getStaticPaths() {
@@ -17,11 +27,17 @@ const suono = soundMap[corso.slug] ?? null;
 const scheda = [
 	{ voce: 'Insegnante', valore: corso.insegnante },
 	{ voce: 'Orario delle lezioni', valore: corso.orari },
-	{ voce: 'Quota di partecipazione', valore: corso.costo },
 	{ voce: 'Età consigliata', valore: corso.eta },
 ];
 
-const mancanti = scheda.filter(r => daConfermare(r.valore)).length;
+// Prezzo mostrato di default: la durata più breve. La scala completa sta nel modal.
+const scala = scalaPrezzi(corso);
+const rigaPredefinita = scala.find(r => r.minuti === DURATA_PREDEFINITA);
+const durataPredefinita = DURATE.find(d => d.minuti === DURATA_PREDEFINITA);
+const haPrezzi = corso.prezzi !== null;
+const scontoPercento = Math.round(SCONTO_BANDA * 100);
+
+const mancanti = scheda.filter(r => daConfermare(r.valore)).length + (haPrezzi ? 0 : 1);
 
 const seo = {
 	title: `${corso.nome} | Corsi del Corpo Bandistico di Castelcovati`,
@@ -86,6 +102,29 @@ const seo = {
 				}
 
 				<dl class="corso__lista">
+					<div class="corso__riga">
+						<dt>Quota mensile</dt>
+						<dd class:list={['tabular', { 'is-vuoto': !haPrezzi }]}>
+							<span class="corso__prezzo">
+								{haPrezzi ? formattaPrezzo(rigaPredefinita.pieno) : '— da confermare'}
+							</span>
+							{
+								haPrezzi && (
+									<span class="corso__prezzo-dettaglio">
+										{PERIODO_PREZZO} &middot; lezione da {durataPredefinita.etichetta}
+									</span>
+								)
+							}
+							<button
+								type="button"
+								class="corso__scala-apri"
+								aria-haspopup="dialog"
+								disabled={!haPrezzi}
+							>
+								Scala prezzi
+							</button>
+						</dd>
+					</div>
 					{
 						scheda.map(riga => (
 							<div class="corso__riga">
@@ -106,7 +145,161 @@ const seo = {
 		</article>
 	</Container>
 
+	<!-- SCALA PREZZI -->
+	{
+		haPrezzi && (
+			<div id="scalaModal" class="scala" hidden>
+				<div class="scala__fondo" data-chiudi />
+				<div
+					class="scala__box"
+					role="dialog"
+					aria-modal="true"
+					aria-labelledby="scalaTitolo"
+				>
+					<button type="button" class="scala__chiudi" data-chiudi aria-label="Chiudi">
+						&times;
+					</button>
+
+					<h2 id="scalaTitolo" class="scala__titolo">Scala prezzi</h2>
+					<p class="scala__sottotitolo">
+						Importi {PERIODO_PREZZO}, per {corso.nome.toLowerCase()}.
+					</p>
+
+					<table class="scala__tabella">
+						<thead>
+							<tr>
+								<th scope="col">Durata della lezione</th>
+								<th scope="col" class="scala__col-prezzo">Quota</th>
+							</tr>
+						</thead>
+						<tbody>
+							{scala.map(riga => (
+								<tr>
+									<th scope="row">{riga.etichetta}</th>
+									<td
+										class="scala__col-prezzo tabular"
+										data-pieno={riga.pieno}
+										data-scontato={riga.scontato}
+									>
+										{formattaPrezzo(riga.pieno)}
+									</td>
+								</tr>
+							))}
+						</tbody>
+					</table>
+
+					<div class="scala__sconto">
+						<label class="interruttore" for="scontoBanda">
+							<input type="checkbox" id="scontoBanda" class="interruttore__input" />
+							<span class="interruttore__pista" aria-hidden="true">
+								<span class="interruttore__pallino" />
+							</span>
+							<span class="interruttore__testo">Suono nella banda</span>
+						</label>
+						<p class="scala__sconto-nota">
+							Chi suona in banda ha il {scontoPercento}% di sconto sulla quota.
+						</p>
+					</div>
+
+					<p class="scala__stato" role="status" aria-live="polite" hidden>
+						Sconto del {scontoPercento}% applicato.
+					</p>
+				</div>
+			</div>
+		)
+	}
+
 	<script>
+		// ---- SCALA PREZZI ----
+		const apri = document.querySelector('.corso__scala-apri');
+		const modale = document.getElementById('scalaModal');
+
+		if (apri && modale) {
+			const box = modale.querySelector('.scala__box');
+			const celle = [...modale.querySelectorAll('[data-pieno]')];
+			const interruttore = modale.querySelector('#scontoBanda');
+			const stato = modale.querySelector('.scala__stato');
+			let ultimoFocus = null;
+
+			// Stessa formattazione del server: gli interi senza decimali,
+			// gli altri con due. Evita "40,5 €".
+			const intero = new Intl.NumberFormat('it-IT', {
+				style: 'currency', currency: 'EUR',
+				minimumFractionDigits: 0, maximumFractionDigits: 0,
+			});
+			const decimale = new Intl.NumberFormat('it-IT', {
+				style: 'currency', currency: 'EUR',
+				minimumFractionDigits: 2, maximumFractionDigits: 2,
+			});
+			const euro = n => (Number.isInteger(n) ? intero : decimale).format(n);
+
+			function aggiornaPrezzi() {
+				const scontato = interruttore.checked;
+				celle.forEach(cella => {
+					const pieno = Number(cella.dataset.pieno);
+					cella.classList.toggle('is-scontato', scontato);
+					cella.replaceChildren();
+					if (scontato) {
+						// il pieno resta visibile barrato: senza confronto lo sconto
+						// non si legge, i due verdi sono troppo simili fra loro
+						const barrato = document.createElement('s');
+						barrato.className = 'scala__pieno';
+						barrato.textContent = euro(pieno);
+						const nuovo = document.createElement('span');
+						nuovo.className = 'scala__nuovo';
+						nuovo.textContent = euro(Number(cella.dataset.scontato));
+						cella.append(barrato, ' ', nuovo);
+					} else {
+						cella.textContent = euro(pieno);
+					}
+				});
+				stato.hidden = !scontato;
+			}
+
+			interruttore.addEventListener('change', aggiornaPrezzi);
+
+			function chiudi() {
+				modale.hidden = true;
+				document.body.style.overflow = '';
+				if (ultimoFocus) ultimoFocus.focus();
+			}
+
+			apri.addEventListener('click', () => {
+				ultimoFocus = apri;
+				modale.hidden = false;
+				document.body.style.overflow = 'hidden';
+				interruttore.focus();
+			});
+
+			modale.querySelectorAll('[data-chiudi]').forEach(el =>
+				el.addEventListener('click', chiudi)
+			);
+
+			document.addEventListener('keydown', e => {
+				if (modale.hidden) return;
+				if (e.key === 'Escape') {
+					chiudi();
+					return;
+				}
+				// il focus resta dentro la finestra finché è aperta
+				if (e.key === 'Tab') {
+					const f = [...box.querySelectorAll('button, input')].filter(
+						el => !el.disabled && el.offsetParent !== null
+					);
+					if (!f.length) return;
+					const primo = f[0];
+					const ultimo = f[f.length - 1];
+					if (e.shiftKey && document.activeElement === primo) {
+						e.preventDefault();
+						ultimo.focus();
+					} else if (!e.shiftKey && document.activeElement === ultimo) {
+						e.preventDefault();
+						primo.focus();
+					}
+				}
+			});
+		}
+
 		// Un solo elemento audio per pagina; il pulsante è un vero toggle
 		// (WCAG 1.4.2: l'audio non parte mai da solo e si può sempre fermare).
 		const bottone = document.querySelector('.corso__audio');
@@ -306,6 +499,214 @@ const seo = {
 		.corso__riga {
 			grid-template-columns: 1fr;
 			gap: var(--space-3xs);
+		}
+	}
+	/* ---- RIGA PREZZO ---- */
+	.corso__prezzo {
+		display: block;
+		font-family: var(--theme-font-family-serif);
+		font-size: var(--font-size-md);
+		font-weight: 600;
+		line-height: 1.15;
+	}
+	.corso__prezzo-dettaglio {
+		display: block;
+		font-size: var(--font-size-xs);
+		color: var(--theme-muted);
+		margin-top: 0.1rem;
+	}
+	.corso__scala-apri {
+		margin-top: var(--space-2xs);
+		padding: 0.35rem 0.75rem;
+		background: transparent;
+		border: 1px solid var(--theme-border-strong);
+		border-radius: var(--radius-sm);
+		color: var(--theme-on-bg);
+		font-family: var(--theme-font-family-sans);
+		font-size: var(--font-size-xs);
+		font-weight: 500;
+		white-space: nowrap;
+		cursor: pointer;
+		transition: background-color var(--theme-transition),
+			border-color var(--theme-transition);
+	}
+	.corso__scala-apri:hover:not(:disabled) {
+		background-color: var(--theme-surface-1);
+		border-color: var(--theme-primary);
+	}
+	.corso__scala-apri:active:not(:disabled) {
+		background-color: var(--theme-surface-2);
+	}
+	.corso__scala-apri:disabled {
+		opacity: 0.45;
+		cursor: not-allowed;
+	}
+
+	/* ---- MODAL SCALA PREZZI ---- */
+	.scala {
+		position: fixed;
+		inset: 0;
+		z-index: var(--z-modal);
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		padding: var(--space-sm);
+	}
+	.scala[hidden] {
+		display: none;
+	}
+	.scala__fondo {
+		position: absolute;
+		inset: 0;
+		background: color-mix(in srgb, var(--ink) 58%, transparent);
+	}
+	.scala__box {
+		position: relative;
+		z-index: 1;
+		width: min(94vw, 30rem);
+		max-height: 88dvh;
+		overflow-y: auto;
+		padding: var(--space-lg) var(--space-md) var(--space-md);
+		background: var(--theme-bg);
+		border-radius: var(--radius-lg);
+		box-shadow: var(--theme-elevation-3);
+	}
+	.scala__chiudi {
+		position: absolute;
+		top: 0.4rem;
+		right: 0.7rem;
+		border: 0;
+		background: none;
+		font-size: 1.5rem;
+		line-height: 1;
+		color: var(--theme-muted);
+		cursor: pointer;
+	}
+	.scala__chiudi:hover {
+		color: var(--theme-on-bg);
+	}
+	.scala__titolo {
+		font-size: var(--font-size-md);
+		margin-bottom: var(--space-3xs);
+	}
+	.scala__sottotitolo {
+		max-width: none;
+		font-size: var(--font-size-sm);
+		color: var(--theme-muted);
+		margin-bottom: var(--space-md);
+	}
+
+	.scala__tabella {
+		width: 100%;
+		border-collapse: collapse;
+	}
+	.scala__tabella th,
+	.scala__tabella td {
+		text-align: left;
+		padding: var(--space-2xs) 0;
+		border-bottom: 1px solid var(--theme-border);
+		font-weight: 400;
+	}
+	.scala__tabella thead th {
+		font-family: var(--theme-font-family-sans);
+		font-size: var(--font-size-xs);
+		font-weight: 600;
+		letter-spacing: var(--tracking-label);
+		text-transform: uppercase;
+		color: var(--theme-muted);
+	}
+	.scala__tabella tbody th {
+		font-size: var(--font-size-sm);
+	}
+	.scala__col-prezzo {
+		text-align: right !important;
+		font-variant-numeric: tabular-nums;
+	}
+	.scala__tabella tbody td {
+		font-size: var(--font-size-base);
+		font-weight: 500;
+		/* il valore cambia al volo: la transizione lo rende leggibile */
+		transition: color var(--theme-transition);
+	}
+	.scala__pieno {
+		color: var(--theme-muted);
+		font-weight: 400;
+		margin-right: 0.35rem;
+	}
+	.scala__nuovo {
+		color: var(--theme-primary);
+		font-weight: 600;
+	}
+
+	/* ---- INTERRUTTORE ---- */
+	.scala__sconto {
+		margin-top: var(--space-md);
+	}
+	.interruttore {
+		display: flex;
+		align-items: center;
+		gap: var(--space-2xs);
+		cursor: pointer;
+		user-select: none;
+	}
+	.interruttore__input {
+		position: absolute;
+		opacity: 0;
+		width: 0;
+		height: 0;
+	}
+	.interruttore__pista {
+		flex: none;
+		display: block;
+		width: 2.6rem;
+		height: 1.5rem;
+		padding: 0.15rem;
+		border-radius: 999px;
+		background: var(--theme-border-strong);
+		transition: background-color var(--theme-transition);
+	}
+	.interruttore__pallino {
+		display: block;
+		width: 1.2rem;
+		height: 1.2rem;
+		border-radius: 50%;
+		background: var(--theme-bg);
+		box-shadow: var(--theme-elevation-1);
+		transition: transform var(--theme-transition);
+	}
+	.interruttore__input:checked + .interruttore__pista {
+		background: var(--theme-primary);
+	}
+	.interruttore__input:checked + .interruttore__pista .interruttore__pallino {
+		transform: translateX(1.1rem);
+	}
+	.interruttore__input:focus-visible + .interruttore__pista {
+		outline: 2px solid var(--theme-accent);
+		outline-offset: 3px;
+	}
+	.interruttore__testo {
+		font-size: var(--font-size-sm);
+		font-weight: 500;
+	}
+	.scala__sconto-nota {
+		margin: var(--space-3xs) 0 0 3.1rem;
+		max-width: none;
+		font-size: var(--font-size-xs);
+		color: var(--theme-muted);
+	}
+	.scala__stato {
+		margin: var(--space-sm) 0 0;
+		max-width: none;
+		font-size: var(--font-size-xs);
+		color: var(--theme-primary);
+	}
+	.scala__stato[hidden] {
+		display: none;
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.interruttore__pallino {
+			transition: none;
 		}
 	}
 </style>

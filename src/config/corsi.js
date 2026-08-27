@@ -142,37 +142,64 @@ const definizioniCollettive = [
 ];
 
 /*
-  Campi organizzativi: identici per struttura su tutti i corsi.
-  Quando un corso ha dati propri, sovrascrivili aggiungendo qui una voce con la
-  stessa chiave dello slug. Esempio:
+  Campi organizzativi, per corso.
 
-  'clarinetto': {
+  PREZZI: le lezioni sono da 30, 45 o 60 minuti e il prezzo cambia con la
+  durata. Sono importi MENSILI. Compila `prezzi` con i tre valori in euro,
+  numeri semplici (niente simbolo, niente stringhe): la formattazione italiana
+  la fa la pagina. Un corso senza `prezzi` mostra "da confermare" e il
+  selettore della scala resta disattivato, invece di esporre cifre inventate.
+
+  Esempio completo:
+
+  clarinetto: {
       insegnante: 'Nome Cognome',
       orari: 'Martedì 17:00 – 18:00',
-      costo: '120 € a trimestre',
       eta: 'Dagli 8 anni',
+      prezzi: { 30: 45, 45: 62, 60: 80 },
   },
 */
 export const datiOrganizzativi = {};
 
+/** Durate disponibili, in ordine. La prima è quella mostrata di default. */
+export const DURATE = [
+	{ minuti: 30, etichetta: '30 minuti' },
+	{ minuti: 45, etichetta: '45 minuti' },
+	{ minuti: 60, etichetta: '1 ora' },
+];
+
+export const DURATA_PREDEFINITA = DURATE[0].minuti;
+
+/** Sconto riservato a chi suona anche in banda. */
+export const SCONTO_BANDA = 0.1;
+
+/** Periodo a cui si riferisce l'importo, usato nelle etichette. */
+export const PERIODO_PREZZO = 'al mese';
+
 const campiDefault = {
 	insegnante: DA_CONFERMARE,
 	orari: DA_CONFERMARE,
-	costo: DA_CONFERMARE,
 	eta: DA_CONFERMARE,
+	prezzi: null,
 };
 
 /** Tutti i corsi, arricchiti con i campi organizzativi e gli asset. */
-export const corsi = [...definizioniStrumento, ...definizioniCollettive].map(corso => ({
-	...campiDefault,
-	...corso,
-	...(datiOrganizzativi[corso.slug] ?? {}),
-	href: `/scuola/corsi/${corso.slug}`,
-	immagine:
-		corso.famiglia === 'collettivo'
-			? null
-			: `/assets/images/strumenti/${corso.slug}.webp`,
-}));
+export const corsi = [...definizioniStrumento, ...definizioniCollettive].map(corso => {
+	const dati = { ...campiDefault, ...corso, ...(datiOrganizzativi[corso.slug] ?? {}) };
+	// Un listino è valido solo se ha tutte e tre le durate: uno parziale
+	// mostrerebbe un buco proprio nella tabella di confronto.
+	const prezziCompleti =
+		dati.prezzi && DURATE.every(d => typeof dati.prezzi[d.minuti] === 'number');
+	return {
+		...dati,
+		prezzi: prezziCompleti ? dati.prezzi : null,
+		href: `/scuola/corsi/${corso.slug}`,
+		immagine:
+			corso.famiglia === 'collettivo'
+				? null
+				: `/assets/images/strumenti/${corso.slug}.webp`,
+	};
+});
 
 export const corsiPerSlug = Object.fromEntries(corsi.map(c => [c.slug, c]));
 
@@ -184,6 +211,44 @@ export const corsiCollettivi = corsi.filter(c => c.famiglia === 'collettivo');
 
 /** True se il campo è ancora un segnaposto: la UI lo marca invece di nasconderlo. */
 export const daConfermare = valore => valore === DA_CONFERMARE;
+
+/*
+  Importo in euro secondo la convenzione italiana: 40,50 € — non € 40.50.
+  Gli interi restano senza decimali ("45 €"), i non interi ne prendono due
+  ("40,50 €", non "40,5 €" che su un prezzo si legge male).
+*/
+const formatoIntero = new Intl.NumberFormat('it-IT', {
+	style: 'currency',
+	currency: 'EUR',
+	minimumFractionDigits: 0,
+	maximumFractionDigits: 0,
+});
+const formatoDecimale = new Intl.NumberFormat('it-IT', {
+	style: 'currency',
+	currency: 'EUR',
+	minimumFractionDigits: 2,
+	maximumFractionDigits: 2,
+});
+
+export const formattaPrezzo = valore => {
+	if (typeof valore !== 'number') return DA_CONFERMARE;
+	return Number.isInteger(valore)
+		? formatoIntero.format(valore)
+		: formatoDecimale.format(valore);
+};
+
+/** Applica lo sconto banda e arrotonda ai centesimi. */
+export const conSconto = valore =>
+	typeof valore === 'number' ? Math.round(valore * (1 - SCONTO_BANDA) * 100) / 100 : null;
+
+/** Righe pronte per la tabella della scala prezzi. */
+export const scalaPrezzi = corso =>
+	DURATE.map(d => ({
+		minuti: d.minuti,
+		etichetta: d.etichetta,
+		pieno: corso.prezzi ? corso.prezzi[d.minuti] : null,
+		scontato: corso.prezzi ? conSconto(corso.prezzi[d.minuti]) : null,
+	}));
 
 export const etichettaFamiglia = {
 	legni: 'Legni',
