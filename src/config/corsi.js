@@ -241,6 +241,9 @@ export const datiOrganizzativi = {
 	'chitarra-elettrica': { insegnante: 'Michele Belleri' },
 	'basso-elettrico': { insegnante: 'Michele Belleri' },
 	tromba: { insegnante: 'Antony Surace' },
+	// Il perfezionamento non ha un docente fisso: lo segue chi insegna lo
+	// strumento dell'allievo. Non è un segnaposto, è la risposta.
+	perfezionamento: { insegnante: 'L’insegnante del tuo strumento' },
 	clarinetto: { insegnante: 'Luigi Corvaglia' },
 	// "sax alto" del prospetto: in italiano è il sassofono contralto
 	'sax-contralto': { insegnante: 'Luigi Corvaglia' },
