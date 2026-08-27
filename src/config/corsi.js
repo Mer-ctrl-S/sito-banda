@@ -238,6 +238,13 @@ export const datiOrganizzativi = {
 	pianoforte: { insegnante: 'Gabriele Moraschi' },
 	'chitarra-elettrica': { insegnante: 'Michele Belleri' },
 	'basso-elettrico': { insegnante: 'Michele Belleri' },
+	clarinetto: { insegnante: 'Luigi Corvaglia' },
+	// "sax alto" del prospetto: in italiano è il sassofono contralto
+	'sax-contralto': { insegnante: 'Luigi Corvaglia' },
+	percussioni: { insegnante: 'Federico Mambretti' },
+	batteria: { insegnante: 'Federico Mambretti' },
+	'laboratorio-percussioni': { insegnante: 'Federico Mambretti' },
+	'musica-insieme': { insegnante: 'Federico Mambretti' },
 };
 
 /** Età minima per i corsi di strumento e canto, dal regolamento. */
