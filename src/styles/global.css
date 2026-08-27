@@ -78,6 +78,17 @@ pre .language-id {
 	display: none;
 }
 
+/*
+  La prima sezione di ogni pagina eredita il margine da sezione (--section-margin)
+  e finisce staccata dall'header di oltre cento pixel. Qui sopra c'e' gia'
+  l'header a fare da respiro: basta un margine breve.
+*/
+#page > section:first-child,
+#page > :first-child > section:first-child,
+#page > :first-child > article:first-child {
+	margin-top: var(--space-md);
+}
+
 /* Contenuto lungo: il ritmo verticale non deve dipendere dai margini dei figli */
 .prose > * + * {
 	margin-top: var(--space-sm);

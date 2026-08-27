@@ -13,7 +13,9 @@ const {surfaceNumber = 1} = Astro.props;
 <style>
 .constrained-text-hero__section {
   margin: var(--section-margin) auto;
-  padding: clamp(10vh, 12vh, 18vh) 2rem;
+  /* era clamp(10vh, 12vh, 18vh): un padding legato all'altezza
+		   della finestra, che su desktop diventava oltre 100px per lato */
+		padding: var(--space-xl) var(--space-lg);
   border-radius: var(--theme-shape-radius);
 }
 </style>

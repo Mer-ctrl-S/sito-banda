@@ -76,7 +76,7 @@
 
 	/* ---- Layout ---- */
 	--navbar-height: 5.5rem;
-	--section-margin: clamp(4rem, 9vw, 9rem);
+	--section-margin: clamp(3rem, 5vw, 5.5rem);
 	--theme-grid-gap: clamp(1rem, 2.5vw, 2rem);
 	--container-max-width: 1320px;
 	--container-max-width-narrow: 68ch;
