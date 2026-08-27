@@ -1,5 +1,21 @@
 ---
 import { Button, FormInput, FormSelect, FormTextarea } from '@components/odyssey-theme';
+import settings from '../../config/settings.js';
+
+/*
+  Il modulo invia tramite Web3Forms: un sito statico non può spedire email da
+  sé. La chiave sta in WEB3FORMS_KEY (vedi .env.example) e va richiesta su
+  web3forms.com indicando la casella di destinazione.
+
+  Senza chiave il modulo NON finge di funzionare: si disattiva e mostra
+  l'indirizzo a cui scrivere. Meglio un modulo dichiaratamente spento che uno
+  che accetta messaggi e li perde.
+
+  Funziona anche senza JavaScript: l'invio nativo va a Web3Forms e torna su
+  /contatti-grazie. Con JavaScript resta sulla pagina e mostra la conferma.
+*/
+const chiave = import.meta.env.WEB3FORMS_KEY?.trim() ?? '';
+const attivo = chiave !== '';
 
 const selectOptions = [
 	'Passaparola',
@@ -8,22 +24,31 @@ const selectOptions = [
 	'La scuola di musica',
 	'Ricerca su internet',
 ];
-
-/*
-  ATTENZIONE: `action` punta a una pagina di cortesia statica, non a un
-  servizio che riceve i messaggi. Finche' non viene configurato un endpoint
-  (Formspree, Formspark, Web3Forms...) il modulo non recapita nulla.
-  Vedi il commento in cima a company/contact.astro.
-*/
 ---
+
+{
+	!attivo && (
+		<p class="form__spento">
+			Il modulo non è ancora attivo. Nel frattempo scrivici a{' '}
+			<a href={`mailto:${settings.email}`}>{settings.email}</a>.
+		</p>
+	)
+}
 
 <form
 	id="contactForm"
-	name="Modulo contatti"
+	action="https://api.web3forms.com/submit"
 	method="POST"
-	action="/contatti-grazie"
 	novalidate
+	hidden={!attivo}
 >
+	<input type="hidden" name="access_key" value={chiave} />
+	<input type="hidden" name="subject" value="Nuovo messaggio dal sito" />
+	<input type="hidden" name="from_name" value={settings.title} />
+	<input type="hidden" name="redirect" value="/contatti-grazie" />
+	{/* Trappola per i robot: invisibile e mai compilata da una persona */}
+	<input type="checkbox" name="botcheck" class="form__esca" tabindex="-1" autocomplete="off" />
+
 	<FormInput
 		type="text"
 		label="Nome e cognome"
@@ -53,6 +78,23 @@ const selectOptions = [
 		required
 	/>
 
+	<div class="form-field__container form__consenso">
+		<label for="field-consenso">
+			<input type="checkbox" id="field-consenso" name="consenso" required />
+			<span>
+				Ho letto l’<a href="/company/legal">informativa privacy</a> e acconsento
+				al trattamento dei miei dati per ricevere una risposta.
+				<span class="form-field__required" aria-hidden="true">*</span>
+			</span>
+		</label>
+		<p class="form-field__error" id="field-consenso-error" aria-live="polite"></p>
+	</div>
+
+	<p class="form__nota">
+		I dati servono solo a risponderti e non vengono usati per altro. L’invio
+		passa da Web3Forms, che li inoltra alla nostra casella.
+	</p>
+
 	<p class="form__summary" id="formSummary" role="alert" hidden></p>
 
 	<div class="form__actions">
@@ -61,9 +103,18 @@ const selectOptions = [
 	</div>
 </form>
 
-<script>
+<div id="formEsito" class="form__esito" hidden>
+	<h3>Messaggio inviato.</h3>
+	<p>
+		Ti rispondiamo appena possibile, di solito entro qualche giorno. Se la
+		richiesta è urgente puoi scriverci anche sui social.
+	</p>
+</div>
+
+<script define:vars={{ indirizzo: settings.email }}>
 	const form = document.querySelector('#contactForm');
 	const summary = document.querySelector('#formSummary');
+	const esito = document.querySelector('#formEsito');
 
 	const messaggi = {
 		valueMissing: 'Questo campo serve per poterti rispondere.',
@@ -72,6 +123,7 @@ const selectOptions = [
 	};
 
 	function messaggioPer(campo) {
+		if (campo.name === 'consenso') return 'Serve il consenso per poterti rispondere.';
 		const v = campo.validity;
 		if (v.valueMissing) return messaggi.valueMissing;
 		if (v.typeMismatch) return messaggi.typeMismatch;
@@ -92,33 +144,67 @@ const selectOptions = [
 	}
 
 	if (form) {
-		const campi = Array.from(form.querySelectorAll('input, textarea, select'));
+		const campi = Array.from(
+			form.querySelectorAll('input, textarea, select')
+		).filter(c => c.type !== 'hidden' && c.name !== 'botcheck');
+		const bottone = form.querySelector('button');
+		const etichetta = bottone.textContent;
 
-		// Convalida al primo invio, poi in tempo reale solo sui campi già sbagliati
 		campi.forEach(campo => {
 			campo.addEventListener('input', () => {
 				if (campo.hasAttribute('aria-invalid') && campo.checkValidity()) {
 					pulisciErrore(campo);
 				}
 			});
+			campo.addEventListener('change', () => {
+				if (campo.hasAttribute('aria-invalid') && campo.checkValidity()) {
+					pulisciErrore(campo);
+				}
+			});
 		});
 
-		form.addEventListener('submit', event => {
-			const invalidi = campi.filter(campo => !campo.checkValidity());
-
+		form.addEventListener('submit', async event => {
+			event.preventDefault();
+			const invalidi = campi.filter(c => !c.checkValidity());
 			campi.forEach(pulisciErrore);
 
 			if (invalidi.length > 0) {
-				event.preventDefault();
-				invalidi.forEach(campo => mostraErrore(campo, messaggioPer(campo)));
+				invalidi.forEach(c => mostraErrore(c, messaggioPer(c)));
 				summary.hidden = false;
 				summary.textContent =
 					invalidi.length === 1
 						? 'Manca un campo. Controlla qui sotto.'
 						: `Mancano ${invalidi.length} campi. Controlla qui sotto.`;
 				invalidi[0].focus();
-			} else {
-				summary.hidden = true;
+				return;
+			}
+
+			summary.hidden = true;
+			bottone.disabled = true;
+			bottone.textContent = 'Invio in corso…';
+
+			try {
+				const risposta = await fetch(form.action, {
+					method: 'POST',
+					headers: { Accept: 'application/json' },
+					body: new FormData(form),
+				});
+				const dati = await risposta.json();
+				if (!risposta.ok || !dati.success) throw new Error(dati.message || 'invio fallito');
+
+				form.hidden = true;
+				esito.hidden = false;
+				esito.focus?.();
+				esito.scrollIntoView({ block: 'center', behavior: 'smooth' });
+			} catch {
+				// Non lasciamo l'utente senza strada: gli diamo l'indirizzo diretto
+				bottone.disabled = false;
+				bottone.textContent = etichetta;
+				summary.hidden = false;
+				summary.innerHTML =
+					'Non siamo riusciti a inviare il messaggio. Riprova fra poco, ' +
+					`oppure scrivici a <a href="mailto:${indirizzo}">${indirizzo}</a>.`;
+				summary.focus?.();
 			}
 		});
 	}
@@ -131,15 +217,80 @@ const selectOptions = [
 		gap: var(--space-md);
 	}
 
+	/* Invisibile per le persone, compilata solo dai robot */
+	.form__esca {
+		position: absolute;
+		left: -9999px;
+		opacity: 0;
+		width: 0;
+		height: 0;
+	}
+
+	.form__spento {
+		padding: var(--nota-padding);
+		border-left: 3px solid var(--theme-accent);
+		background: var(--theme-surface-1);
+		border-radius: var(--nota-radius);
+		font-size: var(--font-size-sm);
+		max-width: none;
+	}
+
+	.form__consenso label {
+		display: grid;
+		grid-template-columns: auto 1fr;
+		gap: var(--space-2xs);
+		align-items: start;
+		font-size: var(--font-size-sm);
+		font-weight: 400;
+		cursor: pointer;
+	}
+	.form__consenso input {
+		width: 1.1rem;
+		height: 1.1rem;
+		margin-top: 0.2rem;
+		accent-color: var(--theme-primary);
+		cursor: pointer;
+	}
+	.form__consenso input[aria-invalid='true'] {
+		outline: 2px solid var(--theme-errore);
+		outline-offset: 2px;
+	}
+
+	.form__nota {
+		margin: 0;
+		max-width: none;
+		font-size: var(--font-size-xs);
+		color: var(--theme-muted);
+	}
+
 	.form__summary {
 		margin: 0;
 		max-width: none;
-		padding: var(--space-xs) var(--space-sm);
-		border-radius: var(--radius-sm);
+		padding: var(--nota-padding);
+		border-radius: var(--nota-radius);
 		border-left: 3px solid var(--theme-errore);
 		background-color: var(--theme-errore-fondo);
 		color: var(--theme-errore-ink);
 		font-size: var(--font-size-sm);
+	}
+	.form__summary a {
+		color: inherit;
+	}
+
+	.form__esito {
+		padding: var(--blocco-padding);
+		background: var(--theme-surface-2);
+		color: var(--theme-on-surface-2);
+		border-radius: var(--blocco-radius);
+	}
+	.form__esito h3 {
+		margin-bottom: var(--space-2xs);
+	}
+	.form__esito p {
+		margin: 0;
+	}
+	.form__esito[hidden] {
+		display: none;
 	}
 
 	.form__actions {
