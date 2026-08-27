@@ -9,7 +9,8 @@ import {
 	formattaPrezzo,
 	DURATA_PREDEFINITA,
 	DURATE,
-	SCONTO_BANDA,
+	SCONTO_BANDA_ANNUO,
+	formattaPrezzo as euro,
 	alMese,
 	MESI_CORSO,
 } from '../../../config/corsi.js';
@@ -37,13 +38,15 @@ const rigaPredefinita = scala.find(r => r.minuti === DURATA_PREDEFINITA);
 const durataPredefinita = DURATE.find(d => d.minuti === DURATA_PREDEFINITA);
 const haPrezzi = corso.prezzi !== null;
 const haQuota = corso.quotaAnnuale !== null;
-const scontoPercento = Math.round(SCONTO_BANDA * 100);
+const compreso = corso.compresoNelloStrumento;
+const risparmioMese = alMese(SCONTO_BANDA_ANNUO);
 
 // La quota conta come campo: senza, l'avviso diceva "nessuna informazione
 // pubblicata" anche quando il prezzo era già a schermo.
 const totaleCampi = scheda.length + 1;
 const mancanti =
-	scheda.filter(r => daConfermare(r.valore)).length + (haPrezzi || haQuota ? 0 : 1);
+	scheda.filter(r => daConfermare(r.valore)).length +
+	(haPrezzi || haQuota || compreso ? 0 : 1);
 
 const seo = {
 	title: `${corso.nome} | Corsi del Corpo Bandistico di Castelcovati`,
@@ -110,7 +113,7 @@ const seo = {
 				<dl class="corso__lista">
 					<div class="corso__riga">
 						<dt>Quota</dt>
-						<dd class:list={['tabular', { 'is-vuoto': !haPrezzi && !haQuota }]}>
+						<dd class:list={['tabular', { 'is-vuoto': !haPrezzi && !haQuota && !compreso }]}>
 							{
 								haPrezzi && (
 									<>
@@ -151,7 +154,21 @@ const seo = {
 									</>
 								)
 							}
-							{!haPrezzi && !haQuota && '— da confermare'}
+							{
+								compreso && (
+									<>
+										<span class="corso__prezzo">Compreso</span>
+										<span class="corso__prezzo-dettaglio">
+											nel corso di strumento
+										</span>
+										<p class="corso__incluso">
+											Non ha una quota a sé: le lezioni sono già incluse nel costo
+											del corso di strumento musicale.
+										</p>
+									</>
+								)
+							}
+							{!haPrezzi && !haQuota && !compreso && '— da confermare'}
 						</dd>
 					</div>
 					{
@@ -234,12 +251,13 @@ const seo = {
 							<span class="interruttore__testo">Suono nella banda</span>
 						</label>
 						<p class="scala__sconto-nota">
-							Chi suona in banda ha il {scontoPercento}% di sconto sulla quota.
+							Chi suona attivamente in banda risparmia {euro(SCONTO_BANDA_ANNUO)}
+							sulla quota annuale, cioè {euro(risparmioMese)} al mese.
 						</p>
 					</div>
 
 					<p class="scala__stato" role="status" aria-live="polite" hidden>
-						Sconto del {scontoPercento}% applicato.
+						Riduzione di {euro(SCONTO_BANDA_ANNUO)} l’anno applicata.
 					</p>
 				</div>
 			</div>

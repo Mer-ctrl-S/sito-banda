@@ -186,7 +186,14 @@ const definizioniCollettive = [
 		nome: 'Propedeutico',
 		famiglia: 'collettivo',
 		descrizione:
-			'Leggere e capire la musica prima e insieme allo strumento: note, ritmo, tempo, misura e i primi elementi di teoria e solfeggio. È la base che rende più rapido e consapevole lo studio di qualunque strumento.',
+			'Il primo avvicinamento alla musica, in gruppo: si gioca con il ritmo, l’ascolto e la voce prima di scegliere uno strumento. Pensato per chi ha fra i 7 e i 9 anni.',
+	},
+	{
+		slug: 'teoria-solfeggio',
+		nome: 'Teoria e solfeggio',
+		famiglia: 'collettivo',
+		descrizione:
+			'Leggere la musica: note, ritmo, tempo, misura e i primi elementi di teoria. Si svolge in piccoli gruppi formati in base al grado di preparazione.',
 	},
 	{
 		slug: 'musica-insieme',
@@ -201,6 +208,13 @@ const definizioniCollettive = [
 		famiglia: 'collettivo',
 		descrizione:
 			'Un percorso collettivo dedicato agli strumenti a percussione: ritmo, coordinazione e suono d’insieme, dai tamburi ai piatti agli strumenti a tastiera.',
+	},
+	{
+		slug: 'perfezionamento',
+		nome: 'Perfezionamento',
+		famiglia: 'collettivo',
+		descrizione:
+			'Un percorso per chi punta all’ammissione a una scuola musicale statale o a un conservatorio: si lavora sul programma d’esame e sulla preparazione tecnica richiesta.',
 	},
 ];
 
@@ -227,11 +241,15 @@ const LISTINO_BANDA = { 30: 440, 45: 520, 60: 640 };
 const LISTINO_ALTRI = { 30: 520, 45: 600, 60: 720 };
 
 export const datiOrganizzativi = {
+	propedeutico: { insegnante: 'Gianfranco Scalvini', eta: 'Dai 7 ai 9 anni' },
+	'teoria-solfeggio': { insegnante: 'Gianfranco Scalvini' },
 	pianoforte: { insegnante: 'Gabriele Moraschi' },
 	'chitarra-elettrica': { insegnante: 'Michele Belleri' },
 	'basso-elettrico': { insegnante: 'Michele Belleri' },
-	propedeutico: { insegnante: 'Gianfranco Scalvini' },
 };
+
+/** Età minima per i corsi di strumento e canto, dal regolamento. */
+const ETA_STRUMENTO = 'Dai 10 anni, o dopo il corso propedeutico';
 
 /** Quote dei corsi collettivi: gratuiti per chi segue già uno strumento. */
 const QUOTE_COLLETTIVE = {
@@ -239,6 +257,13 @@ const QUOTE_COLLETTIVE = {
 	'musica-insieme': 80,
 	'laboratorio-percussioni': 200,
 };
+
+/*
+  Corsi senza quota propria: il regolamento li dà compresi nel corso di
+  strumento ("Nel costo del corso di Strumento Musicale sono incluse: lezioni
+  di Teoria e solfeggio e Musica d'Insieme"). Perfezionamento non è a listino.
+*/
+const COMPRESI_NELLO_STRUMENTO = new Set(['teoria-solfeggio']);
 
 export const DURATE = [
 	{ minuti: 30, etichetta: '30 minuti' },
@@ -248,8 +273,16 @@ export const DURATE = [
 
 export const DURATA_PREDEFINITA = DURATE[0].minuti;
 
-/** Sconto riservato a chi suona anche in banda. */
-export const SCONTO_BANDA = 0.1;
+/*
+  Riduzioni dal regolamento del 1 settembre 2025. Sono importi FISSI sulla
+  quota annuale, non percentuali: 120 € l'anno corrispondono esattamente a
+  15 € al mese sugli 8 mesi di corso.
+*/
+export const SCONTO_BANDA_ANNUO = 120;
+export const SCONTO_FRATELLI_ANNUO = 40;
+
+/** Contributo associativo annuale, comprensivo di assicurazione RC e infortuni. */
+export const QUOTA_ASSOCIATIVA = 10;
 
 /** Periodo a cui si riferisce l'importo, usato nelle etichette. */
 export const PERIODO_PREZZO = 'al mese';
@@ -291,11 +324,23 @@ export const corsi = [
 	const prezziCompleti =
 		listino && DURATE.every(d => typeof listino[d.minuti] === 'number');
 	const quota = QUOTE_COLLETTIVE[corso.slug] ?? null;
+	// I corsi di strumento hanno tutti la stessa età minima: non va ripetuta
+	// venti volte nei dati organizzativi.
+	const eta =
+		dati.eta !== DA_CONFERMARE
+			? dati.eta
+			: prezziCompleti
+				? ETA_STRUMENTO
+				: DA_CONFERMARE;
 	return {
 		...dati,
+		eta,
 		prezzi: prezziCompleti ? listino : null,
 		quotaAnnuale: quota,
+		// quota propria ma gratuita per chi segue già uno strumento
 		inclusoConStrumento: quota !== null,
+		// nessuna quota propria: esiste solo dentro il corso di strumento
+		compresoNelloStrumento: COMPRESI_NELLO_STRUMENTO.has(corso.slug),
 		href: `/scuola/corsi/${corso.slug}`,
 		immagine: SLUG_CON_FOTO.has(corso.slug)
 			? `/assets/images/strumenti/${corso.slug}.webp`
@@ -348,9 +393,9 @@ export const formattaPrezzo = valore => {
 export const alMese = annuale =>
 	typeof annuale === 'number' ? Math.round((annuale / MESI_CORSO) * 100) / 100 : null;
 
-/** Applica lo sconto banda e arrotonda ai centesimi. */
-export const conSconto = valore =>
-	typeof valore === 'number' ? Math.round(valore * (1 - SCONTO_BANDA) * 100) / 100 : null;
+/** Applica lo sconto banda alla quota annuale, senza mai scendere sotto zero. */
+export const conSconto = annuale =>
+	typeof annuale === 'number' ? Math.max(0, annuale - SCONTO_BANDA_ANNUO) : null;
 
 /** Righe pronte per la tabella della scala prezzi. */
 export const scalaPrezzi = corso =>
