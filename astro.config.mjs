@@ -3,14 +3,35 @@ import sitemap from '@astrojs/sitemap';
 import mdx from '@astrojs/mdx';
 import icon from 'astro-icon';
 import lit from '@astrojs/lit';
-import { defineConfig } from 'astro/config';
 import tailwindcss from '@tailwindcss/vite';
 
-// https://astro.build/config
+/*
+  Dominio pubblico, usato per canonical URL, tag Open Graph e sitemap.
+  Ordine di precedenza:
+    1. SITE_URL          — impostala quando ci sarà il dominio definitivo
+    2. dominio di produzione Vercel — stabile, non cambia a ogni deploy
+    3. segnaposto        — solo in locale
+
+  Si usa il dominio di PRODUZIONE anche nelle preview: una preview non deve
+  dichiararsi canonica di se stessa, altrimenti ogni deploy crea un duplicato.
+*/
+const dominioProduzioneVercel = process.env.VERCEL_PROJECT_PRODUCTION_URL;
+const site =
+	process.env.SITE_URL ||
+	(dominioProduzioneVercel ? `https://${dominioProduzioneVercel}` : null) ||
+	'https://example.com';
+
+/*
+  L'indicizzazione è governata da SITE_INDEXABLE, letta direttamente dalle
+  pagine con import.meta.env: Astro la espone come stringa senza bisogno di
+  configurarla qui. NON aggiungere un vite.define su import.meta.env.*, Vite
+  gestisce quell'oggetto per conto suo e il valore verrebbe sovrascritto.
+  La leggono: src/pages/robots.txt.ts e src/components/head/BaseHead.astro.
+*/
+
 export default defineConfig({
-	site: 'https://odyssey-theme.sapling.supply/', // Your public domain, e.g.: https://my-site.dev/. Used to generate sitemaps and canonical URLs.
-	sitemap: true, // Generate sitemap (set to "false" to disable)
-	integrations: [sitemap(), mdx(), lit(), icon()], // Add renderers to the config
+	site,
+	integrations: [sitemap(), mdx(), lit(), icon()],
 	vite: {
 		plugins: [tailwindcss()],
 	},

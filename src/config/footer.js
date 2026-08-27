@@ -63,7 +63,7 @@ export const footerLists = [
 			},
 			{
 				title: '5 per mille',
-				slug: '/theme/style-guide',
+				slug: '/5-per-mille',
 			},
 		],
 	},

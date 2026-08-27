@@ -1,117 +1,114 @@
-/* Special thanks to this tool for local fonts CSS generation:
-  https://google-webfonts-helper.herokuapp.com/fonts/lato?subsets=latin
+/*
+  Due caratteri variabili, sottoinsieme latino, serviti in locale.
+  Fraunces (display, asse ottico) per i titoli; Geist per il testo corrente.
+  Un solo file per famiglia copre tutti i pesi da 400 a 700.
 */
 
-/* roboto-serif-600 - latin */
 @font-face {
-  font-family: 'Roboto Serif';
-  font-style: normal;
-  font-weight: 600;
-  font-display: swap;
-  src: local(''),
-       url('/assets/fonts/roboto-serif-v8-latin-600.woff2') format('woff2'), /* Chrome 26+, Opera 23+, Firefox 39+ */
-       url('/assets/fonts/roboto-serif-v8-latin-600.woff') format('woff'); /* Chrome 6+, Firefox 3.6+, IE 9+, Safari 5.1+ */
-}
-/* roboto-serif-700 - latin */
-@font-face {
-  font-family: 'Roboto Serif';
-  font-style: normal;
-  font-weight: 700;
-  font-display: swap;
-  src: local(''),
-       url('/assets/fonts/roboto-serif-v8-latin-700.woff2') format('woff2'), /* Chrome 26+, Opera 23+, Firefox 39+ */
-       url('/assets/fonts/roboto-serif-v8-latin-700.woff') format('woff'); /* Chrome 6+, Firefox 3.6+, IE 9+, Safari 5.1+ */
+	font-family: 'Fraunces';
+	font-style: normal;
+	font-weight: 400 700;
+	font-display: swap;
+	src: url('/assets/fonts/fraunces-latin-var.woff2') format('woff2');
+	unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6,
+		U+02DA, U+02DC, U+2000-206F, U+20AC, U+2122, U+2212, U+FEFF, U+FFFD;
 }
 
-/* lato-300 - latin */
 @font-face {
-  font-family: 'Lato';
-  font-style: normal;
-  font-weight: 300;
-  font-display: swap;
-  src: local(''),
-       url('/assets/fonts/lato-v23-latin-300.woff2') format('woff2'), /* Chrome 26+, Opera 23+, Firefox 39+ */
-       url('/assets/fonts/lato-v23-latin-300.woff') format('woff'); /* Chrome 6+, Firefox 3.6+, IE 9+, Safari 5.1+ */
+	font-family: 'Geist';
+	font-style: normal;
+	font-weight: 300 700;
+	font-display: swap;
+	src: url('/assets/fonts/geist-latin-var.woff2') format('woff2');
+	unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6,
+		U+02DA, U+02DC, U+2000-206F, U+20AC, U+2122, U+2212, U+FEFF, U+FFFD;
 }
-/* lato-regular - latin */
-@font-face {
-  font-family: 'Lato';
-  font-style: normal;
-  font-weight: 400;
-  font-display: swap;
-  src: local(''),
-       url('/assets/fonts/lato-v23-latin-regular.woff2') format('woff2'), /* Chrome 26+, Opera 23+, Firefox 39+ */
-       url('/assets/fonts/lato-v23-latin-regular.woff') format('woff'); /* Chrome 6+, Firefox 3.6+, IE 9+, Safari 5.1+ */
-}
-/* lato-700 - latin */
-@font-face {
-  font-family: 'Lato';
-  font-style: normal;
-  font-weight: 700;
-  font-display: swap;
-  src: local(''),
-       url('/assets/fonts/lato-v23-latin-700.woff2') format('woff2'), /* Chrome 26+, Opera 23+, Firefox 39+ */
-       url('/assets/fonts/lato-v23-latin-700.woff') format('woff'); /* Chrome 6+, Firefox 3.6+, IE 9+, Safari 5.1+ */
-}
-/* lato-700italic - latin */
-@font-face {
-  font-family: 'Lato';
-  font-style: italic;
-  font-weight: 700;
-  font-display: swap;
-  src: local(''),
-       url('/assets/fonts/lato-v23-latin-700italic.woff2') format('woff2'), /* Chrome 26+, Opera 23+, Firefox 39+ */
-       url('/assets/fonts/lato-v23-latin-700italic.woff') format('woff'); /* Chrome 6+, Firefox 3.6+, IE 9+, Safari 5.1+ */
-}
+
 :root {
-  --font-size-sm: clamp(14.4px, 0.07vw + 14.13px, 15px);
-  --font-size-base: clamp(18px, 0.23vw + 17.09px, 20px);
-  --font-size-md: clamp(22.5px, 0.47vw + 20.61px, 26.66px);
-  --font-size-lg: clamp(28.13px, 0.84vw + 24.76px, 35.54px);
-  --font-size-xl: clamp(35.16px, 1.39vw + 29.6px, 47.37px);
-  --font-size-xxl: clamp(43.95px, 2.18vw + 35.22px, 63.15px);
-  --font-size-xxxl: clamp(54.93px, 3.32vw + 41.64px, 84.17px);
+	--font-size-xs: clamp(0.75rem, 0.02vw + 0.74rem, 0.8rem);
+	--font-size-sm: clamp(0.875rem, 0.04vw + 0.86rem, 0.925rem);
+	--font-size-base: clamp(1.0625rem, 0.12vw + 1.03rem, 1.175rem);
+	--font-size-md: clamp(1.3rem, 0.3vw + 1.22rem, 1.55rem);
+	--font-size-lg: clamp(1.65rem, 0.6vw + 1.5rem, 2.15rem);
+	--font-size-xl: clamp(2.1rem, 1.1vw + 1.82rem, 3rem);
+	--font-size-xxl: clamp(2.7rem, 2vw + 2.2rem, 4.25rem);
+	--font-size-xxxl: clamp(3.4rem, 3.4vw + 2.55rem, 6rem);
+
+	/* Tracking: negativo sui display, positivo sulle etichette piccole */
+	--tracking-display: -0.03em;
+	--tracking-tight: -0.015em;
+	--tracking-normal: 0;
+	--tracking-label: 0.08em;
 }
 
 html,
 body {
-	line-height: 1.5;
 	font-family: var(--theme-font-family-sans);
 	font-size: var(--font-size-base);
+	font-weight: 400;
+	line-height: 1.65;
 	color: var(--theme-on-bg);
-} 
+	font-optical-sizing: auto;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+}
 
 h1,
 h2,
-h3 {
+h3,
+h4 {
 	font-family: var(--theme-font-family-serif);
-	font-weight: 700;
+	color: var(--theme-on-bg);
+	text-wrap: balance;
+	font-variation-settings: 'SOFT' 0, 'WONK' 1;
 }
 
 h1 {
 	font-size: var(--font-size-xxl);
+	font-weight: 600;
+	line-height: 1.03;
+	letter-spacing: var(--tracking-display);
 }
 
 h2 {
 	font-size: var(--font-size-xl);
+	font-weight: 600;
+	line-height: 1.08;
+	letter-spacing: var(--tracking-display);
 }
 
 h3 {
 	font-size: var(--font-size-lg);
+	font-weight: 600;
+	line-height: 1.15;
+	letter-spacing: var(--tracking-tight);
 }
 
-h1,
-h2 {
-	line-height: 1.1;
-	font-weight: 700;
+h4 {
+	font-size: var(--font-size-md);
+	font-weight: 600;
+	line-height: 1.25;
+	letter-spacing: var(--tracking-tight);
 }
 
-h3 {
-	font-weight: 500;
-}
-
+h5,
 h6 {
+	font-family: var(--theme-font-family-sans);
 	font-size: var(--font-size-sm);
+	font-weight: 600;
+	letter-spacing: var(--tracking-label);
+	text-transform: uppercase;
+	color: var(--theme-muted);
+}
+
+p {
+	text-wrap: pretty;
+}
+
+/* Misura di lettura: solo per il testo corrente, non per i titoli */
+p,
+li {
+	max-width: var(--measure);
 }
 
 h1,
@@ -121,14 +118,41 @@ h4,
 h5,
 h6,
 p {
-	margin: 0 0 1rem 0;
+	margin: 0 0 var(--space-sm) 0;
+}
+
+strong,
+b {
+	font-weight: 600;
+}
+
+/* Cifre allineate: date, quote, importi */
+time,
+.tabular {
+	font-variant-numeric: tabular-nums;
+}
+
+/* Occhiello / etichetta: minuscolo spaziato al posto del maiuscolo ovunque */
+.eyebrow {
+	font-family: var(--theme-font-family-sans);
+	font-size: var(--font-size-xs);
+	font-weight: 500;
+	letter-spacing: var(--tracking-label);
+	text-transform: uppercase;
+	color: var(--theme-accent);
+	margin-bottom: var(--space-2xs);
+	display: block;
 }
 
 blockquote {
-	font-style: italic;
-	font-size: var(--font-size-base);
-	font-weight: 500;
-	margin-bottom: 1rem;
-	padding-left: 1.5rem;
-	border-left: 0.25rem solid var(--theme-on-bg);
+	font-family: var(--theme-font-family-serif);
+	font-style: normal;
+	font-size: var(--font-size-md);
+	font-weight: 400;
+	line-height: 1.35;
+	letter-spacing: var(--tracking-tight);
+	margin: 0 0 var(--space-sm) 0;
+	padding-left: var(--space-md);
+	border-left: 2px solid var(--theme-accent);
+	max-width: 40ch;
 }

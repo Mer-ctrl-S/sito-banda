@@ -1,182 +1,461 @@
 ---
 import Layout from '../../../layouts/Page.astro';
-import { Container } from '@components/odyssey-theme';
+import { Container, Button } from '@components/odyssey-theme';
 import BandaChart from '../../../components/BandaChart.astro';
+import TextAndImageHero from '../../../components/sections/heros/TextAndImageHero.astro';
+import HeroSlider from '../../../components/sections/heros/HeroSlider.astro';
+import {
+	corsiPerSlug,
+	corsiStrumento,
+	corsiCollettivi,
+	daConfermare,
+} from '../../../config/corsi.js';
+import { soundMap, soundMapSettore } from '../../../config/suoni.js';
 
 const seo = {
-	title: 'Scelta Corsi | Accademia Musicale',
+	title: 'I nostri corsi | Corpo Bandistico di Castelcovati',
 	description:
-		'Scopri gli strumenti della banda e ascolta il suono di ogni sezione.',
+		'Gli strumenti della banda, la musica d\u2019insieme e il corso di teoria e solfeggio: ascolta ogni strumento e apri la scheda del corso.',
 };
 
-// definizione settori (angoli in gradi, 180° = lato sinistro, 0° = lato destro)
-// layout pensato per assomigliare il più possibile allo screenshot:
-// - anello 1: cerchio più vicino al direttore
-// - anello 2: sedie intermedie
-// - anello 3: arco esterno (percussioni, ottoni grossi, sax...)
+// riuso delle immagini hero della sezione "scuola" per coerenza visiva
+const heroImages = [
+	{
+		src: '/assets/images/hero-school-1.jpeg',
+		alt: "Allievi dell'Accademia Musicale durante una lezione",
+	},
+	{
+		src: '/assets/images/hero-school-2.jpeg',
+		alt: "Allievi dell'Accademia Musicale durante una lezione",
+	},
+];
+
+// definizione settori (angoli in gradi, 180\u00b0 = lato sinistro, 0\u00b0 = lato destro)
 const sections = [
 	// ANELLO 1 (interno, vicino al direttore)
-	// partirò dal centro e ruoto verso destra/sinistra per imitare la foto
-	{ id: 'C1', label: 'C1', ring: 1, startDeg: 175, endDeg: 185 },
-	{ id: 'OB', label: 'OB', ring: 1, startDeg: 185, endDeg: 200 },
-	{ id: 'CB', label: 'CB', ring: 1, startDeg: 200, endDeg: 220 },
-	{ id: 'BSN', label: 'BSN', ring: 1, startDeg: 220, endDeg: 240 },
-	{ id: 'Clar2', label: 'Clarinetto 2', ring: 1, startDeg: 240, endDeg: 260 },
-	{ id: 'Clar3', label: 'Clarinetto 3', ring: 1, startDeg: 260, endDeg: 280 },
-	{ id: 'OTT', label: 'OTT', ring: 1, startDeg: 150, endDeg: 165 },
-	{ id: 'Flute1', label: 'Flute1', ring: 1, startDeg: 280, endDeg: 340 },
+	{ id: 'C1', label: 'Clarinetto', ring: 1, startDeg: 180, endDeg: 265 },
+	{ id: 'OB', label: 'Oboe', ring: 1, startDeg: 265, endDeg: 280 },
+	{ id: 'Flute1', label: 'Flauto Traverso', ring: 1, startDeg: 280, endDeg: 340 },
 	{ id: 'Ottavino', label: 'Ottavino', ring: 1, startDeg: 340, endDeg: 360 },
 
 	// ANELLO 2 (medio, legni/ottoni centrali)
-	{
-		id: 'Flauto2',
-		label: 'Flauto Traverso 2',
-		ring: 2,
-		startDeg: 150,
-		endDeg: 170,
-	},
-	{ id: 'Corno', label: 'Corno Francese', ring: 2, startDeg: 190, endDeg: 210 },
-	{
-		id: 'SaxContr',
-		label: 'Sax Contralto',
-		ring: 2,
-		startDeg: 210,
-		endDeg: 230,
-	},
-	{ id: 'SaxTen', label: 'Sax Tenore', ring: 2, startDeg: 230, endDeg: 250 },
-	{ id: 'SAXB', label: 'SAXB', ring: 2, startDeg: 250, endDeg: 270 },
-	{ id: 'Tuba', label: 'Tuba', ring: 2, startDeg: 270, endDeg: 290 },
-	{ id: 'Euph', label: 'Euphonium', ring: 2, startDeg: 290, endDeg: 310 },
+	{ id: 'Clar2', label: 'Clarinetto', ring: 2, startDeg: 180, endDeg: 195 },
+	{ id: 'CB', label: 'Clar. Basso', ring: 2, startDeg: 195, endDeg: 230 },
+	{ id: 'Corno', label: 'Corno Francese', ring: 2, startDeg: 245, endDeg: 270 },
+	{ id: 'BSN', label: 'Fagotto', ring: 2, startDeg: 230, endDeg: 245 },
+	{ id: 'SAXB', label: 'Sax Baritono', ring: 2, startDeg: 270, endDeg: 290 },
+	{ id: 'SaxTen', label: 'Sax Tenore', ring: 2, startDeg: 290, endDeg: 310 },
+	{ id: 'SaxContr', label: 'Sax Contralto', ring: 2, startDeg: 310, endDeg: 360 },
 
-	// ANELLO 3 (esterno, grande ventaglio come in screenshot)
-	{ id: 'Perc', label: 'Percussioni', ring: 3, startDeg: 180, endDeg: 215 },
-	{ id: 'Tromba', label: 'Tromba', ring: 3, startDeg: 215, endDeg: 240 },
-	{ id: 'Trombone', label: 'Trombone', ring: 3, startDeg: 240, endDeg: 270 },
-	// chiudo il lato destro con una zona trombe/tromboni “larga” come in immagine
+	// ANELLO 3 (esterno, grande ventaglio)
+	{ id: 'Perc', label: 'Percussioni', ring: 3, startDeg: 180, endDeg: 240 },
+	{ id: 'Tromba', label: 'Tromba', ring: 3, startDeg: 240, endDeg: 270 },
+	{ id: 'Tuba', label: 'Tuba', ring: 3, startDeg: 270, endDeg: 290 },
+	{ id: 'Euph', label: 'Euphonium', ring: 3, startDeg: 290, endDeg: 310 },
+	{ id: 'Trombone', label: 'Trombone', ring: 3, startDeg: 310, endDeg: 360 },
 ];
 
-// mappa strumento -> file audio
-const soundMap = {
-	C1: '/audio/clarinetto1.mp3',
-	OB: '/audio/oboe.mp3',
-	CB: '/audio/clarinetto-basso.mp3',
-	BSN: '/audio/fagotto.mp3',
-	Clar2: '/audio/clarinetto2.mp3',
-	Clar3: '/audio/clarinetto3.mp3',
-	OTT: '/audio/ottoni.mp3',
-	Flute1: '/audio/flauto1.mp3',
-	Flauto2: '/audio/flauto2.mp3',
-	Corno: '/audio/corno.mp3',
-	Tromba: '/audio/tromba.mp3',
-	Trombone: '/audio/trombone.mp3',
-	SaxContr: '/audio/sax-contralto.mp3',
-	SaxTen: '/audio/sax-tenore.mp3',
-	SAXB: '/audio/sax-baritono.mp3',
-	Perc: '/audio/percussioni.mp3',
-	Tuba: '/audio/tuba.mp3',
-	Euph: '/audio/euphonium.mp3',
+// Ogni settore del grafico punta a un corso in config/corsi.js.
+const settoreVersoSlug = {
+	C1: 'clarinetto',
+	Clar2: 'clarinetto',
+	CB: 'clarinetto-basso',
+	OB: 'oboe',
+	BSN: 'fagotto',
+	Flute1: 'flauto',
+	Ottavino: 'ottavino',
+	Corno: 'corno',
+	Tromba: 'tromba',
+	Trombone: 'trombone',
+	SaxContr: 'sax-contralto',
+	SaxTen: 'sax-tenore',
+	SAXB: 'sax-baritono',
+	Perc: 'percussioni',
+	Tuba: 'tuba',
+	Euph: 'euphonium',
 };
+
+// Dati passati al modal: nessun campo inventato, i segnaposto arrivano cos\u00ec come sono.
+const instrumentData = Object.fromEntries(
+	sections.map(settore => {
+		const corso = corsiPerSlug[settoreVersoSlug[settore.id]];
+		return [
+			settore.id,
+			{
+				nome: corso.nome,
+				href: corso.href,
+				immagine: corso.immagine,
+				suono: soundMapSettore[settore.id] ?? soundMap[corso.slug] ?? null,
+				scheda: [
+					{ voce: 'Insegnante', valore: corso.insegnante, vuoto: daConfermare(corso.insegnante) },
+					{ voce: 'Orari', valore: corso.orari, vuoto: daConfermare(corso.orari) },
+					{ voce: 'Quota', valore: corso.costo, vuoto: daConfermare(corso.costo) },
+				],
+			},
+		];
+	})
+);
 ---
 
 <Layout {seo}>
-	<Container>
-		<header class="scelta-header">
-			<p class="scelta-header__eyebrow">Accademia Musicale</p>
-			<h1>WIP</h1>
-			<!--<h1>del Corpo Bandistico di Castelcovati</h1>
-			<p class="scelta-header__subtitle">
-				Un percorso formativo completo per musicisti di ogni età e livello.
+	<TextAndImageHero reversed>
+		<div slot="text-container">
+			<h1>I nostri corsi</h1>
+			<p>
+				La nostra accademia è aperta a bambini, ragazzi e adulti che vogliono
+				scoprire il piacere di suonare uno strumento e far parte della banda
+				musicale. Che tu parta da zero o voglia perfezionarti, troverai lezioni
+				su misura per te.
 			</p>
-			-->
-		</header>
-		<!--
-		<section class="banda-section">
-			<div class="banda-section__text">
+		</div>
+
+		<div slot="btns-container">
+			<Button href="#banda-interattiva" outlined>Scopri gli strumenti</Button>
+		</div>
+
+		<HeroSlider slot="image-container" images={heroImages} interval={10000} />
+	</TextAndImageHero>
+
+	<Container>
+		<!-- INTRO SEZIONE BANDA -->
+		<section class="intro-card">
+			<div class="intro-card__content">
 				<h2>Scopri la Banda Musicale</h2>
-				<p class="banda-section__eyebrow">È disposta come da concerto!</p>
-				<p>Clicca sulle sezioni ed ascolta gli strumenti 🎧</p>
+				<p>
+					Nella grafica qui sotto trovi la disposizione reale dei musicisti sul
+					palco. Clicca sulle sezioni per ascoltare il suono degli strumenti e
+					capire quale ti ispira di più.
+				</p>
+				<p class="intro-card__hint">
+					Suggerimento: prova a confrontare i legni (flauti, clarinetti, sax)
+					con gli ottoni (trombe, tromboni, corni, tuba) e le percussioni, così
+					ti fai un’idea delle diverse famiglie strumentali.
+				</p>
+			</div>
+		</section>
+
+		<!-- BANDA INTERATTIVA -->
+		<section id="banda-interattiva" class="banda-section">
+			<div class="banda-section__header">
+				<h3>La banda vista dal direttore</h3>
+				<p>
+					Ogni “spicchio” rappresenta una sezione di strumenti: cliccando, puoi
+					ascoltare un breve estratto audio registrato dai nostri musicisti.
+				</p>
 			</div>
 
 			<div class="banda-svg-wrapper">
+				<!-- BandaChart deve generare l'SVG con id="bandaSvg" e i settori cliccabili -->
 				<BandaChart {sections} />
 			</div>
 		</section>
-		-->
+
+		<!-- CORSI COLLETTIVI: non stanno sul grafico perché non sono strumenti -->
+		<section class="collettivi" aria-labelledby="collettiviTitolo">
+			<h2 id="collettiviTitolo">Non solo strumenti</h2>
+			<p class="collettivi__intro">
+				Due corsi che non compaiono nel grafico perché non sono legati a un
+				singolo strumento, ma accompagnano lo studio di tutti.
+			</p>
+
+			<ul class="collettivi__lista">
+				{
+					corsiCollettivi.map(corso => (
+						<li class="collettivi__voce">
+							<h3><a href={corso.href}>{corso.nome}</a></h3>
+							<p>{corso.descrizione}</p>
+						</li>
+					))
+				}
+			</ul>
+		</section>
+
+		<!-- ELENCO TESTUALE: il grafico è il modo bello di arrivarci, questo è quello
+		     raggiungibile da tastiera, dai lettori di schermo e dai motori di ricerca -->
+		<section class="elenco" aria-labelledby="elencoTitolo">
+			<h2 id="elencoTitolo">Tutti i corsi di strumento</h2>
+			<ul class="elenco__lista">
+				{
+					corsiStrumento.map(corso => (
+						<li>
+							<a href={corso.href}>{corso.nome}</a>
+						</li>
+					))
+				}
+			</ul>
+		</section>
+
+		<!-- BLOCCO FINALE / CTA (opzionale, ma utile per somigliare alla pagina finale) -->
+		<section class="cta-section">
+			<div class="cta-section__content">
+				<h2>Non sai da dove partire?</h2>
+				<p>
+					Se hai dubbi su quale strumento scegliere, contattaci: ti aiuteremo a
+					capire quale corso è più adatto a te in base alla tua età, ai gusti
+					musicali e al tempo che puoi dedicare allo studio.
+				</p>
+				<a href="/company/contact" class="cta-section__button">
+					Scrivici per un consiglio
+				</a>
+			</div>
+		</section>
 	</Container>
 
-	<script>
-		const soundMap = {
-			C1: '/audio/clarinetto1.mp3',
-			OB: '/audio/oboe.mp3',
-			CB: '/audio/clarinetto-basso.mp3',
-			BSN: '/audio/fagotto.mp3',
-			Clar2: '/audio/clarinetto2.mp3',
-			Clar3: '/audio/clarinetto3.mp3',
-			OTT: '/audio/ottoni.mp3',
-			Flute1: '/audio/flauto1.mp3',
-			Flauto2: '/audio/flauto2.mp3',
-			Corno: '/audio/corno.mp3',
-			Tromba: '/audio/tromba.mp3',
-			Trombone: '/audio/trombone.mp3',
-			SaxContr: '/audio/sax-contralto.mp3',
-			SaxTen: '/audio/sax-tenore.mp3',
-			SAXB: '/audio/sax-baritono.mp3',
-			Perc: '/audio/percussioni.mp3',
-			Tuba: '/audio/tuba.mp3',
-			Euph: '/audio/euphonium.mp3',
-		};
+	<!-- MODAL STRUMENTO -->
+	<div id="instrumentModal" class="instrument-modal" hidden>
+		<div class="instrument-modal__backdrop" data-close></div>
+		<div
+			class="instrument-modal__box"
+			role="dialog"
+			aria-modal="true"
+			aria-labelledby="instrumentModalTitle"
+		>
+			<button
+				type="button"
+				class="instrument-modal__close"
+				data-close
+				aria-label="Chiudi"
+			>&times;</button>
 
+			<div class="instrument-modal__media">
+				<img id="instrumentModalImage" class="instrument-modal__image" alt="" hidden />
+				<div id="instrumentModalPlaceholder" class="instrument-modal__placeholder">
+					<svg viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+						<path d="M9 18V5l12-2v13" stroke-linecap="round" stroke-linejoin="round"></path>
+						<circle cx="6" cy="18" r="3"></circle>
+						<circle cx="18" cy="16" r="3"></circle>
+					</svg>
+				</div>
+			</div>
+
+			<h2 id="instrumentModalTitle" class="instrument-modal__title"></h2>
+
+			<button type="button" id="instrumentModalAudio" class="instrument-modal__audio" aria-pressed="false">
+				<span class="instrument-modal__audio-icona" aria-hidden="true"></span>
+				<span id="instrumentModalAudioLabel">Ascolta</span>
+			</button>
+			<p id="instrumentModalNote" class="instrument-modal__note" hidden>Audio in arrivo</p>
+
+			<!-- Dettagli: chiusi di default, il pulsante li espande senza cambiare pagina -->
+			<button
+				type="button"
+				id="instrumentModalToggle"
+				class="instrument-modal__toggle"
+				aria-expanded="false"
+				aria-controls="instrumentModalDetails"
+			>Dettagli del corso</button>
+
+			<div id="instrumentModalDetails" class="instrument-modal__details" hidden>
+				<dl id="instrumentModalScheda" class="instrument-modal__scheda"></dl>
+				<a id="instrumentModalLink" class="instrument-modal__link" href="#">
+					Vedi il corso completo →
+				</a>
+			</div>
+		</div>
+	</div>
+
+	<script define:vars={{ instrumentData }}>
 		const svg = document.getElementById('bandaSvg');
+		const modal = document.getElementById('instrumentModal');
+		const box = modal?.querySelector('.instrument-modal__box');
+		const modalImage = document.getElementById('instrumentModalImage');
+		const modalPlaceholder = document.getElementById('instrumentModalPlaceholder');
+		const modalTitle = document.getElementById('instrumentModalTitle');
+		const modalNote = document.getElementById('instrumentModalNote');
+		const audioBtn = document.getElementById('instrumentModalAudio');
+		const audioLabel = document.getElementById('instrumentModalAudioLabel');
+		const toggle = document.getElementById('instrumentModalToggle');
+		const details = document.getElementById('instrumentModalDetails');
+		const scheda = document.getElementById('instrumentModalScheda');
+		const link = document.getElementById('instrumentModalLink');
+		const audio = new Audio();
+		audio.preload = 'auto';
+
+		let ultimoTrigger = null;
+
+		function fermaAudio() {
+			audio.pause();
+			audioBtn.setAttribute('aria-pressed', 'false');
+			audioLabel.textContent = 'Ascolta';
+		}
+
+		function avviaAudio() {
+			audio.currentTime = 0;
+			audio.play().then(
+				() => {
+					audioBtn.setAttribute('aria-pressed', 'true');
+					audioLabel.textContent = 'Ferma';
+				},
+				() => fermaAudio()
+			);
+		}
+
+		audio.addEventListener('ended', fermaAudio);
+		audio.addEventListener('error', () => {
+			fermaAudio();
+			modalNote.hidden = false;
+			modalNote.textContent = 'Audio non disponibile al momento';
+		});
+		audioBtn.addEventListener('click', () => {
+			if (audioBtn.getAttribute('aria-pressed') === 'true') fermaAudio();
+			else avviaAudio();
+		});
+
+		toggle.addEventListener('click', () => {
+			const aperto = toggle.getAttribute('aria-expanded') === 'true';
+			toggle.setAttribute('aria-expanded', String(!aperto));
+			details.hidden = aperto;
+			toggle.textContent = aperto ? 'Dettagli del corso' : 'Nascondi i dettagli';
+		});
+
+		function closeModal() {
+			modal.hidden = true;
+			document.body.style.overflow = '';
+			fermaAudio();
+			// il focus torna al settore da cui si è partiti
+			if (ultimoTrigger && typeof ultimoTrigger.focus === 'function') {
+				ultimoTrigger.focus();
+			}
+		}
+
+		function openModalFor(id, trigger) {
+			const data = instrumentData[id];
+			if (!data) return;
+
+			ultimoTrigger = trigger ?? null;
+			modalTitle.textContent = data.nome;
+			link.href = data.href;
+
+			modalImage.hidden = false;
+			modalPlaceholder.hidden = true;
+			modalImage.alt = data.nome;
+			modalImage.onerror = () => {
+				modalImage.hidden = true;
+				modalPlaceholder.hidden = false;
+			};
+			modalImage.src = data.immagine;
+
+			// scheda sintetica: i segnaposto restano visibili e dichiarati
+			scheda.replaceChildren();
+			data.scheda.forEach(riga => {
+				const dt = document.createElement('dt');
+				dt.textContent = riga.voce;
+				const dd = document.createElement('dd');
+				dd.textContent = riga.valore;
+				if (riga.vuoto) dd.classList.add('is-vuoto');
+				scheda.append(dt, dd);
+			});
+
+			// dettagli sempre richiusi all'apertura
+			toggle.setAttribute('aria-expanded', 'false');
+			toggle.textContent = 'Dettagli del corso';
+			details.hidden = true;
+
+			fermaAudio();
+			modalNote.textContent = 'Audio in arrivo';
+			if (data.suono) {
+				modalNote.hidden = true;
+				audioBtn.hidden = false;
+				audio.src = data.suono;
+			} else {
+				audio.removeAttribute('src');
+				audioBtn.hidden = true;
+				modalNote.hidden = false;
+			}
+
+			modal.hidden = false;
+			document.body.style.overflow = 'hidden';
+
+			// l'utente ha cliccato: l'ascolto parte, ma il pulsante lo ferma sempre
+			if (data.suono) avviaAudio();
+			(data.suono ? audioBtn : toggle).focus();
+		}
+
 		if (svg) {
-			const audio = new Audio();
 			svg.querySelectorAll('.sector').forEach(sector => {
-				sector.addEventListener('click', () => {
+				const apri = () => {
 					const id = sector.getAttribute('data-instrument');
-					const src = id && soundMap[id];
-					if (!src) return;
-					audio.src = src;
-					audio.currentTime = 0;
-					audio.play();
+					if (id) openModalFor(id, sector);
+				};
+				sector.addEventListener('click', apri);
+				sector.addEventListener('keydown', e => {
+					if (e.key === 'Enter' || e.key === ' ') {
+						e.preventDefault();
+						apri();
+					}
 				});
+			});
+		}
+
+		if (modal) {
+			modal.querySelectorAll('[data-close]').forEach(el => {
+				el.addEventListener('click', closeModal);
+			});
+
+			document.addEventListener('keydown', e => {
+				if (modal.hidden) return;
+
+				if (e.key === 'Escape') {
+					closeModal();
+					return;
+				}
+
+				// il focus resta dentro la finestra finché è aperta
+				if (e.key === 'Tab') {
+					const focusabili = [...box.querySelectorAll('button, a[href]')].filter(
+						el => !el.hidden && el.offsetParent !== null
+					);
+					if (!focusabili.length) return;
+					const primo = focusabili[0];
+					const ultimo = focusabili[focusabili.length - 1];
+					if (e.shiftKey && document.activeElement === primo) {
+						e.preventDefault();
+						ultimo.focus();
+					} else if (!e.shiftKey && document.activeElement === ultimo) {
+						e.preventDefault();
+						primo.focus();
+					}
+				}
 			});
 		}
 	</script>
 </Layout>
 
 <style>
-	.scelta-header__eyebrow {
-		text-transform: uppercase;
-		letter-spacing: 0.08em;
-		font-size: 0.8rem;
-		margin-bottom: 0.25rem;
+	/* HERO */
+	/* INTRO CARD */
+	.intro-card {
+		margin: 2rem auto 2rem;
+		max-width: 52rem;
+		text-align: center;
 	}
 
-	.scelta-header h1 {
-		margin-bottom: 0.25rem;
+	.intro-card__content {
+		padding: 1.5rem 1rem;
 	}
 
-	.scelta-header__subtitle {
-		margin-top: 0.5rem;
-		max-width: 32rem;
+	.intro-card__hint {
+		margin-top: 0.75rem;
 		color: var(--theme-on-surface-2);
 	}
 
+	/* BANDA SECTION */
 	.banda-section {
-		margin: 2.5rem 0;
+		margin: 0 0 3rem;
 	}
 
-	.banda-section__text {
+	.banda-section__header {
 		text-align: center;
-		margin-bottom: 1rem;
+		max-width: 42rem;
+		margin: 0 auto 1.5rem;
 	}
 
-	.banda-section__eyebrow {
-		font-weight: 600;
-		margin: 0 0 0.25rem;
+	.banda-section__header h3 {
+		margin-bottom: 0.5rem;
 	}
 
 	.banda-svg-wrapper {
-		max-width: 800px;
+		max-width: 920px;
 		margin: 0 auto;
 	}
 
@@ -185,5 +464,285 @@ const soundMap = {
 		height: auto;
 		display: block;
 		margin: 0 auto;
+	}
+
+	/* CTA FINALE */
+	.cta-section {
+		border-top: 1px solid var(--theme-border);
+		padding: 2.5rem 0 3rem;
+		margin-top: 1.5rem;
+	}
+
+	.cta-section__content {
+		max-width: 40rem;
+		margin: 0 auto;
+		text-align: center;
+	}
+
+	.cta-section__button {
+		display: inline-block;
+		margin-top: 1.25rem;
+		padding: 0.75rem 1.5rem;
+		border-radius: 999px;
+		background: var(--theme-primary);
+		color: var(--theme-on-primary);
+		text-decoration: none;
+		font-weight: 600;
+		font-size: 0.95rem;
+	}
+
+	.cta-section__button:hover {
+		filter: brightness(1.05);
+	}
+
+	@media (max-width: 640px) {
+		.intro-card {
+			margin: 1.5rem auto 1.75rem;
+		}
+
+		.banda-section {
+			margin-bottom: 2.5rem;
+		}
+
+		.cta-section {
+			padding: 2rem 0 2.5rem;
+		}
+	}
+
+	/* MODAL STRUMENTO */
+	.instrument-modal {
+		position: fixed;
+		inset: 0;
+		z-index: var(--z-modal);
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		padding: 1rem;
+	}
+
+	.instrument-modal[hidden] {
+		display: none;
+	}
+
+	.instrument-modal__backdrop {
+		position: absolute;
+		inset: 0;
+		background: color-mix(in srgb, var(--ink) 58%, transparent);
+	}
+
+	.instrument-modal__box {
+		position: relative;
+		z-index: 1;
+		background: var(--theme-bg);
+		border-radius: var(--radius-lg);
+		padding: var(--space-lg) var(--space-md) var(--space-md);
+		width: min(92vw, 26rem);
+		max-height: 88dvh;
+		overflow-y: auto;
+		text-align: center;
+		box-shadow: var(--theme-elevation-3);
+	}
+
+	.instrument-modal__close {
+		position: absolute;
+		top: 0.5rem;
+		right: 0.75rem;
+		border: none;
+		background: none;
+		font-size: 1.5rem;
+		line-height: 1;
+		cursor: pointer;
+		color: var(--theme-on-surface-2);
+	}
+
+	.instrument-modal__media {
+		width: 100%;
+		aspect-ratio: 1 / 1;
+		border-radius: 0.75rem;
+		overflow: hidden;
+		background: var(--theme-surface-1);
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		margin-bottom: 1rem;
+	}
+
+	.instrument-modal__image {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+	}
+
+	.instrument-modal__placeholder {
+		color: var(--theme-on-surface-2);
+		opacity: 0.6;
+	}
+
+	.instrument-modal__title {
+		margin: 0;
+		font-size: 1.1rem;
+	}
+
+	.instrument-modal__note {
+		margin: 0.4rem 0 0;
+		font-size: 0.85rem;
+		color: var(--theme-on-surface-2);
+	}
+	/* CORSI COLLETTIVI + ELENCO */
+	.collettivi,
+	.elenco {
+		margin: var(--section-margin) auto 0;
+	}
+	.collettivi__intro {
+		color: var(--theme-muted);
+		margin-bottom: var(--space-lg);
+	}
+	.collettivi__lista {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(min(100%, 20rem), 1fr));
+		gap: var(--space-lg);
+		max-width: none;
+	}
+	.collettivi__voce {
+		max-width: none;
+		padding-top: var(--space-sm);
+		border-top: 2px solid var(--theme-accent);
+	}
+	.collettivi__voce h3 {
+		font-size: var(--font-size-md);
+		margin-bottom: var(--space-2xs);
+	}
+	.collettivi__voce h3 a {
+		text-decoration: none;
+		color: inherit;
+		transition: color var(--theme-transition);
+	}
+	.collettivi__voce h3 a:hover {
+		color: var(--theme-primary);
+		text-decoration: underline;
+		text-underline-offset: 0.2em;
+	}
+	.collettivi__voce p {
+		color: var(--theme-muted);
+		margin-bottom: 0;
+	}
+
+	.elenco__lista {
+		list-style: none;
+		margin: var(--space-md) 0 0;
+		padding: 0;
+		max-width: none;
+		display: flex;
+		flex-wrap: wrap;
+		gap: var(--space-2xs) var(--space-xs);
+	}
+	.elenco__lista li {
+		max-width: none;
+	}
+	.elenco__lista a {
+		display: inline-block;
+		padding: 0.35rem 0.75rem;
+		border: 1px solid var(--theme-border-strong);
+		border-radius: var(--radius-sm);
+		font-size: var(--font-size-sm);
+		text-decoration: none;
+		white-space: nowrap;
+		transition: background-color var(--theme-transition),
+			border-color var(--theme-transition);
+	}
+	.elenco__lista a:hover {
+		background-color: var(--theme-surface-1);
+		border-color: var(--theme-primary);
+	}
+
+	/* MODAL: audio, dettagli */
+	.instrument-modal__audio,
+	.instrument-modal__toggle {
+		font-family: var(--theme-font-family-sans);
+		font-size: var(--font-size-sm);
+		font-weight: 500;
+		cursor: pointer;
+		transition: background-color var(--theme-transition),
+			border-color var(--theme-transition);
+	}
+	.instrument-modal__audio {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.5rem;
+		margin: var(--space-sm) auto 0;
+		padding: 0.5rem 1rem 0.5rem 0.8rem;
+		background: transparent;
+		border: 1px solid var(--theme-border-strong);
+		border-radius: var(--radius-sm);
+		color: var(--theme-on-bg);
+	}
+	.instrument-modal__audio:hover {
+		background-color: var(--theme-surface-1);
+		border-color: var(--theme-primary);
+	}
+	.instrument-modal__audio-icona {
+		width: 0;
+		height: 0;
+		border-style: solid;
+		border-width: 0.35rem 0 0.35rem 0.58rem;
+		border-color: transparent transparent transparent var(--theme-primary);
+	}
+	.instrument-modal__audio[aria-pressed='true'] .instrument-modal__audio-icona {
+		width: 0.55rem;
+		height: 0.7rem;
+		border: 0;
+		background: linear-gradient(
+			to right,
+			var(--theme-primary) 0 34%,
+			transparent 34% 66%,
+			var(--theme-primary) 66% 100%
+		);
+	}
+
+	.instrument-modal__toggle {
+		display: block;
+		width: 100%;
+		margin-top: var(--space-md);
+		padding: var(--space-2xs) 0;
+		background: transparent;
+		border: 0;
+		border-top: 1px solid var(--theme-border);
+		color: var(--theme-muted);
+	}
+	.instrument-modal__toggle:hover {
+		color: var(--theme-on-bg);
+	}
+
+	.instrument-modal__details[hidden] {
+		display: none;
+	}
+	.instrument-modal__scheda {
+		display: grid;
+		grid-template-columns: auto 1fr;
+		gap: 0.3rem var(--space-sm);
+		margin: var(--space-2xs) 0 var(--space-md);
+		text-align: left;
+		font-size: var(--font-size-sm);
+	}
+	.instrument-modal__scheda dt {
+		color: var(--theme-muted);
+	}
+	.instrument-modal__scheda dd {
+		margin: 0;
+		font-variant-numeric: tabular-nums;
+	}
+	.instrument-modal__scheda dd.is-vuoto {
+		color: var(--theme-muted);
+		font-style: italic;
+	}
+	.instrument-modal__link {
+		display: inline-block;
+		font-size: var(--font-size-sm);
+		font-weight: 500;
+		color: var(--theme-primary);
+		text-underline-offset: 0.2em;
 	}
 </style>

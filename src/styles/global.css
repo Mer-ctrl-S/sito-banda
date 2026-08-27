@@ -1,6 +1,11 @@
 @import 'tailwindcss';
 @plugin "daisyui";
 
+html {
+	scroll-behavior: smooth;
+	scroll-padding-top: calc(var(--navbar-height) + 1rem);
+}
+
 html,
 body {
 	height: 100%;
@@ -11,14 +16,74 @@ body {
 	margin: 0 auto;
 	background-color: var(--theme-bg);
 	position: relative;
+	/* clip, non hidden: hidden creerebbe un contenitore di scroll
+	   e romperebbe la position: sticky dell’header */
+	overflow-x: clip;
+}
+
+/*
+  Grana: rompe la piattezza del fondo tinta unita senza aggiungere richieste
+  di rete. Fissa, non intercetta il puntatore, si spegne in stampa.
+*/
+body::after {
+	content: '';
+	position: fixed;
+	inset: 0;
+	z-index: var(--z-overlay);
+	pointer-events: none;
+	opacity: 0.4;
+	mix-blend-mode: multiply;
+	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.82' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.055'/%3E%3C/svg%3E");
+}
+
+@media print {
+	body::after {
+		display: none;
+	}
+}
+
+/*
+  Un solo anello di focus per tutto il sito. I singoli componenti non devono
+  azzerare l'outline: se serve, ridefiniscono l'offset.
+*/
+:focus-visible {
+	outline: 2px solid var(--theme-accent);
+	outline-offset: 3px;
+	border-radius: var(--radius-xs);
+}
+
+::selection {
+	background: var(--theme-surface-2);
+	color: var(--theme-on-surface-2);
+}
+
+hr {
+	border: 0;
+	border-top: 1px solid var(--theme-border);
+	margin: var(--space-lg) 0;
+}
+
+img {
+	color: transparent;
 }
 
 pre {
 	padding: 1em;
-	border-radius: 0.5em;
+	border-radius: var(--radius-md);
 	overflow: auto;
+	background: var(--theme-surface-1);
 }
 
 pre .language-id {
 	display: none;
+}
+
+/* Contenuto lungo: il ritmo verticale non deve dipendere dai margini dei figli */
+.prose > * + * {
+	margin-top: var(--space-sm);
+}
+
+.prose > * + h2,
+.prose > * + h3 {
+	margin-top: var(--space-lg);
 }

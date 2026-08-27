@@ -21,3 +21,10 @@ pnpm-debug.log*
 
 icon.d.ts
 *.cache
+
+# Strumenti locali degli agenti IA (skill installate con `npx skills`,
+# permessi personali). Non sono codice del progetto: ~1,3 MB di file di
+# terze parti che non servono a chi clona il repo.
+.agents/
+.claude/
+skills-lock.json

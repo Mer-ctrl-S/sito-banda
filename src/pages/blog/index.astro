@@ -1,11 +1,7 @@
 ---
 import { format, isBefore } from 'date-fns';
 import it from 'date-fns/locale/it/index.js';
-import {
-  Container,
-  TextCardSection,
-  Button,
-} from '@components/odyssey-theme';
+import { Container, Button } from '@components/odyssey-theme';
 import Layout from '../../layouts/Page.astro';
 import NewsletterForm from '../../components/forms/NewsletterForm.astro';
 import HeroSection from '../../components/sections/heros/HeroSection.astro';
@@ -247,7 +243,7 @@ const seo = {
 <style>
 .evento-card {
   border-radius: var(--theme-shape-radius);
-  background: var(--theme-surface);
+  background: var(--theme-surface-1);
   box-shadow: var(--theme-elevation-1);
   padding: 1.5rem;
   margin: 0 0 1.5rem;

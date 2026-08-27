@@ -1,24 +1,76 @@
 ---
+const { label, name, placeholder, rows = 5, required, hint } = Astro.props;
 
-const { label, name, placeholder, rows = 4, required} = Astro.props;
+const id = `field-${name}`;
+const hintId = hint ? `${id}-hint` : undefined;
+const errorId = `${id}-error`;
 ---
 
 <div class="form-field__container">
-  {label && <label for={name}>{label}</label>}
-  <textarea name={name} placeholder={placeholder} rows={rows} required={required}></textarea>
+	{
+		label && (
+			<label for={id}>
+				{label}
+				{required && <span class="form-field__required" aria-hidden="true">*</span>}
+			</label>
+		)
+	}
+	{hint && <p class="form-field__hint" id={hintId}>{hint}</p>}
+	<textarea
+		id={id}
+		name={name}
+		placeholder={placeholder}
+		rows={rows}
+		required={required}
+		aria-describedby={[hintId, errorId].filter(Boolean).join(' ')}></textarea>
+	<p class="form-field__error" id={errorId} aria-live="polite"></p>
 </div>
 
 <style>
-  .form-field__container textarea{
-    --form-field-border-width: 2px;
-    width: 100%;
-    padding: 0.5rem;
-    border: var(--form-field-border-width) solid var(--form-field-border-color, #ccc);
-    color: var(--form-field-input-color, #000000);
-    border-radius: var(--form-field-border-radius, 0.25rem);
-    outline-style: none;
-  }
-  .form-field__container textarea:focus {
-    border: var(--form-field-border-width) solid var(--form-field-border-focus-color, #000);
-  }
+	.form-field__container label {
+		display: block;
+		font-size: var(--font-size-sm);
+		font-weight: 500;
+		margin-bottom: var(--space-3xs);
+	}
+	.form-field__required {
+		color: var(--theme-accent);
+		margin-left: 0.15em;
+	}
+	.form-field__hint {
+		margin: 0 0 var(--space-3xs);
+		max-width: none;
+		font-size: var(--font-size-xs);
+		color: var(--theme-muted);
+	}
+	.form-field__container textarea {
+		width: 100%;
+		padding: 0.7rem 0.85rem;
+		background-color: var(--theme-bg);
+		border: 1px solid var(--theme-border-strong);
+		color: var(--theme-on-bg);
+		border-radius: var(--radius-sm);
+		resize: vertical;
+		transition: border-color var(--theme-transition),
+			box-shadow var(--theme-transition);
+	}
+	.form-field__container textarea::placeholder {
+		color: color-mix(in srgb, var(--theme-muted) 75%, transparent);
+	}
+	.form-field__container textarea:focus {
+		outline: none;
+		border-color: var(--theme-primary);
+		box-shadow: 0 0 0 3px color-mix(in srgb, var(--theme-primary) 18%, transparent);
+	}
+	.form-field__container textarea[aria-invalid='true'] {
+		border-color: #a8412f;
+		box-shadow: 0 0 0 3px rgba(168, 65, 47, 0.14);
+	}
+	.form-field__error {
+		margin: 0;
+		max-width: none;
+		min-height: 1.2em;
+		font-size: var(--font-size-xs);
+		color: #8f3527;
+	}
 </style>

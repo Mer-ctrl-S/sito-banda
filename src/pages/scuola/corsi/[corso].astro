@@ -1,0 +1,311 @@
+---
+import Layout from '../../../layouts/Page.astro';
+import { Container, Button } from '@components/odyssey-theme';
+import { corsi, daConfermare, etichettaFamiglia } from '../../../config/corsi.js';
+import { soundMap } from '../../../config/suoni.js';
+
+export function getStaticPaths() {
+	return corsi.map(corso => ({
+		params: { corso: corso.slug },
+		props: { corso },
+	}));
+}
+
+const { corso } = Astro.props;
+const suono = soundMap[corso.slug] ?? null;
+
+const scheda = [
+	{ voce: 'Insegnante', valore: corso.insegnante },
+	{ voce: 'Orario delle lezioni', valore: corso.orari },
+	{ voce: 'Quota di partecipazione', valore: corso.costo },
+	{ voce: 'Età consigliata', valore: corso.eta },
+];
+
+const mancanti = scheda.filter(r => daConfermare(r.valore)).length;
+
+const seo = {
+	title: `${corso.nome} | Corsi del Corpo Bandistico di Castelcovati`,
+	description: corso.descrizione.slice(0, 155),
+};
+---
+
+<Layout {seo}>
+	<Container>
+		<article class="corso">
+			<nav class="corso__back" aria-label="Percorso">
+				<a href="/scuola/corsi">← Tutti i corsi</a>
+			</nav>
+
+			<header class="corso__header">
+				<h1>{corso.nome}</h1>
+				<p class="corso__famiglia">{etichettaFamiglia[corso.famiglia]}</p>
+				<p class="corso__descrizione">{corso.descrizione}</p>
+			</header>
+
+			{
+				corso.immagine && (
+					<figure class="corso__figura">
+						<img
+							src={corso.immagine}
+							alt={`${corso.nome}`}
+							loading="eager"
+							fetchpriority="high"
+							decoding="async"
+							width="960"
+							height="640"
+						/>
+						{suono && (
+							<figcaption>
+								<button
+									type="button"
+									class="corso__audio"
+									data-audio={suono}
+									aria-pressed="false"
+								>
+									<span class="corso__audio-icona" aria-hidden="true"></span>
+									<span class="corso__audio-testo">Ascolta il suono</span>
+								</button>
+							</figcaption>
+						)}
+					</figure>
+				)
+			}
+
+			<section class="corso__scheda" aria-labelledby="schedaTitolo">
+				<h2 id="schedaTitolo">Informazioni pratiche</h2>
+
+				{
+					mancanti > 0 && (
+						<p class="corso__avviso">
+							{mancanti === scheda.length
+								? 'Le informazioni organizzative di questo corso non sono ancora state pubblicate.'
+								: 'Alcune informazioni di questo corso non sono ancora state pubblicate.'}{' '}
+							Scrivici e ti rispondiamo con i dettagli aggiornati.
+						</p>
+					)
+				}
+
+				<dl class="corso__lista">
+					{
+						scheda.map(riga => (
+							<div class="corso__riga">
+								<dt>{riga.voce}</dt>
+								<dd class:list={['tabular', { 'is-vuoto': daConfermare(riga.valore) }]}>
+									{riga.valore}
+								</dd>
+							</div>
+						))
+					}
+				</dl>
+			</section>
+
+			<section class="corso__azioni">
+				<Button href="/company/contact">Chiedi informazioni</Button>
+				<Button href="/scuola/corsi" outlined>Vedi gli altri corsi</Button>
+			</section>
+		</article>
+	</Container>
+
+	<script>
+		// Un solo elemento audio per pagina; il pulsante è un vero toggle
+		// (WCAG 1.4.2: l'audio non parte mai da solo e si può sempre fermare).
+		const bottone = document.querySelector('.corso__audio');
+
+		if (bottone) {
+			const audio = new Audio();
+			const testo = bottone.querySelector('.corso__audio-testo');
+			const etichettaIniziale = testo.textContent;
+
+			audio.preload = 'auto';
+
+			const ferma = () => {
+				audio.pause();
+				bottone.setAttribute('aria-pressed', 'false');
+				testo.textContent = etichettaIniziale;
+			};
+
+			const fallito = () => {
+				bottone.setAttribute('aria-pressed', 'false');
+				testo.textContent = 'Audio non disponibile';
+				// l'etichetta torna com'era: il pulsante resta riprovabile
+				setTimeout(() => {
+					if (bottone.getAttribute('aria-pressed') === 'false') {
+						testo.textContent = etichettaIniziale;
+					}
+				}, 2500);
+			};
+
+			bottone.addEventListener('click', () => {
+				if (bottone.getAttribute('aria-pressed') === 'true') {
+					ferma();
+					return;
+				}
+				if (audio.src !== new URL(bottone.dataset.audio, location.href).href) {
+					audio.src = bottone.dataset.audio;
+				}
+				audio.currentTime = 0;
+				audio.play().then(() => {
+					bottone.setAttribute('aria-pressed', 'true');
+					testo.textContent = 'Ferma l’ascolto';
+				}, fallito);
+			});
+
+			audio.addEventListener('ended', ferma);
+			audio.addEventListener('error', fallito);
+		}
+	</script>
+</Layout>
+
+<style>
+	.corso {
+		margin: var(--space-lg) auto var(--section-margin);
+		max-width: 54rem;
+	}
+
+	.corso__back {
+		margin-bottom: var(--space-lg);
+	}
+	.corso__back a {
+		font-size: var(--font-size-sm);
+		color: var(--theme-muted);
+		text-decoration: none;
+		transition: color var(--theme-transition);
+	}
+	.corso__back a:hover {
+		color: var(--theme-on-bg);
+	}
+
+	.corso__header h1 {
+		margin-bottom: var(--space-3xs);
+	}
+
+	.corso__famiglia {
+		margin: 0 0 var(--space-md);
+		max-width: none;
+		font-size: var(--font-size-sm);
+		color: var(--theme-accent);
+	}
+
+	.corso__descrizione {
+		font-size: var(--font-size-md);
+		line-height: 1.45;
+		color: var(--theme-on-bg);
+	}
+
+	.corso__figura {
+		margin: var(--space-xl) 0;
+	}
+	.corso__figura img {
+		width: 100%;
+		height: auto;
+		max-height: 26rem;
+		object-fit: cover;
+		border-radius: var(--radius-lg);
+		box-shadow: var(--theme-elevation-2);
+	}
+	.corso__figura figcaption {
+		margin-top: var(--space-sm);
+	}
+
+	.corso__audio {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.55rem;
+		padding: 0.55rem 1rem 0.55rem 0.75rem;
+		background-color: transparent;
+		border: 1px solid var(--theme-border-strong);
+		border-radius: var(--radius-sm);
+		color: var(--theme-on-bg);
+		font-size: var(--font-size-sm);
+		font-weight: 500;
+		cursor: pointer;
+		transition: background-color var(--theme-transition),
+			border-color var(--theme-transition);
+	}
+	.corso__audio:hover {
+		background-color: var(--theme-surface-1);
+		border-color: var(--theme-primary);
+	}
+	.corso__audio:active {
+		background-color: var(--theme-surface-2);
+	}
+
+	/* Triangolo play → doppia barra pause, senza libreria di icone */
+	.corso__audio-icona {
+		width: 0;
+		height: 0;
+		border-style: solid;
+		border-width: 0.4rem 0 0.4rem 0.65rem;
+		border-color: transparent transparent transparent var(--theme-primary);
+	}
+	.corso__audio[aria-pressed='true'] .corso__audio-icona {
+		width: 0.62rem;
+		height: 0.8rem;
+		border: 0;
+		background: linear-gradient(
+			to right,
+			var(--theme-primary) 0 34%,
+			transparent 34% 66%,
+			var(--theme-primary) 66% 100%
+		);
+	}
+
+	.corso__scheda {
+		margin: var(--space-xl) 0;
+	}
+	.corso__scheda h2 {
+		font-size: var(--font-size-md);
+		margin-bottom: var(--space-sm);
+	}
+
+	.corso__avviso {
+		max-width: none;
+		margin-bottom: var(--space-md);
+		padding: var(--space-xs) var(--space-sm);
+		border-left: 3px solid var(--theme-accent);
+		background-color: var(--theme-surface-1);
+		border-radius: var(--radius-sm);
+		font-size: var(--font-size-sm);
+		color: var(--theme-on-surface-1);
+	}
+
+	/* Scheda tecnica: righe con filetto, non card dentro card */
+	.corso__lista {
+		margin: 0;
+		border-top: 1px solid var(--theme-border);
+	}
+	.corso__riga {
+		display: grid;
+		grid-template-columns: minmax(0, 14rem) minmax(0, 1fr);
+		gap: var(--space-sm);
+		padding: var(--space-sm) 0;
+		border-bottom: 1px solid var(--theme-border);
+	}
+	.corso__riga dt {
+		font-size: var(--font-size-sm);
+		font-weight: 500;
+		color: var(--theme-muted);
+	}
+	.corso__riga dd {
+		margin: 0;
+		font-variant-numeric: tabular-nums;
+	}
+	.corso__riga dd.is-vuoto {
+		color: var(--theme-muted);
+		font-style: italic;
+	}
+
+	.corso__azioni {
+		display: flex;
+		flex-wrap: wrap;
+		gap: var(--space-sm);
+		margin-top: var(--space-xl);
+	}
+
+	@media (max-width: 640px) {
+		.corso__riga {
+			grid-template-columns: 1fr;
+			gap: var(--space-3xs);
+		}
+	}
+</style>

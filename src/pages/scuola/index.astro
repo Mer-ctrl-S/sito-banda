@@ -1,5 +1,5 @@
 ---
-import { Container, Button, CustomerQuoteSection, CtaCardSection, ThreeColumnTextSection } from '@components/odyssey-theme';
+import { Container, Button, ThreeColumnTextSection } from '@components/odyssey-theme';
 import Layout from '../../layouts/Page.astro';
 import TextAndImageHero from '../../components/sections/heros/TextAndImageHero.astro';
 import HeroSlider from '../../components/sections/heros/HeroSlider.astro';
@@ -76,7 +76,7 @@ const heroImages = [
 
   <Container>
       <h2>La nostra storia</h2>
-      <p>Nel <strong>1989</strong>, il Corpo Bandistico di Castelcovati – <italic>in accordo con gli enti locali</italic> – ha istituito l'<strong>Accademia Musicale di Castelcovati</strong> per rispondere alle esigenze didattiche emergenti nell'educazione musicale dei suoi allievi. Il progetto, ambizioso e innovativo per quel periodo, ha introdotto per la prima volta l'insegnamento individualizzato degli strumenti musicali della banda, affidato a insegnanti diplomati al Conservatorio con specifiche competenze strumentali.<br></br>
+      <p>Nel <strong>1989</strong>, il Corpo Bandistico di Castelcovati – <em>in accordo con gli enti locali</em> – ha istituito l'<strong>Accademia Musicale di Castelcovati</strong> per rispondere alle esigenze didattiche emergenti nell'educazione musicale dei suoi allievi. Il progetto, ambizioso e innovativo per quel periodo, ha introdotto per la prima volta l'insegnamento individualizzato degli strumenti musicali della banda, affidato a insegnanti diplomati al Conservatorio con specifiche competenze strumentali.<br></br>
 
           Negli anni di attività, l'Accademia ha formato <strong>diverse centinaia di alunni</strong>, principalmente tra i 7 e i 20 anni di età, con la presenza anche di studenti adulti che continuano a frequentare i corsi tuttora.
           <br></br>
@@ -86,63 +86,41 @@ const heroImages = [
 
   <Container>
       <h2>I nostri valori</h2>
-      <CtaCardSection
-		background="var(--theme-surface-2)"
-		color="var(--theme-on-surface-2)"
-		>
-    	<ThreeColumnTextSection>
-    		<div slot="column-1-body">
-    			<h3>Crescita</h3>
-    			<p>Accompagnamo ogni allievo in un percorso personale e condiviso di miglioramento.</p>
-    		</div>
+      <ThreeColumnTextSection>
+        <div slot="column-1-body">
+          <h3>Crescita</h3>
+          <p>Accompagnamo ogni allievo in un percorso personale e condiviso di miglioramento.</p>
+        </div>
 
-    		<div slot="column-2-body">
-    			<h3>Espressività</h3>
-    			<p>
-    			Favoriamo l’espressione di sé attraverso la musica, in tutte le sue forme.
-    			</p>
-    		</div>
+        <div slot="column-2-body">
+          <h3>Espressività</h3>
+          <p>Favoriamo l’espressione di sé attraverso la musica, in tutte le sue forme.</p>
+        </div>
 
-    		<div slot="column-3-body">
-    			<h3>Relazione</h3>
-    			<p>
-    			Crediamo nella forza del gruppo e nella comunità musicale che si crea.
-    			</p>
-    		</div>
-    	</ThreeColumnTextSection>
-	</CtaCardSection>
+        <div slot="column-3-body">
+          <h3>Relazione</h3>
+          <p>Crediamo nella forza del gruppo e nella comunità musicale che si crea.</p>
+        </div>
+      </ThreeColumnTextSection>
+
 
 	<h2>Competenza alla base di tutto</h2>
-            <ThreeColumnTextSection>
-              		<div slot="column-1-body">
-                    <CtaCardSection
-              		background="var(--theme-surface-1)"
-              		color="var(--theme-on-surface-1)"
-              		>
-              			<h3>Insegnanti</h3>
-                        <p>Qualificati e professionisti del settore</p>
-                    </CtaCardSection>
-              		</div>
-              		<div slot="column-2-body">
-                    <CtaCardSection
-              		background="var(--theme-surface-2)"
-              		color="var(--theme-on-surface-2)"
-              		>
-              			<h3>Metodi</h3>
-                        <p>Aggiornati e rivisti annualmente</p>
-                    </CtaCardSection>
-              		</div>
+    <ThreeColumnTextSection>
+        <div slot="column-1-body">
+          <h3>Insegnanti</h3>
+          <p>Qualificati e professionisti.</p>
+        </div>
 
-              		<div slot="column-3-body">
-                    <CtaCardSection
-              		background="var(--theme-surface-1)"
-              		color="var(--theme-on-surface-1)"
-              		>
-              			<h3>Obiettivi</h3>
-                 <p>Chiari e definiti anno per anno</p>
-                    </CtaCardSection>
-              		</div>
-           	</ThreeColumnTextSection>
+        <div slot="column-2-body">
+          <h3>Metodi</h3>
+          <p>Aggiornati e rivisti annualmente.</p>
+        </div>
+
+        <div slot="column-3-body">
+          <h3>Obiettivi</h3>
+          <p>Chiari e definiti anno per anno.</p>
+        </div>
+      </ThreeColumnTextSection>
   </Container>
 </Layout>
 

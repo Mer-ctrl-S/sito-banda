@@ -1,41 +1,122 @@
 ---
-import { Button, Container, TextCardSection } from '@components/odyssey-theme';
+import { Container } from '@components/odyssey-theme';
 import Layout from '../layouts/Page.astro';
 
 const seo = {
-	title: 'Get Started using the Astro Odyssey Theme',
-	description: 'Get started on how to setup and use this Astro theme.',
+	title: 'Pagina non trovata | Corpo Bandistico di Castelcovati',
+	description:
+		'La pagina cercata non esiste o è stata spostata. Da qui puoi tornare alle sezioni principali del sito.',
 };
+
+const scorciatoie = [
+	{ title: 'Eventi e concerti', slug: '/blog' },
+	{ title: 'Chi siamo', slug: '/company/about' },
+	{ title: 'La scuola di musica', slug: '/scuola' },
+	{ title: 'Contatti', slug: '/company/contact' },
+];
 ---
 
 <Layout {seo}>
 	<Container>
-		<TextCardSection>
-			<h1>404</h1>
-			<h2>Page Not Found 👀</h2>
-			<div class="cta-buttons__container">
-				<Button href="/">Return Home</Button>
-			</div>
-		</TextCardSection>
+		<section class="notfound">
+			<p class="eyebrow">Errore 404</p>
+			<h1>Questa pagina non c’è più.</h1>
+			<p class="notfound__lede">
+				Forse l’indirizzo è stato scritto male, oppure la pagina è stata
+				spostata. Nessun problema: da qui riparti da dove vuoi.
+			</p>
+
+			<ul class="notfound__links">
+				{
+					scorciatoie.map(link => (
+						<li>
+							<a href={link.slug}>
+								<span>{link.title}</span>
+								<svg viewBox="0 0 24 24" aria-hidden="true">
+									<path
+										d="M5 12h13M13 6l6 6-6 6"
+										fill="none"
+										stroke="currentColor"
+										stroke-width="1.75"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+									/>
+								</svg>
+							</a>
+						</li>
+					))
+				}
+			</ul>
+		</section>
 	</Container>
 </Layout>
 
 <style>
-	.cta-buttons__container {
+	.notfound {
+		padding: var(--space-2xl) 0;
+		max-width: 46rem;
+	}
+
+	.notfound h1 {
+		font-size: var(--font-size-xxl);
+		margin-bottom: var(--space-md);
+	}
+
+	.notfound__lede {
+		font-size: var(--font-size-md);
+		color: var(--theme-muted);
+		margin-bottom: var(--space-xl);
+	}
+
+	.notfound__links {
+		margin: 0;
+		padding: 0;
+		list-style: none;
+		max-width: none;
+		border-top: 1px solid var(--theme-border);
+	}
+	.notfound__links li {
+		max-width: none;
+		border-bottom: 1px solid var(--theme-border);
+	}
+	.notfound__links a {
 		display: flex;
-		flex-wrap: wrap;
+		align-items: center;
+		justify-content: space-between;
+		gap: var(--space-sm);
+		padding: var(--space-sm) var(--space-2xs);
+		font-family: var(--theme-font-family-serif);
+		font-size: var(--font-size-lg);
+		font-weight: 600;
+		letter-spacing: var(--tracking-tight);
+		text-decoration: none;
+		color: var(--theme-on-bg);
+		transition: color var(--theme-transition),
+			padding-left var(--theme-transition);
 	}
-	.cta-buttons__container :global(a) {
-		margin-right: 1rem;
-		margin-bottom: 1rem;
+	.notfound__links a:hover {
+		color: var(--theme-primary);
+		padding-left: var(--space-sm);
 	}
-	.code-buttons__container {
-		margin: 1rem auto;
-		display: flex;
-		flex-wrap: wrap;
+	.notfound__links svg {
+		width: 1.4rem;
+		height: 1.4rem;
+		flex: none;
+		color: var(--theme-accent);
+		opacity: 0;
+		transform: translateX(-6px);
+		transition: opacity var(--theme-transition),
+			transform 260ms var(--ease-spring);
 	}
-	.code-buttons__container > a {
-		margin-right: 1rem;
-		margin-bottom: 1rem;
+	.notfound__links a:hover svg {
+		opacity: 1;
+		transform: translateX(0);
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.notfound__links a,
+		.notfound__links svg {
+			transition: none;
+		}
 	}
 </style>

@@ -1,50 +1,135 @@
 ---
 import { TextSection } from '@components/odyssey-theme';
 import Layout from '../../layouts/Page.astro';
+import settings from '../../config/settings.js';
+
+/*
+  DA COMPLETARE A CURA DELL'ASSOCIAZIONE.
+  Questa pagina conteneva ancora il testo segnaposto in Lorem Ipsum del tema
+  originale. E' stata sostituita con una traccia in italiano: i contenuti
+  legali (privacy, cookie, dati dell'ente) vanno scritti da chi ha i dati
+  reali e, per l'informativa privacy, preferibilmente con un consulente.
+  Il collegamento nel footer punta qui.
+*/
+
+const cf = settings.codiceFiscale?.trim() ?? '';
+const etichettaCf = settings.codiceFiscaleAnchePartitaIva
+	? 'Codice fiscale e partita IVA'
+	: 'Codice fiscale';
+
+// Un'unica fonte per i dati dell'ente: compilare settings.js e questa lista si
+// aggiorna. I campi non ancora noti restano dichiarati, non spariscono.
+const datiEnte = [
+	{ voce: 'Denominazione', valore: settings.title },
+	{ voce: 'Sede legale', valore: settings.sedeLegale },
+	{ voce: etichettaCf, valore: cf },
+	{ voce: 'Iscrizione al RUNTS', valore: settings.runts },
+	{ voce: 'PEC', valore: settings.pec, tipo: 'email' },
+	{ voce: 'Email', valore: settings.email, tipo: 'email' },
+];
 
 const seo = {
-  title: `Legal Page | Astro Odyssey Theme`,
-  description: `This is the legal page template. It is a great starter for your company's Terms of Service, Terms & Conditions, Privacy Policy, etc.`,
+	title: 'Note legali e privacy | Corpo Bandistico di Castelcovati',
+	description:
+		'Dati dell’associazione, informativa privacy e note legali del Corpo Bandistico di Castelcovati APS.',
 };
 ---
 
 <Layout seo={seo}>
-  <TextSection narrow>
-    <h1>Legal Page</h1>
+	<TextSection narrow>
+		<p class="eyebrow">Informazioni</p>
+		<h1>Note legali e privacy</h1>
 
-    <p>This is the legal page template. It is a great starter for your company's Terms of Service, Terms & Conditions,
-      Privacy Policy, etc.</p>
+		<p class="legal__notice">
+			Questa pagina è in corso di redazione. I dati e i testi qui sotto vanno
+			completati dall’associazione prima della pubblicazione del sito.
+		</p>
 
-    <h2>Terms of Service</h2>
+		<h2>Dati dell’associazione</h2>
+		<dl class="legal__dati">
+			{
+				datiEnte.map(riga => (
+					<div class="legal__riga">
+						<dt>{riga.voce}</dt>
+						<dd class:list={['tabular', { 'is-vuoto': !riga.valore }]}>
+							{
+								riga.valore && riga.tipo === 'email' ? (
+									<a href={`mailto:${riga.valore}`}>{riga.valore}</a>
+								) : (
+									riga.valore || '— da inserire'
+								)
+							}
+						</dd>
+					</div>
+				))
+			}
+		</dl>
 
-    <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Inventore, obcaecati. Aspernatur facilis molestias
-      vitae. Aliquid debitis eum quis repudiandae pariatur possimus provident accusantium reiciendis nemo, culpa labore
-      laborum, dolorum ea.</p>
+		<h2>Titolare del trattamento dei dati</h2>
+		<p>
+			Da inserire: chi è il titolare del trattamento e a quale indirizzo si
+			possono esercitare i diritti previsti dal GDPR.
+		</p>
 
-    <p>Corrupti impedit perferendis, libero in, voluptates quod ratione repudiandae veniam sapiente necessitatibus, eius
-      illo. Impedit quibusdam esse saepe placeat incidunt voluptatibus soluta dolore blanditiis ad provident animi
-      illum, est adipisci?</p>
+		<h2>Dati raccolti dal sito</h2>
+		<p>
+			Da inserire: quali dati raccoglie il modulo contatti, per quale finalità
+			vengono usati, per quanto tempo sono conservati e a chi vengono
+			comunicati. Vanno indicati anche i servizi esterni utilizzati (per
+			esempio il portale soci WindDoc) e il relativo trattamento.
+		</p>
 
-    <p>Ratione optio necessitatibus numquam dignissimos sunt molestiae ipsum fugiat quae maxime veniam aspernatur eius
-      quidem vel reprehenderit sequi, molestias perspiciatis, illo architecto perferendis nobis, in dolore! Nam
-      asperiores eaque totam.</p>
+		<h2>Cookie</h2>
+		<p>
+			Da inserire: elenco dei cookie e degli strumenti di misurazione
+			eventualmente attivi. Se verranno introdotti cookie non tecnici sarà
+			necessario anche un banner di consenso, al momento non presente.
+		</p>
 
-    <p>Repudiandae, labore alias. Voluptatem quia itaque sequi, aperiam, reprehenderit ipsum libero quae adipisci
-      possimus eum esse corrupti sapiente harum dignissimos eligendi cum iure tempora magnam nemo, sunt provident vero.
-      Voluptatibus.</p>
-
-    <h2>Privacy Policy</h2>
-
-    <p>
-      Lorem ipsum, dolor sit amet consectetur adipisicing elit. Natus eveniet quibusdam ipsa, veniam adipisci rerum
-      temporibus inventore! Sit quas vero laboriosam tempora alias! Fugit, saepe earum quod modi harum qui.
-      Expedita, pariatur consequuntur! Modi, maiores. Quaerat voluptatibus nostrum non harum rerum dolorem totam qui
-      repellendus, itaque dignissimos eveniet consequuntur ducimus! Non commodi magnam nemo, pariatur facilis
-      repellendus sunt fuga ipsa.
-    </p>
-
-    <p>Consequuntur similique ab ea tenetur, quo aperiam molestias sed facilis minus eaque eveniet libero quis
-      accusantium deleniti tempore? Qui vel reiciendis voluptates corporis eum repellat maiores fugit, eveniet sapiente
-      ad.</p>
-  </TextSection>
+		<h2>Diritti dell’interessato</h2>
+		<p>
+			Da inserire: come richiedere accesso, rettifica, cancellazione o
+			limitazione del trattamento dei propri dati.
+		</p>
+	</TextSection>
 </Layout>
+
+<style>
+	.legal__notice {
+		padding: var(--space-sm) var(--space-md);
+		border-left: 3px solid var(--theme-accent);
+		background-color: var(--theme-surface-1);
+		border-radius: var(--radius-sm);
+		color: var(--theme-on-surface-1);
+		max-width: none;
+	}
+	.legal__dati {
+		margin: 0 0 var(--space-lg);
+		border-top: 1px solid var(--theme-border);
+	}
+	.legal__riga {
+		display: grid;
+		grid-template-columns: minmax(0, 16rem) minmax(0, 1fr);
+		gap: var(--space-sm);
+		padding: var(--space-2xs) 0;
+		border-bottom: 1px solid var(--theme-border);
+	}
+	.legal__riga dt {
+		font-size: var(--font-size-sm);
+		color: var(--theme-muted);
+	}
+	.legal__riga dd {
+		margin: 0;
+		font-variant-numeric: tabular-nums;
+	}
+	.legal__riga dd.is-vuoto {
+		color: var(--theme-muted);
+		font-style: italic;
+	}
+	@media (max-width: 640px) {
+		.legal__riga {
+			grid-template-columns: 1fr;
+			gap: 0;
+		}
+	}
+</style>

@@ -5,25 +5,84 @@ const { quoteText, customerName } = Astro.props;
 ---
 
 <section class="customer-quote__section">
-	<Container narrow>
-		<blockquote data-quote-text>"{quoteText}"</blockquote>
-		<p data-quote-name>&mdash; {customerName}</p>
+	<Container>
+		<figure class="customer-quote__figure">
+			<span class="customer-quote__mark" aria-hidden="true">&ldquo;</span>
+			<blockquote data-quote-text>{quoteText}</blockquote>
+			<figcaption>
+				<span class="customer-quote__rule" aria-hidden="true"></span>
+				<span data-quote-name>{customerName}</span>
+			</figcaption>
+		</figure>
 	</Container>
 </section>
 
 <style>
+	/*
+	  Prima: margine calc(--section-margin * 2), che con la scala fluida
+	  diventava oltre 300px sopra e sotto e apriva un vuoto nella pagina.
+	*/
 	.customer-quote__section {
-		margin: calc(var(--section-margin) * 2) auto;
-		padding: 3rem;
+		margin: var(--section-margin) auto;
+		padding: clamp(2.5rem, 6vw, 5rem) 0;
 		background-color: var(--theme-surface-1);
-		text-align: center;
+		border-radius: var(--theme-shape-radius);
 	}
+
+	/* Fuori asse: la citazione non e' centrata, il segno di apertura sborda */
+	.customer-quote__figure {
+		position: relative;
+		margin: 0;
+		max-width: 46rem;
+		padding-left: clamp(2rem, 5vw, 4.5rem);
+	}
+
+	.customer-quote__mark {
+		position: absolute;
+		left: 0;
+		top: -0.28em;
+		font-family: var(--theme-font-family-serif);
+		font-size: clamp(4rem, 9vw, 7rem);
+		font-weight: 600;
+		line-height: 1;
+		color: var(--theme-accent);
+		opacity: 0.45;
+		user-select: none;
+	}
+
 	.customer-quote__section blockquote {
+		margin: 0;
 		padding: 0;
 		border: none;
-		font-size: var(--font-size-md);
+		max-width: none;
+		font-family: var(--theme-font-family-serif);
+		font-size: var(--font-size-lg);
 		font-weight: 400;
-		font-style: italic;
-		line-height: 1.8;
+		font-style: normal;
+		line-height: 1.32;
+		letter-spacing: var(--tracking-tight);
+		text-wrap: pretty;
+		color: var(--theme-on-surface-1);
+	}
+
+	.customer-quote__figure figcaption {
+		display: flex;
+		align-items: center;
+		gap: var(--space-xs);
+		margin-top: var(--space-md);
+		font-family: var(--theme-font-family-sans);
+		font-size: var(--font-size-xs);
+		font-weight: 500;
+		letter-spacing: var(--tracking-label);
+		text-transform: uppercase;
+		color: var(--theme-muted);
+	}
+
+	.customer-quote__rule {
+		display: block;
+		width: 2rem;
+		height: 1px;
+		flex: none;
+		background-color: var(--theme-accent);
 	}
 </style>

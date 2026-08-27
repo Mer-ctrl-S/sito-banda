@@ -2,10 +2,15 @@
 import ContactForm from '../../components/forms/ContactForm.astro';
 import Layout from '../../layouts/Page.astro';
 import { Container } from '@components/odyssey-theme';
+import settings from '../../config/settings.js';
+
+// Recapiti da settings.js: erano scritti a mano qui e nelle note legali,
+// due copie che potevano divergere.
+const telefono = '+39 371 771 1684';
 
 const seo = {
-	title: 'Contact | CB Castelcovati aps',
-	description: 'Contact Page',
+	title: 'Contatti | Corpo Bandistico di Castelcovati',
+	description: 'Scrivici per informazioni su concerti, servizi, scuola di musica o per proporci una collaborazione.',
 };
 ---
 
@@ -20,14 +25,19 @@ const seo = {
 					Ti forniremo tutte le informazioni di cui necessiti.</br></br>
 					In alternativa puoi sempre contattarci ai seguenti recapiti:
 				</p>
-				<div>
-					<p>
-						<em><a href="tel:+393717711684">(+39) 371 771 1684</a></em> • <em
-							><a href="mailto:corpobandistico.castelcovati@gmail.com">corpobandistico.castelcovati@gmail.com</a
-							></em
-						>
-					</p>
-				</div>
+				<ul class="contact-hero__recapiti">
+					<li>
+						<a href={`tel:${telefono.replace(/\s/g, '')}`} class="tabular">{telefono}</a>
+					</li>
+					<li>
+						<a href={`mailto:${settings.email}`}>{settings.email}</a>
+					</li>
+					<li>
+						<span class="contact-hero__etichetta">PEC</span>
+						<a href={`mailto:${settings.pec}`}>{settings.pec}</a>
+					</li>
+					<li class="contact-hero__sede">{settings.sedeLegale}</li>
+				</ul>
 			</div>
 			<div class="col-2__container">
 				<ContactForm />
@@ -61,5 +71,31 @@ const seo = {
 		.contact-hero__section {
 			grid-template-columns: 1fr;
 		}
+	}
+	.contact-hero__recapiti {
+		list-style: none;
+		margin: var(--space-md) 0 0;
+		padding: 0;
+		max-width: none;
+	}
+	.contact-hero__recapiti li {
+		max-width: none;
+		padding: var(--space-3xs) 0;
+		font-size: var(--font-size-sm);
+	}
+	.contact-hero__recapiti a {
+		text-underline-offset: 0.2em;
+	}
+	.contact-hero__etichetta {
+		display: inline-block;
+		min-width: 2.6rem;
+		font-size: var(--font-size-xs);
+		letter-spacing: var(--tracking-label);
+		text-transform: uppercase;
+		color: var(--theme-muted);
+	}
+	.contact-hero__sede {
+		color: var(--theme-muted);
+		padding-top: var(--space-2xs);
 	}
 </style>

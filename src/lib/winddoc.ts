@@ -2,11 +2,22 @@
 
 export const WINDDOC_URL = 'https://app.winddoc.com/v1/api_json.php';
 
-// In produzione sposta questi su .env e importali da import.meta.env
-export const TOKEN_APP =
-	'bffb341ae63fbce4a510d123d4ae8af0b2b04a5ae0ecd58cd3a747f3161af24d';
-export const TOKEN_KEY =
-	'7a0b2b9dc333a2fb235953e17f36d78a9532d46fc2a2ffae1a1464dbd81efe8d';
+// I token vivono in `.env` (non versionato, vedi `.env.example`). Vengono letti
+// solo qui e usati nel frontmatter delle pagine, quindi restano lato build e non
+// finiscono mai nel bundle inviato al browser: NON rinominarli con prefisso
+// PUBLIC_, che li esporrebbe al client.
+function requireEnv(name: string): string {
+	const value = import.meta.env[name];
+	if (!value) {
+		throw new Error(
+			`Variabile d'ambiente ${name} mancante: copia .env.example in .env e inserisci i token WindDoc.`
+		);
+	}
+	return value;
+}
+
+export const TOKEN_APP = requireEnv('WINDDOC_TOKEN_APP');
+export const TOKEN_KEY = requireEnv('WINDDOC_TOKEN_KEY');
 
 export function toFormUrlEncoded(data: Record<string, any>): string {
 	const params = new URLSearchParams();

@@ -2,25 +2,157 @@
 import { Button, FormInput, FormSelect, FormTextarea } from '@components/odyssey-theme';
 
 const selectOptions = [
-  "Google Search",
-  "Social Media",
-  "Email",
-]
+	'Passaparola',
+	'Un concerto o un servizio in paese',
+	'Instagram o Facebook',
+	'La scuola di musica',
+	'Ricerca su internet',
+];
 
+/*
+  ATTENZIONE: `action` punta a una pagina di cortesia statica, non a un
+  servizio che riceve i messaggi. Finche' non viene configurato un endpoint
+  (Formspree, Formspark, Web3Forms...) il modulo non recapita nulla.
+  Vedi il commento in cima a company/contact.astro.
+*/
 ---
 
-<form name="Contact Form" method="POST" action="/contact-thank-you">
-  <FormInput type="text" label="Name" name="Name" placeholder="John Doe" />
-  <FormInput type="email" label="Email" name="Email" placeholder="hello@example.com" />
-  <FormSelect label="How Did You Hear About Us?" options={selectOptions} />
-  <FormTextarea label="Message" name="Message" placeholder="Your message here..." />
-  <Button>Submit</Button>
+<form
+	id="contactForm"
+	name="Modulo contatti"
+	method="POST"
+	action="/contatti-grazie"
+	novalidate
+>
+	<FormInput
+		type="text"
+		label="Nome e cognome"
+		name="nome"
+		placeholder="Come ti chiami"
+		autocomplete="name"
+		required
+	/>
+	<FormInput
+		type="email"
+		label="Email"
+		name="email"
+		placeholder="nome@esempio.it"
+		autocomplete="email"
+		hint="La usiamo solo per risponderti."
+		required
+	/>
+	<FormSelect
+		label="Come ci hai conosciuto?"
+		name="provenienza"
+		options={selectOptions}
+	/>
+	<FormTextarea
+		label="Messaggio"
+		name="messaggio"
+		placeholder="Scrivi qui la tua richiesta"
+		required
+	/>
+
+	<p class="form__summary" id="formSummary" role="alert" hidden></p>
+
+	<div class="form__actions">
+		<Button>Invia il messaggio</Button>
+		<p class="form__note">I campi con * sono obbligatori.</p>
+	</div>
 </form>
 
+<script>
+	const form = document.querySelector('#contactForm');
+	const summary = document.querySelector('#formSummary');
+
+	const messaggi = {
+		valueMissing: 'Questo campo serve per poterti rispondere.',
+		typeMismatch: 'Controlla l’indirizzo: manca la @ o il dominio.',
+		tooShort: 'Scrivi qualche parola in più.',
+	};
+
+	function messaggioPer(campo) {
+		const v = campo.validity;
+		if (v.valueMissing) return messaggi.valueMissing;
+		if (v.typeMismatch) return messaggi.typeMismatch;
+		if (v.tooShort) return messaggi.tooShort;
+		return 'Valore non valido.';
+	}
+
+	function mostraErrore(campo, testo) {
+		const box = document.querySelector(`#field-${campo.name}-error`);
+		campo.setAttribute('aria-invalid', 'true');
+		if (box) box.textContent = testo;
+	}
+
+	function pulisciErrore(campo) {
+		const box = document.querySelector(`#field-${campo.name}-error`);
+		campo.removeAttribute('aria-invalid');
+		if (box) box.textContent = '';
+	}
+
+	if (form) {
+		const campi = Array.from(form.querySelectorAll('input, textarea, select'));
+
+		// Convalida al primo invio, poi in tempo reale solo sui campi già sbagliati
+		campi.forEach(campo => {
+			campo.addEventListener('input', () => {
+				if (campo.hasAttribute('aria-invalid') && campo.checkValidity()) {
+					pulisciErrore(campo);
+				}
+			});
+		});
+
+		form.addEventListener('submit', event => {
+			const invalidi = campi.filter(campo => !campo.checkValidity());
+
+			campi.forEach(pulisciErrore);
+
+			if (invalidi.length > 0) {
+				event.preventDefault();
+				invalidi.forEach(campo => mostraErrore(campo, messaggioPer(campo)));
+				summary.hidden = false;
+				summary.textContent =
+					invalidi.length === 1
+						? 'Manca un campo. Controlla qui sotto.'
+						: `Mancano ${invalidi.length} campi. Controlla qui sotto.`;
+				invalidi[0].focus();
+			} else {
+				summary.hidden = true;
+			}
+		});
+	}
+</script>
+
 <style>
-  form {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 1rem;
-  }
+	form {
+		display: grid;
+		grid-template-columns: 1fr;
+		gap: var(--space-md);
+	}
+
+	.form__summary {
+		margin: 0;
+		max-width: none;
+		padding: var(--space-xs) var(--space-sm);
+		border-radius: var(--radius-sm);
+		border-left: 3px solid #a8412f;
+		background-color: rgba(168, 65, 47, 0.07);
+		color: #8f3527;
+		font-size: var(--font-size-sm);
+	}
+
+	.form__actions {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: var(--space-md);
+	}
+
+	.form__note {
+		margin: 0;
+		max-width: none;
+		font-size: var(--font-size-xs);
+		color: var(--theme-muted);
+	}
 </style>

@@ -24,35 +24,46 @@ const { reversed } = Astro.props;
 
 <style>
 	.text-and-image__section {
-		margin: var(--section-margin) auto;
-		min-height: clamp(90vh, 100vw, calc(100vh - var(--navbar-height)));
+		/* Margine ottico: poco sopra (l'header gia' distanzia), molto sotto */
+		margin: var(--space-md) auto var(--section-margin);
+		min-height: clamp(28rem, 62dvh, calc(100dvh - var(--navbar-height)));
 		display: grid;
-		grid-template-columns: 1fr 1fr;
+		grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
 		align-items: center;
-		gap: 1rem;
+		gap: clamp(1.5rem, 4vw, 4rem);
 	}
 	.text-and-image__section--reversed .text-and-image__text {
 		order: 2;
 	}
 	.text-and-image__text {
-		padding: 2rem 0;
-		justify-self: center;
-		max-width: 25rem;
+		padding: 0;
+		justify-self: start;
+		max-width: 30rem;
+	}
+	.text-and-image__btns {
+		display: flex;
+		flex-wrap: wrap;
+		gap: var(--space-sm);
+		margin-top: var(--space-md);
 	}
 	.text-and-image__image :global(img) {
 		width: 100%;
 		height: 100%;
-		max-height: 80vh;
+		max-height: 62dvh;
 		object-fit: cover;
-		border-radius: var(--theme-shape-radius);
+		/* Raggio piu' stretto dei contenitori: gerarchia di forme */
+		border-radius: var(--radius-lg);
+		box-shadow: var(--theme-elevation-2);
 	}
 	@media (max-width: 768px) {
 		.text-and-image__section {
-			margin: 2rem auto 0 auto;
+			margin: var(--space-sm) auto var(--space-xl);
+			min-height: 0;
 			grid-template-columns: 1fr;
 		}
 		.text-and-image__text {
-			padding: 2rem 0;
+			padding: var(--space-md) 0 0;
+			max-width: none;
 		}
 	}
 </style>

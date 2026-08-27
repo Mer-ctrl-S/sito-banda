@@ -1,126 +1,223 @@
 ---
 import { Icon } from 'astro-icon/components';
-import Container  from '../core/Container.astro';
+import Container from '../core/Container.astro';
 import Plug from './Plug.astro';
 
-const { footerSocials, footerLists, copyrightName, background, color, showPlug: showPlug = true } =
-  Astro.props;
+import settings from '../../config/settings.js';
+
+const {
+	footerSocials,
+	footerLists,
+	copyrightName,
+	background,
+	color,
+	showPlug = true,
+} = Astro.props;
+
+const year = new Date().getFullYear();
+
+// Il numero si legge da settings.js: mai riscritto a mano nel markup.
+const cf = settings.codiceFiscale?.trim() ?? '';
+const etichettaCf = settings.codiceFiscaleAnchePartitaIva
+	? 'C.F. e P.IVA'
+	: 'C.F.';
 ---
 
-<footer
-  style={background && `--footer-bg:${background}; --footer-color:${color}`}
->
-  <Container>
-    <div class="footer-grid__container">
-      <div class="footer-brand__container">
-        <div>
-          <slot name="logo" />
-        </div>
-        <ul class="footer-socials__list">
-          {
-            footerSocials.map((social) => (
-              <li class="footer-socials__item">
-                <a
-                  href={social.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  class="footer-socials__link"
-                  title={`Open ${social.name} profile`}
-                >
-                  <Icon name={social.icon} width={24} height={24} />
-                </a>
-              </li>
-            ))
-          }
-        </ul>
-      </div>
-      {
-        footerLists.map((list) => (
-          <div>
-            <p><strong>{list.title}</strong></p>
-            <ul class="footer-link__list">
-              {list.items.map((item) => (
-                <li>
-                  <a href={item.slug}>{item.title}</a>
-                </li>
-              ))}
-            </ul>
-          </div>
-        ))
-      }
-    </div>
-    <div class="footer-copyright__container">
-      {showPlug && <Plug/>}
-      <p>Copyright &copy; {new Date().getFullYear()} {copyrightName}</p>
-    </div>
+<footer style={background && `--footer-bg:${background}; --footer-color:${color}`}>
+	<Container>
+		<div class="footer-grid__container">
+			<div class="footer-brand__container">
+				<div class="footer-logo">
+					<slot name="logo" />
+				</div>
+				<p class="footer-brand__blurb">
+					Banda, scuola di musica e vita di paese a Castelcovati.
+				</p>
+				<ul class="footer-socials__list">
+					{
+						footerSocials.map((social) => (
+							<li>
+								<a
+									href={social.url}
+									target="_blank"
+									rel="noopener noreferrer"
+									class="footer-socials__link"
+									aria-label={`${social.name} (si apre in una nuova scheda)`}
+								>
+									<Icon name={social.icon} width={20} height={20} />
+								</a>
+							</li>
+						))
+					}
+				</ul>
+			</div>
 
-  </Container>
+			<div class="footer-lists__container">
+				{
+					footerLists.map((list) => (
+						<nav class="footer-list" aria-label={list.title}>
+							<h2 class="footer-list__title">{list.title}</h2>
+							<ul class="footer-link__list">
+								{list.items.map((item) => (
+									<li>
+										<a href={item.slug}>{item.title}</a>
+									</li>
+								))}
+							</ul>
+						</nav>
+					))
+				}
+			</div>
+		</div>
+
+		<div class="footer-copyright__container">
+			<p class="footer-copyright__legal">
+				&copy; {year} {copyrightName}
+				{cf && <> &middot; <span class="tabular">{etichettaCf} {cf}</span></>} &middot;
+				<a href="/company/legal">Note legali e privacy</a>
+			</p>
+			{showPlug && <Plug />}
+		</div>
+	</Container>
 </footer>
 
 <style>
-  footer {
-    --footer-bg: var(--theme-primary);
-    --footer-color: var(--theme-on-primary);
-    min-height: 40vh;
-    background-color: var(--footer-bg);
-    color: var(--footer-color);
-    border-top-left-radius: var(--theme-shape-radius);
-    border-top-right-radius: var(--theme-shape-radius);
-  }
-  .footer-grid__container {
-    padding: 10vh 0 1rem 0;
-    display: grid;
-    grid-template-columns: 2fr 1fr 1fr 1fr;
-  }
-  .footer-socials__list {
-    margin: 1rem 0;
-    padding: 0;
-    display: flex;
-    list-style: none;
-  }
-  .footer-socials__item {
-    margin-right: 0.5rem;
-  }
-  .footer-link__list {
-    margin: 0;
-    padding: 0;
-    list-style: none;
-  }
-  .footer-link__list li {
-    margin-bottom: 0.5rem;
-  }
-  .footer-link__list li a {
-    text-decoration: none;
-  }
-  .footer-link__list li a:hover {
-    opacity: 0.84;
-  }
-  .footer-copyright__container {
-    display: flex;
-    flex-direction: column;
-    /* justify-content: space-between; */
-  }
-  .footer-copyright__container p {
-    font-size: var(--font-size-sm);
-  }
-  @media (max-width: 768px) {
-    .footer-grid__container :first-child {
-      grid-column: 1/-1;
-    }
-    .footer-grid__container {
-      padding: 5vh 0;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 1rem;
-    }
-  }
-  @media (max-width: 600px) {
-    .footer-grid__container {
-      padding: 5vh 0;
-      grid-template-columns: 1fr;
-      gap: 1rem;
-    }
-    .footer-copyright__container {
-      flex-direction: column;
-    }
-  }
+	footer {
+		--footer-bg: var(--theme-primary);
+		--footer-color: var(--theme-on-primary);
+		margin-top: var(--section-margin);
+		background-color: var(--footer-bg);
+		color: var(--footer-color);
+		border-top-left-radius: var(--theme-shape-radius);
+		border-top-right-radius: var(--theme-shape-radius);
+	}
+
+	/*
+	  Non più quattro colonne uguali: il marchio prende peso, le liste stanno
+	  insieme sul lato opposto. Padding ottico, il fondo respira più della testa.
+	*/
+	.footer-grid__container {
+		padding: var(--space-2xl) 0 var(--space-xl);
+		display: grid;
+		grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+		gap: var(--space-xl);
+	}
+
+	.footer-logo :global(svg),
+	.footer-logo :global(img) {
+		max-width: 12rem;
+		height: auto;
+	}
+
+	.footer-brand__blurb {
+		margin: var(--space-md) 0 0;
+		max-width: 32ch;
+		font-size: var(--font-size-sm);
+		opacity: 0.72;
+	}
+
+	.footer-socials__list {
+		margin: var(--space-md) 0 0;
+		padding: 0;
+		display: flex;
+		gap: var(--space-2xs);
+		list-style: none;
+	}
+	.footer-socials__list li {
+		max-width: none;
+	}
+	.footer-socials__link {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		width: 2.5rem;
+		height: 2.5rem;
+		border-radius: var(--radius-sm);
+		border: 1px solid color-mix(in srgb, var(--footer-color) 22%, transparent);
+		color: inherit;
+		transition: background-color var(--theme-transition),
+			border-color var(--theme-transition), transform 160ms var(--ease-spring);
+	}
+	.footer-socials__link:hover {
+		background-color: color-mix(in srgb, var(--footer-color) 12%, transparent);
+		border-color: color-mix(in srgb, var(--footer-color) 44%, transparent);
+		transform: translateY(-2px);
+	}
+	.footer-socials__link:active {
+		transform: translateY(0) scale(0.96);
+	}
+
+	.footer-lists__container {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
+		gap: var(--space-lg);
+	}
+
+	.footer-list__title {
+		font-family: var(--theme-font-family-sans);
+		font-size: var(--font-size-xs);
+		font-weight: 600;
+		letter-spacing: var(--tracking-label);
+		text-transform: uppercase;
+		color: inherit;
+		opacity: 0.56;
+		margin-bottom: var(--space-sm);
+	}
+
+	.footer-link__list {
+		margin: 0;
+		padding: 0;
+		list-style: none;
+	}
+	.footer-link__list li {
+		margin-bottom: var(--space-2xs);
+		max-width: none;
+	}
+	.footer-link__list li a {
+		font-size: var(--font-size-sm);
+		text-decoration: none;
+		opacity: 0.82;
+		transition: opacity var(--theme-transition);
+	}
+	.footer-link__list li a:hover {
+		opacity: 1;
+		text-decoration: underline;
+		text-underline-offset: 0.25em;
+	}
+
+	.footer-copyright__container {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		justify-content: space-between;
+		gap: var(--space-sm);
+		padding: var(--space-md) 0 var(--space-lg);
+		border-top: 1px solid color-mix(in srgb, var(--footer-color) 16%, transparent);
+	}
+	.footer-copyright__legal {
+		margin: 0;
+		max-width: none;
+		font-size: var(--font-size-xs);
+		opacity: 0.62;
+	}
+	.footer-copyright__legal a {
+		color: inherit;
+		text-underline-offset: 0.2em;
+	}
+
+	@media (max-width: 860px) {
+		.footer-grid__container {
+			grid-template-columns: 1fr;
+			gap: var(--space-lg);
+			padding: var(--space-xl) 0 var(--space-lg);
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.footer-socials__link,
+		.footer-socials__link:hover,
+		.footer-socials__link:active {
+			transform: none;
+		}
+	}
 </style>

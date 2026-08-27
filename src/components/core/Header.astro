@@ -1,160 +1,265 @@
 ---
-import { Icon } from 'astro-icon/components'
+import { Icon } from 'astro-icon/components';
 const { navData, rightMenu } = Astro.props;
+
+// Indicatore di pagina corrente: senza, l'utente non sa dove si trova.
+const strip = (p) => (p !== '/' && p.endsWith('/') ? p.slice(0, -1) : p);
+const current = strip(Astro.url.pathname);
+const isCurrent = (slug) => {
+	const s = strip(slug);
+	return s === '/' ? current === '/' : current === s || current.startsWith(s + '/');
+};
 ---
 
 <script type="module">
-  const bodyElement = document.querySelector('body');
-  const menuButton = document.querySelector('#menuButton')
-  const navHeader = document.querySelector('#odysseyNavHeader');
-  const menuButtonIconHam = document.querySelector('#menuButtonIconHam');
-  const menuButtonIconClose = document.querySelector('#menuButtonIconClose');
-  let scrollPosition = 0;
+	const bodyElement = document.querySelector('body');
+	const menuButton = document.querySelector('#menuButton');
+	const navHeader = document.querySelector('#odysseyNavHeader');
+	const menuButtonIconHam = document.querySelector('#menuButtonIconHam');
+	const menuButtonIconClose = document.querySelector('#menuButtonIconClose');
+	let scrollPosition = 0;
 
-  menuButton.addEventListener('click', toggleMenu)
+	menuButton.addEventListener('click', toggleMenu);
 
-  function toggleMenu() {
-    menuButtonIconHam.toggleAttribute('hidden');
-    menuButtonIconClose.toggleAttribute('hidden');
-    
-    if (navHeader.hasAttribute('mobile-menu-open', true)) {
-      menuButton.title = "Open Main Menu"
-      // unlock scroll position
-      bodyElement.style.removeProperty('overflow');
-      bodyElement.style.removeProperty('position');
-      bodyElement.style.removeProperty('top');
-      bodyElement.style.removeProperty('width');
-      window.scrollTo(0, scrollPosition);
-    } else {
-      menuButton.title = "Close Main Menu"
-      // lock scroll position
-      scrollPosition = window.pageYOffset;
-      bodyElement.style.overflow = 'hidden';
-      bodyElement.style.position = 'fixed';
-      bodyElement.style.top = `-${scrollPosition}px`;
-      bodyElement.style.width = '100%';
-    }
-    
-    navHeader.toggleAttribute('mobile-menu-open');
-  }
-</script>  
+	function toggleMenu() {
+		menuButtonIconHam.toggleAttribute('hidden');
+		menuButtonIconClose.toggleAttribute('hidden');
 
-<header id="odysseyNavHeader" class={`${rightMenu ? "header--right" : ``.trim()}`}>
-  <div class="header-logo-menu__container">
-  <button id="menuButton" title="Open Main Menu">
-    <span id="menuButtonIconHam">
-      <Icon name="ic:baseline-menu" width="24px" height="24px" />
-    </span>
-    <span id="menuButtonIconClose" hidden>
-      <Icon name="ic:baseline-close" width="24px" height="24px" />
-    </span>
-  </button>
-  <a class="header-logo__link" href="/">
-    <slot name="logo">
-    </slot>
-  </a>
-  </div>
-  <div class="header-nav__container">
-    <slot name="nav">
-      {navData && <nav>
-        <ul>
-          {navData.map(navItem => (
-            (<li><a href={navItem.slug} >{navItem.title}</a></li>)
-          ))}
-        </ul>
-      </nav>}
-    </slot>
-  </div>
-  <div class="header-action-item__container">
-    <slot name="action-item">
-    </slot>
-  </div>
+		const isOpen = navHeader.hasAttribute('mobile-menu-open');
+
+		if (isOpen) {
+			menuButton.title = 'Apri il menu principale';
+			menuButton.setAttribute('aria-expanded', 'false');
+			bodyElement.style.removeProperty('overflow');
+			bodyElement.style.removeProperty('position');
+			bodyElement.style.removeProperty('top');
+			bodyElement.style.removeProperty('width');
+			window.scrollTo(0, scrollPosition);
+		} else {
+			menuButton.title = 'Chiudi il menu principale';
+			menuButton.setAttribute('aria-expanded', 'true');
+			scrollPosition = window.pageYOffset;
+			bodyElement.style.overflow = 'hidden';
+			bodyElement.style.position = 'fixed';
+			bodyElement.style.top = `-${scrollPosition}px`;
+			bodyElement.style.width = '100%';
+		}
+
+		navHeader.toggleAttribute('mobile-menu-open');
+	}
+
+	// Ombra dell’header solo quando la pagina e' effettivamente scrollata
+	const onScroll = () => {
+		navHeader.toggleAttribute('scrolled', window.scrollY > 8);
+	};
+	onScroll();
+	window.addEventListener('scroll', onScroll, { passive: true });
+</script>
+
+<header id="odysseyNavHeader" class={rightMenu ? 'header--right' : undefined}>
+	<div class="header-logo-menu__container">
+		<button
+			id="menuButton"
+			type="button"
+			title="Apri il menu principale"
+			aria-label="Apri il menu principale"
+			aria-expanded="false"
+			aria-controls="mainNav"
+		>
+			<span id="menuButtonIconHam">
+				<Icon name="ic:baseline-menu" width="24px" height="24px" />
+			</span>
+			<span id="menuButtonIconClose" hidden>
+				<Icon name="ic:baseline-close" width="24px" height="24px" />
+			</span>
+		</button>
+		<a class="header-logo__link" href="/">
+			<slot name="logo" />
+		</a>
+	</div>
+	<div class="header-nav__container" id="mainNav">
+		<slot name="nav">
+			{
+				navData && (
+					<nav aria-label="Menu principale">
+						<ul>
+							{navData.map((navItem) => (
+								<li>
+									<a
+										href={navItem.slug}
+										aria-current={isCurrent(navItem.slug) ? 'page' : undefined}
+									>
+										{navItem.title}
+									</a>
+								</li>
+							))}
+						</ul>
+					</nav>
+				)
+			}
+		</slot>
+	</div>
+	<div class="header-action-item__container">
+		<slot name="action-item" />
+	</div>
 </header>
 
 <style>
-  header {
-    width: 100%;
-    padding: 1rem 0.5rem;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-  header.header--right {
-    display: grid;
-    grid-template-columns: 1fr auto auto;
-  }
-  .header-logo__link {
-    width: fit-content;
-    color: inherit;
-    text-decoration: none;
-  }
-  .header-logo-menu__container {
-    display: flex;
-    align-items: center;
-    z-index: 100;
-  }
-  .header-action-item__container {
-    z-index: 100;
-  }
-  #menuButton {
-    outline: none;
-    border: none;
-    background-color: transparent;
-    margin-right: 0.5rem;
-    display: none;
-    cursor: pointer;
-    -webkit-tap-highlight-color: transparent;
-  }
-  #menuButton > span {
-    color: var(--theme-on-bg);
-    vertical-align: middle;
-  }
-  nav {
-  display: flex;
-  }
-  nav ul {
-    margin: 0;
-    padding: 0;
-    list-style: none;
-    display: flex;
-  }
-  nav ul li a {
-    text-decoration: none;
-    margin-right: 1rem;
-    color: inherit;
-    opacity: 0.72;
-    transition: opacity linear 150ms;
-  }
-  nav ul li a:hover {
-    opacity: 1;
-  }
-  @media(max-width: 600px) {
-    #menuButton {
-      display: block;  
-      z-index: 100;
-    }
-    .header-nav__container {
-      width: 100%;
-      height: 100%;
-      background-color: var(--theme-bg);
-      display: none;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      position: fixed;
-      inset: 0;
-      z-index: 99;
-    }
-    header[mobile-menu-open] .header-nav__container {
-      display: flex;
-    }
-    header[mobile-menu-open] nav ul {
-      align-items: center;
-      flex-direction: column;
-    }
-     header[mobile-menu-open] nav ul li {
-       font-size: var(--font-size-lg);
-       margin-bottom: 1rem;
-     }
-  }
+	header {
+		width: 100%;
+		min-height: var(--navbar-height);
+		padding: var(--space-sm) clamp(1.25rem, 5vw, 3rem);
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		position: sticky;
+		top: 0;
+		z-index: var(--z-sticky);
+		background-color: color-mix(in srgb, var(--theme-bg) 82%, transparent);
+		backdrop-filter: saturate(140%) blur(14px);
+		-webkit-backdrop-filter: saturate(140%) blur(14px);
+		border-bottom: 1px solid transparent;
+		transition: border-color var(--theme-transition),
+			background-color var(--theme-transition);
+	}
+	header[scrolled] {
+		border-bottom-color: var(--theme-border);
+		background-color: color-mix(in srgb, var(--theme-bg) 92%, transparent);
+	}
+	/*
+	  Con il menu aperto niente backdrop-filter: un filtro sull'antenato rende
+	  l'header il containing block dei figli position: fixed, e l'overlay a tutto
+	  schermo si riduce alla barra. Spento qui, torna a coprire lo schermo.
+	*/
+	header[mobile-menu-open] {
+		backdrop-filter: none;
+		-webkit-backdrop-filter: none;
+		background-color: transparent;
+		border-bottom-color: transparent;
+	}
+	header.header--right {
+		display: grid;
+		grid-template-columns: auto 1fr auto;
+		gap: var(--space-md);
+		align-items: center;
+	}
+	.header-nav__container {
+		justify-self: end;
+	}
+	.header-logo__link {
+		width: fit-content;
+		color: inherit;
+		text-decoration: none;
+		display: flex;
+		align-items: center;
+	}
+	.header-logo-menu__container {
+		display: flex;
+		align-items: center;
+		z-index: var(--z-sticky);
+	}
+	.header-action-item__container {
+		z-index: var(--z-sticky);
+	}
+	#menuButton {
+		border: none;
+		background-color: transparent;
+		margin-right: var(--space-2xs);
+		display: none;
+		cursor: pointer;
+		padding: 0.35rem;
+		border-radius: var(--radius-sm);
+		-webkit-tap-highlight-color: transparent;
+	}
+	#menuButton > span {
+		color: var(--theme-on-bg);
+		vertical-align: middle;
+		display: block;
+	}
+	nav {
+		display: flex;
+	}
+	nav ul {
+		margin: 0;
+		padding: 0;
+		list-style: none;
+		display: flex;
+		gap: clamp(0.75rem, 1.8vw, 1.75rem);
+	}
+	nav ul li {
+		max-width: none;
+	}
+	nav ul li a {
+		position: relative;
+		display: block;
+		padding: 0.35rem 0;
+		text-decoration: none;
+		color: inherit;
+		font-size: var(--font-size-sm);
+		font-weight: 500;
+		opacity: 0.68;
+		transition: opacity var(--theme-transition);
+	}
+	nav ul li a:hover {
+		opacity: 1;
+	}
+	/* Filetto in ottone: unico segnale di pagina corrente */
+	nav ul li a::after {
+		content: '';
+		position: absolute;
+		left: 0;
+		right: 0;
+		bottom: -2px;
+		height: 2px;
+		background-color: var(--theme-accent);
+		border-radius: 2px;
+		transform: scaleX(0);
+		transform-origin: left;
+		transition: transform 320ms var(--ease-out);
+	}
+	nav ul li a[aria-current='page'] {
+		opacity: 1;
+		font-weight: 600;
+	}
+	nav ul li a[aria-current='page']::after {
+		transform: scaleX(1);
+	}
+
+	@media (max-width: 600px) {
+		#menuButton {
+			display: block;
+			z-index: var(--z-sticky);
+		}
+		.header-nav__container {
+			width: 100%;
+			height: 100dvh;
+			background-color: var(--theme-bg);
+			display: none;
+			flex-direction: column;
+			align-items: center;
+			justify-content: center;
+			position: fixed;
+			inset: 0;
+			z-index: calc(var(--z-sticky) - 1);
+		}
+		header[mobile-menu-open] .header-nav__container {
+			display: flex;
+		}
+		header[mobile-menu-open] nav ul {
+			align-items: center;
+			flex-direction: column;
+			gap: var(--space-md);
+		}
+		header[mobile-menu-open] nav ul li a {
+			font-family: var(--theme-font-family-serif);
+			font-size: var(--font-size-lg);
+			font-weight: 600;
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		nav ul li a::after {
+			transition: none;
+		}
+	}
 </style>

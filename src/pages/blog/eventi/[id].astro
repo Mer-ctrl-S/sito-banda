@@ -12,8 +12,6 @@ import {
 
 // 1) getStaticPaths: genera le route /blog/eventi/[id_associazione_evento]
 export async function getStaticPaths() {
-  const modules = import.meta.glob('../../pages/jobs/*.md', { eager: true });
-
   const bodyLista = {
     method: 'associazioni_eventi_lista',
     request: {

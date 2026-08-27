@@ -1,0 +1,284 @@
+---
+import Layout from '../layouts/Page.astro';
+import { Container, Button } from '@components/odyssey-theme';
+import settings from '../config/settings.js';
+
+/*
+  DA COMPLETARE: il codice fiscale si inserisce in src/config/settings.js
+  (campo `codiceFiscale`). Finché è vuoto la pagina lo dichiara come mancante
+  invece di mostrare un numero: un codice fiscale sbagliato manderebbe il
+  contributo di qualcun altro, quindi non va inventato né approssimato.
+
+  Anche il paragrafo "A cosa serve" va riscritto dall'associazione con le
+  destinazioni reali del contributo.
+*/
+
+const cf = settings.codiceFiscale?.trim() ?? '';
+const cfMancante = cf === '';
+
+const passi = [
+	'Nella dichiarazione dei redditi (modello 730, Redditi PF, oppure la Certificazione Unica) cerca il riquadro dedicato agli enti del terzo settore.',
+	'Firma nello spazio del riquadro.',
+	'Scrivi il codice fiscale dell’associazione nella casella sotto la firma.',
+];
+
+const seo = {
+	title: '5 per mille | Corpo Bandistico di Castelcovati',
+	description:
+		'Destina il tuo 5 per mille al Corpo Bandistico di Castelcovati APS: non costa nulla e sostiene la banda e la scuola di musica.',
+};
+---
+
+<Layout {seo}>
+	<Container>
+		<article class="cinque">
+			<header class="cinque__header">
+				<h1>Il tuo 5 per mille alla banda</h1>
+				<p class="cinque__lede">
+					È una quota di imposte che paghi comunque: destinarla a noi non ti
+					costa nulla e non toglie nulla all’8 per mille. Basta una firma e un
+					numero.
+				</p>
+			</header>
+
+			<!-- Il codice fiscale è l'unico dato che serve davvero: sta al centro -->
+			<section class="cf" aria-labelledby="cfTitolo">
+				<h2 id="cfTitolo" class="cf__etichetta">Codice fiscale</h2>
+
+				{
+					cfMancante ? (
+						<>
+							<p class="cf__numero cf__numero--vuoto">— da inserire</p>
+							<p class="cf__avviso">
+								Il codice fiscale dell’associazione non è ancora pubblicato su
+								questa pagina. Scrivici e te lo forniamo, così puoi destinare
+								comunque il tuo 5 per mille.
+							</p>
+						</>
+					) : (
+						<>
+							<p class="cf__numero tabular">{cf}</p>
+							<button type="button" class="cf__copia" data-cf={cf}>
+								<span class="cf__copia-testo">Copia il codice</span>
+							</button>
+						</>
+					)
+				}
+			</section>
+
+			<section class="cinque__come" aria-labelledby="comeTitolo">
+				<h2 id="comeTitolo">Come si fa</h2>
+				<ol class="cinque__passi">
+					{passi.map(passo => <li>{passo}</li>)}
+				</ol>
+				<p class="cinque__nota">
+					Il riquadro cambia nome e posizione a seconda del modello e dell’anno:
+					se hai dubbi, chiedi a chi ti compila la dichiarazione oppure scrivici.
+				</p>
+			</section>
+
+			<section class="cinque__uso" aria-labelledby="usoTitolo">
+				<h2 id="usoTitolo">A cosa serve</h2>
+				<p class="cinque__uso-vuoto">
+					— da completare: qui va scritto a cosa viene destinato il contributo
+					(strumenti, spartiti, borse di studio per gli allievi, attività della
+					scuola di musica). Meglio con esempi concreti dell’ultimo anno.
+				</p>
+			</section>
+
+			<section class="cinque__azioni">
+				<Button href="/company/contact">Chiedi informazioni</Button>
+				<Button href="/trasparenza" outlined>Vedi la trasparenza</Button>
+			</section>
+		</article>
+	</Container>
+
+	<script>
+		const bottone = document.querySelector('.cf__copia');
+
+		if (bottone) {
+			const testo = bottone.querySelector('.cf__copia-testo');
+			const etichetta = testo.textContent;
+			let attesa;
+
+			bottone.addEventListener('click', async () => {
+				clearTimeout(attesa);
+				try {
+					await navigator.clipboard.writeText(bottone.dataset.cf);
+					testo.textContent = 'Copiato';
+					bottone.dataset.stato = 'ok';
+				} catch {
+					// clipboard negata o contesto non sicuro: si seleziona il numero
+					// cosi' resta copiabile a mano
+					const numero = document.querySelector('.cf__numero');
+					const range = document.createRange();
+					range.selectNodeContents(numero);
+					const sel = getSelection();
+					sel.removeAllRanges();
+					sel.addRange(range);
+					testo.textContent = 'Selezionato: copia con ⌘C';
+					bottone.dataset.stato = 'errore';
+				}
+				attesa = setTimeout(() => {
+					testo.textContent = etichetta;
+					delete bottone.dataset.stato;
+				}, 2500);
+			});
+		}
+	</script>
+</Layout>
+
+<style>
+	.cinque {
+		margin: var(--space-lg) auto var(--section-margin);
+		max-width: 48rem;
+	}
+
+	.cinque__lede {
+		font-size: var(--font-size-md);
+		line-height: 1.45;
+		color: var(--theme-on-bg);
+	}
+
+	/* Blocco del codice fiscale: il dato che la gente viene a cercare */
+	.cf {
+		margin: var(--space-xl) 0;
+		padding: var(--space-lg) var(--space-md);
+		background-color: var(--theme-surface-1);
+		border-radius: var(--radius-lg);
+		text-align: center;
+	}
+
+	.cf__etichetta {
+		font-family: var(--theme-font-family-sans);
+		font-size: var(--font-size-xs);
+		font-weight: 600;
+		letter-spacing: var(--tracking-label);
+		text-transform: uppercase;
+		color: var(--theme-muted);
+		margin-bottom: var(--space-2xs);
+	}
+
+	.cf__numero {
+		margin: 0;
+		max-width: none;
+		font-family: var(--theme-font-family-serif);
+		font-size: clamp(1.9rem, 6vw, 3rem);
+		font-weight: 600;
+		line-height: 1.1;
+		/* cifre allineate e spaziate: si leggono e si trascrivono a mano */
+		font-variant-numeric: tabular-nums;
+		letter-spacing: 0.06em;
+		overflow-wrap: anywhere;
+		color: var(--theme-on-surface-1);
+	}
+
+	.cf__numero--vuoto {
+		font-size: var(--font-size-lg);
+		font-style: italic;
+		letter-spacing: normal;
+		color: var(--theme-muted);
+	}
+
+	.cf__avviso {
+		margin: var(--space-md) auto 0;
+		max-width: 38ch;
+		font-size: var(--font-size-sm);
+		color: var(--theme-on-surface-1);
+	}
+
+	.cf__copia {
+		margin-top: var(--space-md);
+		padding: 0.5rem 1rem;
+		background: transparent;
+		border: 1px solid var(--theme-border-strong);
+		border-radius: var(--radius-sm);
+		color: var(--theme-on-surface-1);
+		font-family: var(--theme-font-family-sans);
+		font-size: var(--font-size-sm);
+		font-weight: 500;
+		white-space: nowrap;
+		cursor: pointer;
+		transition: background-color var(--theme-transition),
+			border-color var(--theme-transition);
+	}
+	.cf__copia:hover {
+		background-color: var(--theme-bg);
+		border-color: var(--theme-primary);
+	}
+	.cf__copia:active {
+		background-color: var(--theme-surface-2);
+	}
+	.cf__copia[data-stato='ok'] {
+		border-color: var(--theme-primary);
+		color: var(--theme-primary);
+	}
+	.cf__copia[data-stato='errore'] {
+		border-color: var(--theme-accent);
+	}
+
+	.cinque__come,
+	.cinque__uso {
+		margin: var(--space-xl) 0;
+	}
+	.cinque__come h2,
+	.cinque__uso h2 {
+		font-size: var(--font-size-md);
+		margin-bottom: var(--space-sm);
+	}
+
+	/* Passi realmente ordinali: la numerazione qui ha un motivo */
+	.cinque__passi {
+		margin: 0;
+		padding: 0;
+		list-style: none;
+		counter-reset: passo;
+		border-top: 1px solid var(--theme-border);
+	}
+	.cinque__passi li {
+		counter-increment: passo;
+		display: grid;
+		grid-template-columns: 2rem 1fr;
+		gap: var(--space-sm);
+		padding: var(--space-sm) 0;
+		border-bottom: 1px solid var(--theme-border);
+		max-width: none;
+	}
+	.cinque__passi li::before {
+		content: counter(passo);
+		font-family: var(--theme-font-family-serif);
+		font-size: var(--font-size-md);
+		font-weight: 600;
+		color: var(--theme-accent);
+		line-height: 1.2;
+	}
+
+	.cinque__nota {
+		margin-top: var(--space-sm);
+		font-size: var(--font-size-sm);
+		color: var(--theme-muted);
+	}
+
+	.cinque__uso-vuoto {
+		padding: var(--space-sm) var(--space-md);
+		border-left: 3px solid var(--theme-accent);
+		background-color: var(--theme-surface-1);
+		border-radius: var(--radius-sm);
+		font-style: italic;
+		color: var(--theme-muted);
+		max-width: none;
+	}
+
+	.cinque__azioni {
+		display: flex;
+		flex-wrap: wrap;
+		gap: var(--space-sm);
+		margin-top: var(--space-xl);
+	}
+
+	@media (max-width: 640px) {
+		.cf {
+			padding: var(--space-md) var(--space-sm);
+		}
+	}
+</style>

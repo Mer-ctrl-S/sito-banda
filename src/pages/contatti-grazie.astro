@@ -1,0 +1,43 @@
+---
+import { Button, Container } from '@components/odyssey-theme';
+import Layout from '../layouts/Page.astro';
+
+const seo = {
+	title: 'Messaggio inviato | Corpo Bandistico di Castelcovati',
+	description: 'Conferma di invio del modulo di contatto.',
+};
+---
+
+<Layout {seo}>
+	<Container>
+		<section class="grazie">
+			<p class="eyebrow">Contatti</p>
+			<h1>Abbiamo ricevuto il tuo messaggio.</h1>
+			<p class="grazie__lede">
+				Ti rispondiamo appena possibile, di solito entro qualche giorno. Se la
+				richiesta è urgente puoi scriverci anche sui social.
+			</p>
+			<div class="grazie__actions">
+				<Button href="/">Torna alla home</Button>
+				<Button href="/blog" outlined>Guarda i prossimi eventi</Button>
+			</div>
+		</section>
+	</Container>
+</Layout>
+
+<style>
+	.grazie {
+		padding: var(--space-2xl) 0;
+		max-width: 44rem;
+	}
+	.grazie__lede {
+		font-size: var(--font-size-md);
+		color: var(--theme-muted);
+		margin-bottom: var(--space-xl);
+	}
+	.grazie__actions {
+		display: flex;
+		flex-wrap: wrap;
+		gap: var(--space-sm);
+	}
+</style>

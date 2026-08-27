@@ -4,8 +4,8 @@ import Layout from '../../layouts/Page.astro';
 import HeroSection from '../../components/sections/heros/HeroSection.astro';
 import VerticalTimeline from '../../components/VerticalTimeline/VerticalTimeline.astro';
 const seo = {
-	title: 'About | Astro Odyssey Theme',
-	description: 'About Page',
+	title: 'Chi siamo | Corpo Bandistico di Castelcovati',
+	description: 'La storia del Corpo Bandistico di Castelcovati: fondazione, concerti, progetti e traguardi anno per anno.',
 };
 const timelineItems = [
 	{
@@ -21,24 +21,179 @@ const timelineItems = [
 			"Il 2026 è un anno di stravolgimenti per l'associazione. Per questo per il Consiglio Direttivo ha convocato un Consiglio straordinario dei Soci per approvare importanti modifiche statutarie richieste dalle recenti norme introdotte.",
 	},
 	{
-		date: '2023',
-		title: 'Team Expansion',
+		date: '10-2024',
+		title: 'Ricordi e musica, un omaggio a Don Lino Toninelli',
 		content:
-			'Grew the team from 3 to 15 members, adding developers, designers, and product managers.',
-		image: '/images/team.jpg',
-		imageAlt: 'Team photo',
+			'Un concerto in onore ai 20 anni dalla scomparsa del nostro fondatore',
 	},
 	{
-		date: '2022',
-		title: 'Company Founded',
+		date: '05-2024',
+		title: 'Concerto in Piazza Loggia',
 		content:
-			'Started the company in a small garage with big dreams and a laptop.',
-		// No image for this entry (optional)
+			'Concerto con la Banda di Urago Mella per il centenario della banda Gemellata',
+	},
+	{
+		date: '2024',
+		title: '37° Concerto di S.Antonio',
+		content: 'Con la collaborazione del Corpo Bandistico di Urago Mella',
+	},
+	{
+		date: '2023',
+		title: 'La cattività Avignonese',
+		content:
+			'Il Maestro Mattia Rullo viene aiutato e supportato Dal Maestro Marco Rampini, il quale viene introdotto gradualmente in sostituzione a Mattia Rullo',
 	},
 	{
 		date: '2021',
-		title: 'Initial Idea',
-		content: 'The concept was born during a hackathon weekend.',
+		title: '36° Concerto di S.Antonio',
+		content: 'Con la collaborazione del Corpo Bandistico di Urago Mella',
+	},
+	{
+		date: '2020',
+		title: '31° Concerto estivo - Tra castelli e leggende',
+		content: 'Con la collaborazione del Corpo Bandistico di Urago Mella',
+	},
+	{
+		date: '2020',
+		title: '35° Concerto di S.Antonio - Il mondo in concerto',
+		content: "Concerto invernale. Annullato a casua dell'epidemia COVID",
+	},
+	{
+		date: '2020',
+		title: 'Gemellaggio con il Corpo Bandistico di Urago Mella',
+		content:
+			"Inizia ufficialmente il gemellaggio delle due realtà, nato con l'intento di aiutarsi reciprocamente",
+	},
+	{
+		date: '2019',
+		title: '30° Concerto estivo - Peter i coming',
+		content: 'Concerto estivo',
+	},
+	{
+		date: '2019',
+		title: '34° Concerto di S.Antonio',
+		content: 'Concerto invernale',
+	},
+	{
+		date: '2018',
+		title:
+			'29° Concerto estivo - Musical, Blues e Mancini... ma anche ambidestri!',
+		content: 'Concerto estivo',
+	},
+	{
+		date: '2018',
+		title: '33° Concerto di S.Antonio - Winter Symphony',
+		content: 'Concerto invernale',
+	},
+	{
+		date: '2017',
+		title: "28° Concerto estivo - Concerto d'Estate",
+		content:
+			"Concerto realizzato con la collaborazione del Civico Corpo Bandistico Musicale 'Giuseppe Verdi' di Gambara",
+	},
+	{
+		date: '2017',
+		title: '32° Concerto di S.Antonio - con ospite',
+		content:
+			'Concerto invernale realizzato con la collaborazione del fisarmonicista Gino Zambelli',
+	},
+	{
+		date: '2016',
+		title: '27° Concerto Estivo - con ospite',
+		content:
+			'Concerto etivo nella piazza comunale di Castelovati, realizzato con la collaborazione della soprano Alessia Pintossi',
+	},
+	{
+		date: '2016',
+		title: '31° Concerto di S.Antonio',
+		content: '',
+	},
+	{
+		date: '2015',
+		title: 'Concerto estivo',
+		content: 'Concerto etivo nella piazza comunale di Castelovati',
+	},
+	{
+		date: '2013',
+		title: 'Avviato il progetto "Impariamo a suonare con ... La Banda!"',
+		content:
+			"Dopo una lunga preparazione, frutto del lavoro del Direttore Artistico Mattia Rullo e del socio Giangranco Scalvini, viene avviato il progetto che anora oggi portiamo nelle scuole. Inizialmente destinato per le classi terze, quarte e quinte il corso di educazione musicale mira ad avvicinare i bambini alla musica. Partendo da strumenti Orff si punta ad arrivare agli strumenti a fiato e apercussione, con l'obiettivo di sviluppare musicalità e consapevolezza corporea. Il progetto è nato in collaborazione con L'Istituto Comprensivo M.L.King di Castelcovati ed è interamente finanziato dall'Amministrazione Comunale. ",
+	},
+	{
+		date: '2013',
+		title: 'Rassegna "Bande Musicali in Concerto"',
+		content:
+			"l'associazione partecipa alla rassegna organizzata a ABMB e Assessorato alla Cultura della Provincia di Brescia, esibendosi presso la chiesa di San Giorgio a Brescia",
+	},
+	{
+		date: '2012',
+		title: '25° Concerto di S.Antonio',
+		content:
+			'Collaborazione con la Banda ospitante di Polaveno. Al termine, il Corpo Bandistico di Castelcovati si è esibito presso il comune della banda ospitante.',
+	},
+	{
+		date: '2011',
+		title: 'Concerto Estivo a polaveno',
+		content:
+			'Collaborazione con la Banda ospitante di Polaveno. Al termine, il Corpo Bandistico di Castelcovati si è esibito presso il comune della banda ospitante.',
+	},
+	{
+		date: '2011',
+		title: 'Concerto S.Antonio - con ospite',
+		content:
+			'Concerto di S.Antonio, in contemporanea alla sagra di paese. Collabora con la Banda il soprano Tea Franchi per la realizzazione del concerto.',
+	},
+	{
+		date: '2010',
+		title: 'Classificazione',
+		content:
+			'Con la direzione del Maestro Mattia Rullo, la banda partecipa alle giornate di classificazione, organizzate da ABMB a Brescia.',
+	},
+	{
+		date: '2010',
+		title: 'Concerto S.Antonio',
+		content: 'Concerto di S.Antonio, in contemporanea alla sagra di paese.',
+	},
+	{
+		date: '2004',
+		title: "Concerto estivo 'per te Lucia...' la memoria e la speranza",
+		content: 'Testo di Giuliano Gritti, interpretato da Luca Rubagotti',
+	},
+	{
+		date: '2003',
+		title: 'Concerti tematici',
+		content:
+			"Con la direzione del Maestro Samuele Pedergnani, i cornceti aggregano musica, poesia e testi letterari all'interno di percorsi narrativi collegati ai brani eseguiti",
+	},
+	{
+		date: '2002',
+		title: 'Esibizione da Cavalli Musica',
+		content:
+			"Ancora una volta l'associazione accompagna i fedeli durante il corteo",
+	},
+	{
+		date: '1999',
+		title: 'Comunioni',
+		content:
+			"Ancora una volta l'associazione accompagna i fedeli durante il corteo",
+	},
+	{
+		date: '1998',
+		title: 'Miglioramento nella tecnica',
+		content:
+			"Sotto la guida del Maestro Domenico Gazzoli l'associazione inizia i lavori per migliorare le proprie capacità sia tecniche sia espressive",
+	},
+	{
+		date: '1992',
+		title: 'Ampliamento',
+		content:
+			"L'organico si amplia e si rinnova sotto la direzione del Maestro Franco Rubagotti",
+	},
+	{
+		date: '1987',
+		title: 'Comunioni',
+		content:
+			'La Banda di Castelcovati partecipa al corteo delle prime Comunioni accompagnando i fedeli.',
 	},
 	{
 		date: '1985',
