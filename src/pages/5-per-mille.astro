@@ -79,11 +79,15 @@ const seo = {
 
 			<section class="cinque__uso" aria-labelledby="usoTitolo">
 				<h2 id="usoTitolo">A cosa serve</h2>
-				<p class="cinque__uso-vuoto">
-					— da completare: qui va scritto a cosa viene destinato il contributo
-					(strumenti, spartiti, borse di studio per gli allievi, attività della
-					scuola di musica). Meglio con esempi concreti dell’ultimo anno.
-				</p>
+				<p class="cinque__uso-guida">A sostenere la banda.</p>
+				<ul class="cinque__uso-lista">
+					<li>Aggiornare i brani in archivio.</li>
+					<li>Aiutare l’associazione con le spese fisse.</li>
+					<li>
+						Acquistare nuovi materiali, per tenere la formazione al passo e
+						aggiornata.
+					</li>
+				</ul>
 			</section>
 
 			<section class="cinque__azioni">
@@ -259,14 +263,36 @@ const seo = {
 		color: var(--theme-muted);
 	}
 
-	.cinque__uso-vuoto {
-		padding: var(--nota-padding);
-		border-left: 3px solid var(--theme-accent);
-		background-color: var(--theme-surface-1);
-		border-radius: var(--radius-sm);
-		font-style: italic;
-		color: var(--theme-muted);
+	.cinque__uso-guida {
+		font-size: var(--font-size-md);
+		font-weight: 500;
+		margin-bottom: var(--space-sm);
+	}
+
+	/* Elenco non ordinato: le tre destinazioni non sono in sequenza,
+	   quindi niente numeri. Il segno in ottone le tiene insieme. */
+	.cinque__uso-lista {
+		list-style: none;
+		margin: 0;
+		padding: 0;
 		max-width: none;
+		border-top: 1px solid var(--theme-border);
+	}
+	.cinque__uso-lista li {
+		display: grid;
+		grid-template-columns: auto 1fr;
+		gap: var(--space-sm);
+		align-items: baseline;
+		padding: var(--space-xs) 0;
+		border-bottom: 1px solid var(--theme-border);
+		max-width: none;
+	}
+	.cinque__uso-lista li::before {
+		content: '';
+		width: 1.25rem;
+		height: 2px;
+		background: var(--theme-accent);
+		transform: translateY(-0.3em);
 	}
 
 	.cinque__azioni {
