@@ -19,8 +19,8 @@ export default {
 	sedeLegale: 'Via Aldo Moro snc, 25030 Castelcovati (BS)',
 	pec: 'corpobandistico.castelcovati@pec.it',
 	email: 'corpobandistico.castelcovati@gmail.com',
-	// Estremi di iscrizione al RUNTS: non ancora forniti.
-	runts: '',
+	// Attestazione RUNTS richiesta, in attesa di riscontro.
+	runts: 'Attestazione in corso',
 	enableThemeSwitcher: false,
 	showPlug: false, // Disable this if you want to remove the plug from the footer. (╯°□°)╯︵ ┻━┻
 };

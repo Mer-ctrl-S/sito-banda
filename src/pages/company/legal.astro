@@ -4,12 +4,15 @@ import Layout from '../../layouts/Page.astro';
 import settings from '../../config/settings.js';
 
 /*
-  DA COMPLETARE A CURA DELL'ASSOCIAZIONE.
-  Questa pagina conteneva ancora il testo segnaposto in Lorem Ipsum del tema
-  originale. E' stata sostituita con una traccia in italiano: i contenuti
-  legali (privacy, cookie, dati dell'ente) vanno scritti da chi ha i dati
-  reali e, per l'informativa privacy, preferibilmente con un consulente.
-  Il collegamento nel footer punta qui.
+  Informativa privacy del SITO. Adattata da quella che l'associazione consegna
+  ai soci al tesseramento: la sostanza giuridica e le formule sono le loro,
+  qui cambia l'ambito — il sito raccoglie solo i dati del modulo contatti.
+
+  DA FAR CONTROLLARE. Due punti in particolare, segnalati anche a schermo:
+  - l'indirizzo della sede compare con tre numeri civici diversi nei documenti
+    forniti (79 nel regolamento, 47 nell'informativa ai soci, "snc" qui);
+  - Web3Forms è un fornitore statunitense: il trasferimento fuori dall'Unione
+    va inquadrato da chi se ne intende.
 */
 
 const cf = settings.codiceFiscale?.trim() ?? '';
@@ -17,8 +20,6 @@ const etichettaCf = settings.codiceFiscaleAnchePartitaIva
 	? 'Codice fiscale e partita IVA'
 	: 'Codice fiscale';
 
-// Un'unica fonte per i dati dell'ente: compilare settings.js e questa lista si
-// aggiorna. I campi non ancora noti restano dichiarati, non spariscono.
 const datiEnte = [
 	{ voce: 'Denominazione', valore: settings.title },
 	{ voce: 'Sede legale', valore: settings.sedeLegale },
@@ -28,21 +29,111 @@ const datiEnte = [
 	{ voce: 'Email', valore: settings.email, tipo: 'email' },
 ];
 
+const diritti = [
+	'accedere ai dati personali che trattiamo',
+	'chiederne la rettifica o la cancellazione',
+	'chiedere la limitazione del trattamento',
+	'revocare il consenso già fornito',
+	'opporsi al trattamento',
+	'chiedere la portabilità dei dati',
+	'proporre reclamo al Garante per la protezione dei dati personali',
+];
+
 const seo = {
 	title: 'Note legali e privacy | Corpo Bandistico di Castelcovati',
 	description:
-		'Dati dell’associazione, informativa privacy e note legali del Corpo Bandistico di Castelcovati APS.',
+		'Informativa sul trattamento dei dati personali raccolti da questo sito e dati dell’Associazione Corpo Bandistico di Castelcovati APS.',
 };
 ---
 
-<Layout seo={seo}>
+<Layout {seo}>
 	<TextSection narrow>
 		<p class="eyebrow">Informazioni</p>
 		<h1>Note legali e privacy</h1>
+		<p class="legal__guida">
+			Informativa ai sensi dell’articolo 13 del Regolamento UE 2016/679 sui dati
+			raccolti attraverso questo sito. Il tesseramento e la partecipazione alle
+			attività hanno un’informativa propria, consegnata al momento
+			dell’iscrizione.
+		</p>
 
-		<p class="legal__notice">
-			Questa pagina è in corso di redazione. I dati e i testi qui sotto vanno
-			completati dall’associazione prima della pubblicazione del sito.
+		<h2>Chi tratta i dati</h2>
+		<p>
+			Il titolare del trattamento è l’Associazione Corpo Bandistico di
+			Castelcovati, nella persona del suo legale rappresentante. Per qualsiasi
+			richiesta relativa ai propri dati si può scrivere a
+			<a href={`mailto:${settings.email}`}>{settings.email}</a>.
+		</p>
+
+		<h2>Quali dati raccoglie questo sito</h2>
+		<p>
+			Soltanto quelli che si scelgono di inviare tramite il modulo della pagina
+			contatti: <strong>nome, indirizzo email e testo del messaggio</strong>,
+			oltre all’indicazione facoltativa di come si è conosciuta
+			l’associazione. Servono unicamente a rispondere.
+		</p>
+		<p class="legal__rilievo">
+			Il sito <strong>non usa cookie</strong> e <strong>non raccoglie
+			statistiche</strong> sulle visite. Non c’è alcun sistema di
+			profilazione, né pubblicità.
+		</p>
+
+		<h2>A chi vengono comunicati</h2>
+		<ul>
+			<li>
+				L’invio del modulo passa da <strong>Web3Forms</strong>, il servizio che
+				recapita il messaggio alla nostra casella di posta. È un fornitore con
+				sede negli Stati Uniti.
+			</li>
+			<li>
+				I dati possono essere comunicati a consulenti di cui l’associazione
+				abbia bisogno di servirsi, limitatamente alle informazioni
+				indispensabili al servizio prestato.
+			</li>
+			<li>
+				Possono essere forniti agli enti pubblici che, in base alle normative
+				vigenti, ne facciano richiesta.
+			</li>
+		</ul>
+		<p>
+			Al di fuori di questi casi i dati non vengono comunicati a terzi.
+		</p>
+
+		<h2>Per quanto tempo li conserviamo</h2>
+		<p>
+			Per il tempo necessario a gestire la richiesta e comunque per i tempi
+			minimi richiesti dalle normative di riferimento. In assenza di tali norme
+			l’associazione stabilisce un termine di conservazione limitato, non
+			superiore a cinque anni dal termine dell’utilizzo dei dati.
+		</p>
+
+		<h2>I diritti di chi ci scrive</h2>
+		<p>In ogni momento è possibile:</p>
+		<ul>
+			{diritti.map(d => <li>{d}</li>)}
+		</ul>
+		<p>
+			È sufficiente scriverci a
+			<a href={`mailto:${settings.email}`}>{settings.email}</a>. Il mancato
+			conferimento dei dati rende impossibile rispondere alla richiesta.
+		</p>
+
+		<h2>Immagini e riprese</h2>
+		<p>
+			Nell’ambito delle attività dell’associazione possono essere effettuate
+			riprese, registrazioni e fotografie, che possono essere utilizzate nel
+			materiale informativo e promozionale, sia cartaceo sia pubblicato su
+			questo sito e sulle pagine social dell’associazione.
+		</p>
+
+		<h2>Contenuti caricati da altri siti</h2>
+		<p>
+			Le immagini degli eventi provengono dal gestionale
+			<strong>WindDoc</strong>, che ospita anche l’area riservata ai soci:
+			aprendo la pagina degli eventi il browser si collega a quel servizio, che
+			può quindi registrare l’indirizzo IP della visita. I collegamenti a
+			Instagram e Facebook sono semplici link: nessun contenuto di quelle
+			piattaforme viene caricato dentro il sito.
 		</p>
 
 		<h2>Dati dell’associazione</h2>
@@ -64,47 +155,40 @@ const seo = {
 				))
 			}
 		</dl>
-
-		<h2>Titolare del trattamento dei dati</h2>
-		<p>
-			Da inserire: chi è il titolare del trattamento e a quale indirizzo si
-			possono esercitare i diritti previsti dal GDPR.
-		</p>
-
-		<h2>Dati raccolti dal sito</h2>
-		<p>
-			Da inserire: quali dati raccoglie il modulo contatti, per quale finalità
-			vengono usati, per quanto tempo sono conservati e a chi vengono
-			comunicati. Vanno indicati anche i servizi esterni utilizzati (per
-			esempio il portale soci WindDoc) e il relativo trattamento.
-		</p>
-
-		<h2>Cookie</h2>
-		<p>
-			Da inserire: elenco dei cookie e degli strumenti di misurazione
-			eventualmente attivi. Se verranno introdotti cookie non tecnici sarà
-			necessario anche un banner di consenso, al momento non presente.
-		</p>
-
-		<h2>Diritti dell’interessato</h2>
-		<p>
-			Da inserire: come richiedere accesso, rettifica, cancellazione o
-			limitazione del trattamento dei propri dati.
-		</p>
 	</TextSection>
 </Layout>
 
 <style>
-	.legal__notice {
+	.legal__guida {
+		font-size: var(--font-size-md);
+		line-height: 1.45;
+		color: var(--theme-muted);
+		margin-bottom: var(--space-xl);
+	}
+
+	h2 {
+		font-size: var(--font-size-md);
+		margin-top: var(--space-xl);
+		margin-bottom: var(--space-2xs);
+	}
+
+	ul {
+		padding-left: 1.15rem;
+	}
+	li {
+		margin-bottom: var(--space-3xs);
+	}
+
+	.legal__rilievo {
 		padding: var(--nota-padding);
 		border-left: 3px solid var(--theme-accent);
-		background-color: var(--theme-surface-1);
-		border-radius: var(--radius-sm);
-		color: var(--theme-on-surface-1);
+		background: var(--theme-surface-1);
+		border-radius: var(--nota-radius);
 		max-width: none;
 	}
+
 	.legal__dati {
-		margin: 0 0 var(--space-lg);
+		margin: var(--space-sm) 0 var(--space-lg);
 		border-top: 1px solid var(--theme-border);
 	}
 	.legal__riga {
@@ -126,6 +210,7 @@ const seo = {
 		color: var(--theme-muted);
 		font-style: italic;
 	}
+
 	@media (max-width: 640px) {
 		.legal__riga {
 			grid-template-columns: 1fr;
