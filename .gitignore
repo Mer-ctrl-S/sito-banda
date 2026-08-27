@@ -2,6 +2,11 @@
 dist/
 .output/
 
+# Cartella rigenerata da Astro a ogni avvio: era tracciata e risultava
+# modificata di continuo, col rischio di committarla al posto del proprio
+# lavoro. Non serve a chi clona: Astro la ricrea.
+.astro/
+
 # dependencies
 node_modules/
 
