@@ -38,7 +38,6 @@ const rigaPredefinita = scala.find(r => r.minuti === DURATA_PREDEFINITA);
 const durataPredefinita = DURATE.find(d => d.minuti === DURATA_PREDEFINITA);
 const haPrezzi = corso.prezzi !== null;
 const haQuota = corso.quotaAnnuale !== null;
-const compreso = corso.compresoNelloStrumento;
 const risparmioMese = alMese(SCONTO_BANDA_ANNUO);
 
 // La quota conta come campo: senza, l'avviso diceva "nessuna informazione
@@ -46,7 +45,7 @@ const risparmioMese = alMese(SCONTO_BANDA_ANNUO);
 const totaleCampi = scheda.length + 1;
 const mancanti =
 	scheda.filter(r => daConfermare(r.valore)).length +
-	(haPrezzi || haQuota || compreso ? 0 : 1);
+	(haPrezzi || haQuota ? 0 : 1);
 
 const seo = {
 	title: `${corso.nome} | Corsi del Corpo Bandistico di Castelcovati`,
@@ -113,7 +112,7 @@ const seo = {
 				<dl class="corso__lista">
 					<div class="corso__riga">
 						<dt>Quota</dt>
-						<dd class:list={['tabular', { 'is-vuoto': !haPrezzi && !haQuota && !compreso }]}>
+						<dd class:list={['tabular', { 'is-vuoto': !haPrezzi && !haQuota }]}>
 							{
 								haPrezzi && (
 									<>
@@ -147,28 +146,15 @@ const seo = {
 										</span>
 										{corso.inclusoConStrumento && (
 											<p class="corso__incluso">
-												Gratuito per chi frequenta un corso di strumento: la quota
-												vale solo per chi segue esclusivamente questo corso.
+												Questa quota vale per chi non frequenta ancora un corso di
+												strumento. Da quando si inizia con uno strumento, il corso
+												è compreso nella quota dello strumento stesso.
 											</p>
 										)}
 									</>
 								)
 							}
-							{
-								compreso && (
-									<>
-										<span class="corso__prezzo">Compreso</span>
-										<span class="corso__prezzo-dettaglio">
-											nel corso di strumento
-										</span>
-										<p class="corso__incluso">
-											Non ha una quota a sé: le lezioni sono già incluse nel costo
-											del corso di strumento musicale.
-										</p>
-									</>
-								)
-							}
-							{!haPrezzi && !haQuota && !compreso && '— da confermare'}
+							{!haPrezzi && !haQuota && '— da confermare'}
 						</dd>
 					</div>
 					{

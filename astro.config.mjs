@@ -16,8 +16,19 @@ import tailwindcss from '@tailwindcss/vite';
   dichiararsi canonica di se stessa, altrimenti ogni deploy crea un duplicato.
 */
 const dominioProduzioneVercel = process.env.VERCEL_PROJECT_PRODUCTION_URL;
+
+/*
+  Dominio ufficiale dell'associazione, dal regolamento del 1 settembre 2025.
+  Lasciato commentato: c'è già un altro deploy attivo su questo indirizzo e
+  attivarlo qui farebbe dichiarare a questo sito di essere quello ufficiale
+  (canonical, Open Graph, sitemap). Togli il commento quando questo sito
+  prende il posto dell'altro.
+*/
+// const DOMINIO_UFFICIALE = 'https://www.bandacastelcovati.it';
+
 const site =
 	process.env.SITE_URL ||
+	// DOMINIO_UFFICIALE ||
 	(dominioProduzioneVercel ? `https://${dominioProduzioneVercel}` : null) ||
 	'https://example.com';
 

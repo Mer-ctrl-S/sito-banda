@@ -49,6 +49,10 @@ export const footerLists = [
 				slug: '/scuola',
 			},
 			{
+				title: 'Regolamento dei corsi',
+				slug: '/scuola/regolamento',
+			},
+			{
 				title: 'Contatti',
 				slug: '/company/contact',
 			},

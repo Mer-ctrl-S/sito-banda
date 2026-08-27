@@ -1,0 +1,503 @@
+---
+import Layout from '../../layouts/Page.astro';
+import { Container, Button } from '@components/odyssey-theme';
+import settings from '../../config/settings.js';
+import {
+	SCONTO_BANDA_ANNUO,
+	SCONTO_FRATELLI_ANNUO,
+	QUOTA_ASSOCIATIVA,
+	MESI_CORSO,
+	formattaPrezzo,
+	alMese,
+} from '../../config/corsi.js';
+
+/*
+  Trascrizione del "Regolamento Corsi — Accademia Musicale", valido dal
+  1 settembre 2025. I contenuti vengono dal documento dell'associazione: non
+  aggiungere qui regole, cifre o scadenze che il regolamento non riporta.
+
+  DA DECIDERE: l'IBAN per il pagamento delle rette è nel documento ma non è
+  pubblicato qui. Metterlo online espone il conto a scraping e tentativi di
+  frode: va deciso dall'associazione, non dato per scontato.
+*/
+
+const VALIDO_DAL = '1 settembre 2025';
+
+const sezioni = [
+	{ id: 'offerta', titolo: 'Offerta formativa' },
+	{ id: 'impegno', titolo: 'Impegno settimanale' },
+	{ id: 'iscrizione', titolo: 'Come iscriversi' },
+	{ id: 'pagamenti', titolo: 'Pagamenti' },
+	{ id: 'riduzioni', titolo: 'Riduzioni' },
+	{ id: 'regole', titolo: 'Regole e frequenza' },
+	{ id: 'strumenti', titolo: 'Prestito degli strumenti' },
+	{ id: 'accademia', titolo: 'L’Accademia' },
+];
+
+const corsiAttivi = [
+	'Propedeutico in gruppo, dai 7 ai 9 anni',
+	'Teoria e solfeggio, in piccoli gruppi formati per grado di preparazione',
+	'Strumento musicale e canto moderno, dai 10 anni o dopo il corso propedeutico',
+	'Musica d’insieme',
+	'Laboratorio di percussioni',
+	'Perfezionamento, in vista dell’ammissione a scuole musicali statali o conservatori',
+];
+
+const regole = [
+	{
+		titolo: 'Comportamento e partecipazione',
+		voci: [
+			'Rispetto reciproco verso insegnanti e compagni di studio.',
+			'Cura degli ambienti: attenzione per le aule, gli strumenti e i materiali.',
+			'Puntualità: si richiede presenza puntuale a ogni lezione.',
+		],
+	},
+	{
+		titolo: 'Organizzazione delle lezioni',
+		voci: [
+			'Le lezioni si svolgono nella sede dell’Associazione. Lezioni private esterne non sono autorizzate.',
+			'30 lezioni annuali, da ottobre a maggio, seguendo il calendario scolastico.',
+			'Giugno e settembre sono dedicati al recupero di eventuali lezioni perse per cause organizzative.',
+		],
+	},
+	{
+		titolo: 'Assenze e giustificazioni',
+		voci: [
+			'Ogni assenza deve essere giustificata dall’allievo; anche l’insegnante è tenuto a farlo.',
+			'Le lezioni perse dagli allievi non si recuperano, salvo assenze prolungate per malattia comprovata: in quel caso la retta viene sospesa fino al rientro.',
+			'Chi non può partecipare a una lezione individuale deve avvisare l’insegnante per tempo.',
+		],
+	},
+	{
+		titolo: 'Gestione interna',
+		voci: [
+			'Ogni lezione è registrata: contenuti svolti e presenze di allievi e insegnanti vengono annotati.',
+			'Gli insegnanti sono disponibili al termine delle lezioni per aggiornare i genitori sull’andamento dell’allievo.',
+		],
+	},
+	{
+		titolo: 'Rapporto con l’Associazione',
+		voci: [
+			'Ogni allievo iscritto è anche socio del Corpo Bandistico di Castelcovati.',
+			'La quota mensile è un contributo volontario del socio per sostenere le attività associative.',
+			'La quota associativa annuale dà diritto, da maggiorenni, a partecipare alle assemblee e a votare o candidarsi per il Consiglio Direttivo.',
+		],
+	},
+];
+
+const seo = {
+	title: 'Regolamento dei corsi | Accademia Musicale di Castelcovati',
+	description:
+		'Corsi attivi, quote, modalità di pagamento, riduzioni, regole di frequenza e prestito degli strumenti dell’Accademia Musicale di Castelcovati.',
+};
+---
+
+<Layout {seo}>
+	<Container>
+		<article class="reg">
+			<header class="reg__header">
+				<h1>Regolamento dei corsi</h1>
+				<p class="reg__meta">
+					Accademia Musicale di Castelcovati &middot; valido dal {VALIDO_DAL}
+				</p>
+				<p class="reg__sede">
+					Le lezioni si svolgono in via Aldo Moro 79, Castelcovati (BS), presso
+					il centro sportivo.
+				</p>
+			</header>
+
+			<nav class="reg__indice" aria-label="Indice del regolamento">
+				<h2 class="reg__indice-titolo">In questa pagina</h2>
+				<ol>
+					{sezioni.map(s => <li><a href={`#${s.id}`}>{s.titolo}</a></li>)}
+				</ol>
+			</nav>
+
+			<section id="offerta" class="reg__sezione">
+				<h2>Offerta formativa</h2>
+				<p>I corsi attivi sono sei.</p>
+				<ol class="reg__elenco-num">
+					{corsiAttivi.map(c => <li>{c}</li>)}
+				</ol>
+			</section>
+
+			<section id="impegno" class="reg__sezione">
+				<h2>Impegno settimanale</h2>
+				<p>
+					Ogni corso inizia a ottobre e termina a maggio, per un totale di 30
+					lezioni. È previsto un impegno settimanale di almeno mezz’ora, in una
+					giornata scelta secondo le disponibilità dell’insegnante.
+				</p>
+				<p class="reg__rilievo">
+					Nel costo del corso di strumento musicale sono comprese le lezioni di
+					teoria e solfeggio e di musica d’insieme. Il corso di percussioni
+					orchestrali comprende anche il laboratorio di percussioni, senza costi
+					aggiuntivi.
+				</p>
+				<p>
+					Le quote complete, divise per durata della lezione, sono nella pagina
+					dei corsi.
+				</p>
+				<p><Button href="/scuola/corsi" outlined>Vedi i corsi e le quote</Button></p>
+			</section>
+
+			<section id="iscrizione" class="reg__sezione">
+				<h2>Come iscriversi</h2>
+				<p>
+					Per iscriversi occorre compilare la domanda di ammissione
+					all’associazione, che viene sottoposta al vaglio del Consiglio
+					Direttivo. Con la compilazione della domanda si fornisce il consenso
+					al trattamento dei dati personali.
+				</p>
+				<p>
+					È richiesto un contributo associativo annuale, da gennaio a dicembre,
+					di {formattaPrezzo(QUOTA_ASSOCIATIVA)}, che comprende anche
+					l’assicurazione R.C. e infortuni.
+				</p>
+			</section>
+
+			<section id="pagamenti" class="reg__sezione">
+				<h2>Pagamenti</h2>
+				<p>
+					Il pagamento delle rette avviene tramite bonifico bancario. Le
+					coordinate si richiedono all’associazione insieme alla domanda di
+					ammissione.
+				</p>
+				<p>
+					È possibile <strong>pagare in modo dilazionato</strong>: la quota
+					annuale si può dividere in un massimo di {MESI_CORSO} rate mensili.
+					Per esempio, una quota di 520 € l’anno diventa {MESI_CORSO} rate da
+					65 €.
+				</p>
+				<p>
+					Gli importi superiori a 77,47 € richiedono per legge una marca da bollo
+					da 2 €. Aggiungendo 2 € all’importo e la dicitura “marca da bollo”
+					alla causale del bonifico, se ne occupa l’associazione.
+				</p>
+
+				<h3>Esempi di causale</h3>
+				<ul class="reg__esempi">
+					<li>
+						<span class="reg__causale">Mario Rossi tesseramento annuale</span>
+						<span class="reg__importo tabular">10 €</span>
+					</li>
+					<li>
+						<span class="reg__causale">
+							Retta di Rossi Mario allievo trombone 45 minuti, mese di gennaio,
+							tesseramento annuale
+						</span>
+						<span class="reg__importo tabular">65 € + 10 €</span>
+					</li>
+					<li>
+						<span class="reg__causale">
+							Retta di Rossi Mario allievo trombone 45 minuti, mesi di ottobre,
+							novembre e dicembre e marca da bollo
+						</span>
+						<span class="reg__importo tabular">65 € + 65 € + 65 € + 2 €</span>
+					</li>
+					<li>
+						<span class="reg__causale">
+							Retta di Rossi Mario allievo trombone 45 minuti, quota annuale,
+							tesseramento annuale e marca da bollo
+						</span>
+						<span class="reg__importo tabular">520 € + 10 € + 2 €</span>
+					</li>
+				</ul>
+
+				<h3>Dichiarazione dei redditi</h3>
+				<p>
+					Le ricevute dell’associazione si possono allegare alla dichiarazione
+					dei redditi per i figli minorenni; non viene rilasciato alcun
+					certificato a fini fiscali. La cifra detraibile riguarda unicamente la
+					quota annuale dei corsi: non si possono aggiungere il tesseramento
+					annuale e le marche da bollo.
+				</p>
+			</section>
+
+			<section id="riduzioni" class="reg__sezione">
+				<h2>Riduzioni</h2>
+				<dl class="reg__riduzioni">
+					<div>
+						<dt>Dal secondo figlio iscritto</dt>
+						<dd class="tabular">
+							&minus;{formattaPrezzo(SCONTO_FRATELLI_ANNUO)} sulla quota annuale
+							<span class="reg__mese">
+								({formattaPrezzo(alMese(SCONTO_FRATELLI_ANNUO))} al mese)
+							</span>
+						</dd>
+					</div>
+					<div>
+						<dt>Chi suona attivamente nella banda</dt>
+						<dd class="tabular">
+							&minus;{formattaPrezzo(SCONTO_BANDA_ANNUO)} sulla quota annuale
+							<span class="reg__mese">
+								({formattaPrezzo(alMese(SCONTO_BANDA_ANNUO))} al mese)
+							</span>
+						</dd>
+					</div>
+				</dl>
+			</section>
+
+			<section id="regole" class="reg__sezione">
+				<h2>Regole e frequenza</h2>
+				<p>
+					Servono a garantire un ambiente sereno, rispettoso e organizzato per
+					allievi e insegnanti.
+				</p>
+				{
+					regole.map(gruppo => (
+						<div class="reg__gruppo">
+							<h3>{gruppo.titolo}</h3>
+							<ul>
+								{gruppo.voci.map(v => <li>{v}</li>)}
+							</ul>
+						</div>
+					))
+				}
+			</section>
+
+			<section id="strumenti" class="reg__sezione">
+				<h2>Prestito degli strumenti</h2>
+				<p>
+					L’associazione mette a disposizione dei soci un numero limitato di
+					strumenti, richiedibili in prestito per le lezioni individuali e
+					collettive e per lo studio a casa.
+				</p>
+				<ul>
+					<li>
+						Il primo anno di corso il prestito è <strong>gratuito</strong>. Al
+						termine dell’anno, chi non prosegue è tenuto a restituire lo
+						strumento.
+					</li>
+					<li>
+						Per gli anni successivi, sempre in base alla disponibilità, il
+						noleggio prevede un contributo annuale di 100 €.
+					</li>
+					<li>
+						Gli strumenti vanno custoditi con cura e restituiti puliti. La
+						manutenzione ordinaria è a carico dell’allievo, così come
+						l’attrezzatura personale: bocchini, ance, letturini, tracolle,
+						bacchette.
+					</li>
+					<li>
+						In caso di furto, smarrimento o danneggiamento, l’allievo è tenuto
+						al risarcimento del valore dello strumento.
+					</li>
+				</ul>
+				<p>
+					Per chi desidera acquistare uno strumento, gli insegnanti offrono
+					supporto e consulenza tecnica per una scelta adeguata all’allievo.
+				</p>
+			</section>
+
+			<section id="accademia" class="reg__sezione">
+				<h2>L’Accademia</h2>
+				<p>
+					Fondata nel 1989, l’Accademia è rivolta a chiunque desideri
+					avvicinarsi alla musica, dai 7 anni in su. I corsi mirano a sviluppare
+					la personalità musicale dell’allievo e, più in generale, gli aspetti
+					espressivi, culturali e umani. Tutti gli insegnanti sono qualificati e
+					seguono un progetto didattico condiviso.
+				</p>
+				<p>
+					Gli studenti di strumenti a fiato o percussioni possono entrare a far
+					parte del Corpo Bandistico.
+				</p>
+			</section>
+
+			<section class="reg__sezione">
+				<h2>Contatti</h2>
+				<ul class="reg__contatti">
+					<li><a href="tel:+393717711684" class="tabular">+39 371 771 1684</a> <span class="reg__nota">(anche WhatsApp)</span></li>
+					<li><a href={`mailto:${settings.email}`}>{settings.email}</a></li>
+					<li><a href={`mailto:${settings.pec}`}>{settings.pec}</a> <span class="reg__nota">(PEC)</span></li>
+					<li>Codice fiscale <span class="tabular">{settings.codiceFiscale}</span></li>
+				</ul>
+				<p class="reg__azioni">
+					<Button href="/company/contact">Scrivici</Button>
+					<Button href="/scuola/corsi" outlined>Vedi i corsi</Button>
+				</p>
+			</section>
+		</article>
+	</Container>
+</Layout>
+
+<style>
+	.reg {
+		margin: var(--space-lg) auto var(--section-margin);
+		max-width: 46rem;
+	}
+	.reg__meta {
+		margin: 0 0 var(--space-2xs);
+		max-width: none;
+		font-size: var(--font-size-sm);
+		color: var(--theme-accent);
+	}
+	.reg__sede {
+		color: var(--theme-muted);
+	}
+
+	.reg__indice {
+		margin: var(--space-xl) 0;
+		padding: var(--space-md);
+		background: var(--theme-surface-1);
+		border-radius: var(--radius-lg);
+	}
+	.reg__indice-titolo {
+		font-family: var(--theme-font-family-sans);
+		font-size: var(--font-size-xs);
+		font-weight: 600;
+		letter-spacing: var(--tracking-label);
+		text-transform: uppercase;
+		color: var(--theme-muted);
+		margin-bottom: var(--space-2xs);
+	}
+	.reg__indice ol {
+		margin: 0;
+		padding: 0;
+		list-style: none;
+		columns: 2;
+		column-gap: var(--space-lg);
+	}
+	.reg__indice li {
+		max-width: none;
+		break-inside: avoid;
+		padding: 0.15rem 0;
+	}
+	.reg__indice a {
+		font-size: var(--font-size-sm);
+		text-underline-offset: 0.2em;
+	}
+
+	.reg__sezione {
+		margin-top: var(--space-2xl);
+		scroll-margin-top: calc(var(--navbar-height) + 1rem);
+	}
+	.reg__sezione h2 {
+		font-size: var(--font-size-lg);
+		padding-bottom: var(--space-2xs);
+		border-bottom: 2px solid var(--theme-accent);
+		margin-bottom: var(--space-md);
+	}
+	.reg__sezione h3 {
+		font-size: var(--font-size-md);
+		margin-top: var(--space-lg);
+		margin-bottom: var(--space-2xs);
+	}
+	.reg__sezione ul,
+	.reg__elenco-num {
+		padding-left: 1.2rem;
+	}
+	.reg__sezione li {
+		margin-bottom: var(--space-2xs);
+	}
+
+	.reg__rilievo {
+		padding: var(--space-sm) var(--space-md);
+		border-left: 3px solid var(--theme-accent);
+		background: var(--theme-surface-1);
+		border-radius: var(--radius-sm);
+		max-width: none;
+	}
+
+	.reg__gruppo {
+		margin-top: var(--space-lg);
+	}
+
+	/* Esempi di causale: testo a sinistra, importo allineato a destra */
+	.reg__esempi {
+		list-style: none;
+		padding: 0;
+		margin: 0;
+		border-top: 1px solid var(--theme-border);
+	}
+	.reg__esempi li {
+		display: grid;
+		grid-template-columns: minmax(0, 1fr) auto;
+		gap: var(--space-sm);
+		align-items: baseline;
+		padding: var(--space-2xs) 0;
+		border-bottom: 1px solid var(--theme-border);
+		max-width: none;
+		margin: 0;
+	}
+	.reg__causale {
+		font-size: var(--font-size-sm);
+		color: var(--theme-muted);
+	}
+	.reg__causale::before {
+		content: '“';
+	}
+	.reg__causale::after {
+		content: '”';
+	}
+	.reg__importo {
+		font-weight: 600;
+		white-space: nowrap;
+	}
+
+	.reg__riduzioni {
+		margin: 0;
+		border-top: 1px solid var(--theme-border);
+	}
+	.reg__riduzioni > div {
+		display: grid;
+		grid-template-columns: minmax(0, 1fr) auto;
+		gap: var(--space-sm);
+		align-items: baseline;
+		padding: var(--space-xs) 0;
+		border-bottom: 1px solid var(--theme-border);
+	}
+	.reg__riduzioni dt {
+		font-size: var(--font-size-sm);
+	}
+	.reg__riduzioni dd {
+		margin: 0;
+		font-weight: 600;
+		text-align: right;
+		white-space: nowrap;
+	}
+	.reg__mese {
+		display: block;
+		font-size: var(--font-size-xs);
+		font-weight: 400;
+		color: var(--theme-muted);
+	}
+
+	.reg__contatti {
+		list-style: none;
+		padding: 0;
+		margin: 0 0 var(--space-lg);
+	}
+	.reg__contatti li {
+		max-width: none;
+		padding: 0.15rem 0;
+		font-size: var(--font-size-sm);
+	}
+	.reg__nota {
+		color: var(--theme-muted);
+		font-size: var(--font-size-xs);
+	}
+
+	.reg__azioni {
+		display: flex;
+		flex-wrap: wrap;
+		gap: var(--space-sm);
+		max-width: none;
+	}
+
+	@media (max-width: 640px) {
+		.reg__indice ol {
+			columns: 1;
+		}
+		.reg__esempi li,
+		.reg__riduzioni > div {
+			grid-template-columns: 1fr;
+			gap: 0.15rem;
+		}
+		.reg__importo,
+		.reg__riduzioni dd {
+			text-align: left;
+		}
+	}
+</style>

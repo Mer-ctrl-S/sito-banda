@@ -183,17 +183,10 @@ const definizioniAltri = [
 const definizioniCollettive = [
 	{
 		slug: 'propedeutico',
-		nome: 'Propedeutico',
+		nome: 'Propedeutico — teoria e solfeggio',
 		famiglia: 'collettivo',
 		descrizione:
-			'Il primo avvicinamento alla musica, in gruppo: si gioca con il ritmo, l’ascolto e la voce prima di scegliere uno strumento. Pensato per chi ha fra i 7 e i 9 anni.',
-	},
-	{
-		slug: 'teoria-solfeggio',
-		nome: 'Teoria e solfeggio',
-		famiglia: 'collettivo',
-		descrizione:
-			'Leggere la musica: note, ritmo, tempo, misura e i primi elementi di teoria. Si svolge in piccoli gruppi formati in base al grado di preparazione.',
+			'Leggere e capire la musica: note, ritmo, tempo, misura e i primi elementi di teoria, in piccoli gruppi formati per grado di preparazione. È il primo passo per chi non suona ancora, e la base che rende più rapido lo studio di qualunque strumento.',
 	},
 	{
 		slug: 'musica-insieme',
@@ -241,8 +234,7 @@ const LISTINO_BANDA = { 30: 440, 45: 520, 60: 640 };
 const LISTINO_ALTRI = { 30: 520, 45: 600, 60: 720 };
 
 export const datiOrganizzativi = {
-	propedeutico: { insegnante: 'Gianfranco Scalvini', eta: 'Dai 7 ai 9 anni' },
-	'teoria-solfeggio': { insegnante: 'Gianfranco Scalvini' },
+	propedeutico: { insegnante: 'Gianfranco Scalvini', eta: 'Dai 7 anni' },
 	pianoforte: { insegnante: 'Gabriele Moraschi' },
 	'chitarra-elettrica': { insegnante: 'Michele Belleri' },
 	'basso-elettrico': { insegnante: 'Michele Belleri' },
@@ -258,12 +250,6 @@ const QUOTE_COLLETTIVE = {
 	'laboratorio-percussioni': 200,
 };
 
-/*
-  Corsi senza quota propria: il regolamento li dà compresi nel corso di
-  strumento ("Nel costo del corso di Strumento Musicale sono incluse: lezioni
-  di Teoria e solfeggio e Musica d'Insieme"). Perfezionamento non è a listino.
-*/
-const COMPRESI_NELLO_STRUMENTO = new Set(['teoria-solfeggio']);
 
 export const DURATE = [
 	{ minuti: 30, etichetta: '30 minuti' },
@@ -339,8 +325,7 @@ export const corsi = [
 		quotaAnnuale: quota,
 		// quota propria ma gratuita per chi segue già uno strumento
 		inclusoConStrumento: quota !== null,
-		// nessuna quota propria: esiste solo dentro il corso di strumento
-		compresoNelloStrumento: COMPRESI_NELLO_STRUMENTO.has(corso.slug),
+
 		href: `/scuola/corsi/${corso.slug}`,
 		immagine: SLUG_CON_FOTO.has(corso.slug)
 			? `/assets/images/strumenti/${corso.slug}.webp`
