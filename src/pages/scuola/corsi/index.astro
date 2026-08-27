@@ -209,21 +209,22 @@ const instrumentData = Object.fromEntries(
 			</ul>
 		</section>
 
-		<!-- BLOCCO FINALE / CTA (opzionale, ma utile per somigliare alla pagina finale) -->
+		<!-- BLOCCO FINALE: manda al regolamento, dove c'è tutto il resto -->
 		<section class="cta-section">
 			<div class="cta-section__content">
-				<h2>Non sai da dove partire?</h2>
+				<h2>Prima di iscriverti</h2>
 				<p>
-					Se hai dubbi su quale strumento scegliere, contattaci: ti aiuteremo a
-					capire quale corso è più adatto a te in base alla tua età, ai gusti
-					musicali e al tempo che puoi dedicare allo studio.
+					Nel regolamento trovi le quote per ogni durata di lezione, le
+					riduzioni per chi suona in banda e per il secondo figlio, come si
+					paga, il prestito degli strumenti e le regole di frequenza.
 				</p>
-				<a href="/company/contact" class="cta-section__button">
-					Scrivici per un consiglio
-				</a>
+				<div class="cta-section__azione">
+					<Button href="/scuola/regolamento">Leggi il regolamento dei corsi</Button>
+				</div>
 				<p class="cta-section__reg">
-					Quote, modalità di pagamento, riduzioni e regole di frequenza sono nel
-					<a href="/scuola/regolamento">regolamento dei corsi</a>.
+					Non sai da dove partire? <a href="/company/contact">Scrivici</a>: ti
+					aiutiamo a capire quale corso è più adatto in base all’età, ai gusti
+					musicali e al tempo che puoi dedicare allo studio.
 				</p>
 			</div>
 		</section>
@@ -507,16 +508,12 @@ const instrumentData = Object.fromEntries(
 		text-align: center;
 	}
 
-	.cta-section__button {
-		display: inline-block;
-		margin-top: 1.25rem;
-		padding: 0.75rem 1.5rem;
-		border-radius: 999px;
-		background: var(--theme-primary);
-		color: var(--theme-on-primary);
-		text-decoration: none;
-		font-weight: 600;
-		font-size: 0.95rem;
+	/* Il pulsante è il componente Button: prima era un <a> con stile proprio,
+	   pillola a 999px e hover con filter, senza stato di focus. */
+	.cta-section__azione {
+		display: flex;
+		justify-content: center;
+		margin-top: var(--space-md);
 	}
 
 	.cta-section__reg {
@@ -524,9 +521,17 @@ const instrumentData = Object.fromEntries(
 		font-size: var(--font-size-sm);
 		color: var(--theme-muted);
 	}
-
-	.cta-section__button:hover {
-		filter: brightness(1.05);
+	/* Il paragrafo è grigio: senza questo il link ci si confondeva dentro. */
+	.cta-section__reg a {
+		color: var(--theme-on-bg);
+		font-weight: 500;
+		text-decoration: underline;
+		text-underline-offset: 0.2em;
+		text-decoration-thickness: 1px;
+	}
+	.cta-section__reg a:hover {
+		color: var(--theme-primary);
+		text-decoration-thickness: 2px;
 	}
 
 	@media (max-width: 640px) {
