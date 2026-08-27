@@ -26,7 +26,8 @@ const { reversed } = Astro.props;
 	.text-and-image__section {
 		/* Margine ottico: poco sopra (l'header gia' distanzia), molto sotto */
 		margin: var(--space-md) auto var(--section-margin);
-		min-height: clamp(28rem, 62dvh, calc(100dvh - var(--navbar-height)));
+		/* Niente altezza imposta: la detta l'immagine. Forzarla lasciava aria
+		   attorno al testo sulle pagine con poche righe, come /scuola/corsi. */
 		display: grid;
 		grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
 		align-items: center;
@@ -49,7 +50,7 @@ const { reversed } = Astro.props;
 	.text-and-image__image :global(img) {
 		width: 100%;
 		height: 100%;
-		max-height: 62dvh;
+		max-height: 28rem;
 		object-fit: cover;
 		/* Raggio piu' stretto dei contenitori: gerarchia di forme */
 		border-radius: var(--radius-lg);
