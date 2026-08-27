@@ -119,10 +119,13 @@ const seo = {
 
     <div slot="image-container">
       <img
-        src="assets/images/hero-event-list.jpeg"
+        src="/assets/images/hero-event-list.jpeg"
         alt="Concerto del Corpo Bandistico di Castelcovati"
-        loading="lazy"
+        loading="eager"
+        fetchpriority="high"
         decoding="async"
+        width="1200"
+        height="800"
       />
     </div>
   </HeroSection>
