@@ -236,8 +236,11 @@ const LISTINO_ALTRI = { 30: 520, 45: 600, 60: 720 };
 export const datiOrganizzativi = {
 	propedeutico: { insegnante: 'Gianfranco Scalvini', eta: 'Dai 7 anni' },
 	pianoforte: { insegnante: 'Gabriele Moraschi' },
+	// Belleri segue tutti i corsi di chitarra e basso
+	'chitarra-classica': { insegnante: 'Michele Belleri' },
 	'chitarra-elettrica': { insegnante: 'Michele Belleri' },
 	'basso-elettrico': { insegnante: 'Michele Belleri' },
+	tromba: { insegnante: 'Antony Surace' },
 	clarinetto: { insegnante: 'Luigi Corvaglia' },
 	// "sax alto" del prospetto: in italiano è il sassofono contralto
 	'sax-contralto': { insegnante: 'Luigi Corvaglia' },
