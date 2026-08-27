@@ -10,7 +10,8 @@ import {
 	DURATA_PREDEFINITA,
 	DURATE,
 	SCONTO_BANDA,
-	PERIODO_PREZZO,
+	alMese,
+	MESI_CORSO,
 } from '../../../config/corsi.js';
 import { soundMap } from '../../../config/suoni.js';
 
@@ -35,9 +36,14 @@ const scala = scalaPrezzi(corso);
 const rigaPredefinita = scala.find(r => r.minuti === DURATA_PREDEFINITA);
 const durataPredefinita = DURATE.find(d => d.minuti === DURATA_PREDEFINITA);
 const haPrezzi = corso.prezzi !== null;
+const haQuota = corso.quotaAnnuale !== null;
 const scontoPercento = Math.round(SCONTO_BANDA * 100);
 
-const mancanti = scheda.filter(r => daConfermare(r.valore)).length + (haPrezzi ? 0 : 1);
+// La quota conta come campo: senza, l'avviso diceva "nessuna informazione
+// pubblicata" anche quando il prezzo era già a schermo.
+const totaleCampi = scheda.length + 1;
+const mancanti =
+	scheda.filter(r => daConfermare(r.valore)).length + (haPrezzi || haQuota ? 0 : 1);
 
 const seo = {
 	title: `${corso.nome} | Corsi del Corpo Bandistico di Castelcovati`,
@@ -93,7 +99,7 @@ const seo = {
 				{
 					mancanti > 0 && (
 						<p class="corso__avviso">
-							{mancanti === scheda.length
+							{mancanti === totaleCampi
 								? 'Le informazioni organizzative di questo corso non sono ancora state pubblicate.'
 								: 'Alcune informazioni di questo corso non sono ancora state pubblicate.'}{' '}
 							Scrivici e ti rispondiamo con i dettagli aggiornati.
@@ -103,26 +109,49 @@ const seo = {
 
 				<dl class="corso__lista">
 					<div class="corso__riga">
-						<dt>Quota mensile</dt>
-						<dd class:list={['tabular', { 'is-vuoto': !haPrezzi }]}>
-							<span class="corso__prezzo">
-								{haPrezzi ? formattaPrezzo(rigaPredefinita.pieno) : '— da confermare'}
-							</span>
+						<dt>Quota</dt>
+						<dd class:list={['tabular', { 'is-vuoto': !haPrezzi && !haQuota }]}>
 							{
 								haPrezzi && (
-									<span class="corso__prezzo-dettaglio">
-										{PERIODO_PREZZO} &middot; lezione da {durataPredefinita.etichetta}
-									</span>
+									<>
+										<span class="corso__prezzo">
+											{formattaPrezzo(rigaPredefinita.mese)}
+											<span class="corso__prezzo-unita"> al mese</span>
+										</span>
+										<span class="corso__prezzo-dettaglio">
+											{formattaPrezzo(rigaPredefinita.anno)} all’anno ({MESI_CORSO} mesi)
+											&middot; lezione da {durataPredefinita.etichetta}
+										</span>
+										<button
+											type="button"
+											class="corso__scala-apri"
+											aria-haspopup="dialog"
+										>
+											Scala prezzi
+										</button>
+									</>
 								)
 							}
-							<button
-								type="button"
-								class="corso__scala-apri"
-								aria-haspopup="dialog"
-								disabled={!haPrezzi}
-							>
-								Scala prezzi
-							</button>
+							{
+								haQuota && (
+									<>
+										<span class="corso__prezzo">
+											{formattaPrezzo(alMese(corso.quotaAnnuale))}
+											<span class="corso__prezzo-unita"> al mese</span>
+										</span>
+										<span class="corso__prezzo-dettaglio">
+											{formattaPrezzo(corso.quotaAnnuale)} all’anno ({MESI_CORSO} mesi)
+										</span>
+										{corso.inclusoConStrumento && (
+											<p class="corso__incluso">
+												Gratuito per chi frequenta un corso di strumento: la quota
+												vale solo per chi segue esclusivamente questo corso.
+											</p>
+										)}
+									</>
+								)
+							}
+							{!haPrezzi && !haQuota && '— da confermare'}
 						</dd>
 					</div>
 					{
@@ -162,14 +191,15 @@ const seo = {
 
 					<h2 id="scalaTitolo" class="scala__titolo">Scala prezzi</h2>
 					<p class="scala__sottotitolo">
-						Importi {PERIODO_PREZZO}, per {corso.nome.toLowerCase()}.
+						{corso.nome} &middot; quote su {MESI_CORSO} mesi di lezione.
 					</p>
 
 					<table class="scala__tabella">
 						<thead>
 							<tr>
-								<th scope="col">Durata della lezione</th>
-								<th scope="col" class="scala__col-prezzo">Quota</th>
+								<th scope="col">Lezione settimanale</th>
+								<th scope="col" class="scala__col-prezzo">Al mese</th>
+								<th scope="col" class="scala__col-prezzo">All’anno</th>
 							</tr>
 						</thead>
 						<tbody>
@@ -178,10 +208,17 @@ const seo = {
 									<th scope="row">{riga.etichetta}</th>
 									<td
 										class="scala__col-prezzo tabular"
-										data-pieno={riga.pieno}
-										data-scontato={riga.scontato}
+										data-pieno={riga.mese}
+										data-scontato={riga.meseScontato}
 									>
-										{formattaPrezzo(riga.pieno)}
+										{formattaPrezzo(riga.mese)}
+									</td>
+									<td
+										class="scala__col-prezzo scala__col-anno tabular"
+										data-pieno={riga.anno}
+										data-scontato={riga.annoScontato}
+									>
+										{formattaPrezzo(riga.anno)}
 									</td>
 								</tr>
 							))}
@@ -636,6 +673,27 @@ const seo = {
 	.scala__nuovo {
 		color: var(--theme-primary);
 		font-weight: 600;
+	}
+	.scala__col-anno {
+		color: var(--theme-muted);
+		font-weight: 400 !important;
+	}
+	.corso__prezzo-unita {
+		font-family: var(--theme-font-family-sans);
+		font-size: var(--font-size-sm);
+		font-weight: 400;
+		color: var(--theme-muted);
+	}
+	.corso__incluso {
+		margin: var(--space-2xs) 0 0;
+		max-width: 44ch;
+		padding: var(--space-2xs) var(--space-xs);
+		border-left: 2px solid var(--theme-accent);
+		background: var(--theme-surface-1);
+		border-radius: var(--radius-xs);
+		font-size: var(--font-size-xs);
+		font-style: normal;
+		color: var(--theme-on-surface-1);
 	}
 
 	/* ---- INTERRUTTORE ---- */

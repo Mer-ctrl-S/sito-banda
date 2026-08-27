@@ -137,11 +137,32 @@ const definizioniAltri = [
 			'Si suona con entrambe le mani su una tastiera di 88 tasti: melodia e accompagnamento insieme, senza bisogno di altri strumenti. È anche il modo più diretto per vedere come funziona l’armonia.',
 	},
 	{
-		slug: 'chitarra-e-basso-elettrico',
-		nome: 'Chitarra e basso elettrico',
+		slug: 'chitarra-classica',
+		nome: 'Chitarra classica',
 		famiglia: 'altri',
 		descrizione:
-			'Due strumenti a corde amplificati, spesso studiati insieme perché condividono impostazione e linguaggio. La chitarra porta accordi e assoli, il basso tiene il fondo ritmico e armonico del gruppo.',
+			'Corde in nylon pizzicate con le dita, senza amplificazione. È la strada più solida per imparare la tecnica della mano destra e leggere la musica sullo strumento.',
+	},
+	{
+		slug: 'chitarra-elettrica',
+		nome: 'Chitarra elettrica',
+		famiglia: 'altri',
+		descrizione:
+			'Corde in acciaio e amplificazione: il suono si costruisce anche con l’amplificatore e gli effetti. Repertorio rock, pop e blues, fra accordi, riff e assoli.',
+	},
+	{
+		slug: 'basso-elettrico',
+		nome: 'Basso elettrico',
+		famiglia: 'altri',
+		descrizione:
+			'Quattro corde gravi che tengono insieme ritmo e armonia: è il ponte fra la batteria e gli strumenti melodici, la parte che si sente più con il corpo che con l’orecchio.',
+	},
+	{
+		slug: 'batteria',
+		nome: 'Batteria',
+		famiglia: 'altri',
+		descrizione:
+			'Un insieme di tamburi e piatti suonati con mani e piedi insieme. Si lavora sull’indipendenza degli arti e sulla tenuta del tempo, che è il mestiere di chi sta dietro al gruppo.',
 	},
 	{
 		slug: 'canto-moderno',
@@ -161,6 +182,13 @@ const definizioniAltri = [
 
 const definizioniCollettive = [
 	{
+		slug: 'propedeutico',
+		nome: 'Propedeutico',
+		famiglia: 'collettivo',
+		descrizione:
+			'Leggere e capire la musica prima e insieme allo strumento: note, ritmo, tempo, misura e i primi elementi di teoria e solfeggio. È la base che rende più rapido e consapevole lo studio di qualunque strumento.',
+	},
+	{
 		slug: 'musica-insieme',
 		nome: 'Musica d’insieme',
 		famiglia: 'collettivo',
@@ -168,39 +196,50 @@ const definizioniCollettive = [
 			'Si suona in gruppo: si impara ad ascoltare gli altri, ad accordarsi, a seguire il direttore e a tenere la propria parte dentro un insieme. È il passaggio fra lo studio individuale e il suonare in banda.',
 	},
 	{
-		slug: 'teoria-solfeggio',
-		nome: 'Teoria e solfeggio',
+		slug: 'laboratorio-percussioni',
+		nome: 'Laboratorio di percussioni',
 		famiglia: 'collettivo',
 		descrizione:
-			'Leggere la musica: note, ritmo, tempo, misura e i primi elementi di teoria. È la base che rende più rapido e consapevole lo studio di qualunque strumento.',
+			'Un percorso collettivo dedicato agli strumenti a percussione: ritmo, coordinazione e suono d’insieme, dai tamburi ai piatti agli strumenti a tastiera.',
 	},
 ];
 
 /*
-  Campi organizzativi, per corso.
+  Campi organizzativi e listini, dal prospetto ufficiale della scuola.
 
-  PREZZI: le lezioni sono da 30, 45 o 60 minuti e il prezzo cambia con la
-  durata. Sono importi MENSILI. Compila `prezzi` con i tre valori in euro,
-  numeri semplici (niente simbolo, niente stringhe): la formattazione italiana
-  la fa la pagina. Un corso senza `prezzi` mostra "da confermare" e il
-  selettore della scala resta disattivato, invece di esporre cifre inventate.
+  I prezzi sono QUOTE ANNUALI su 8 mesi. Il mensile non si scrive: si ricava
+  dividendo per MESI_CORSO. Nel prospetto i due valori coincidono sempre
+  (440/8 = 55, 520/8 = 65, 640/8 = 80...), quindi tenerne uno solo evita che
+  in futuro divergano.
 
-  Esempio completo:
-
-  clarinetto: {
-      insegnante: 'Nome Cognome',
-      orari: 'Martedì 17:00 – 18:00',
-      eta: 'Dagli 8 anni',
-      prezzi: { 30: 45, 45: 62, 60: 80 },
-  },
+  - Corsi di strumento: `prezzi` con le tre durate della lezione settimanale.
+  - Corsi collettivi: `quotaAnnuale`, una cifra sola, e `inclusoConStrumento`
+    per chi frequenta già un corso di strumento.
 */
+
+/** Mesi di lezione in un anno di corso: il prospetto parla di 8 mesi. */
+export const MESI_CORSO = 8;
+
+/** Listino degli strumenti dell'organico della banda. */
+const LISTINO_BANDA = { 30: 440, 45: 520, 60: 640 };
+
+/** Listino di pianoforte, chitarre, basso, batteria, canto e violino. */
+const LISTINO_ALTRI = { 30: 520, 45: 600, 60: 720 };
+
 export const datiOrganizzativi = {
 	pianoforte: { insegnante: 'Gabriele Moraschi' },
-	'chitarra-e-basso-elettrico': { insegnante: 'Michele Belleri' },
-	'teoria-solfeggio': { insegnante: 'Gianfranco Scalvini' },
+	'chitarra-elettrica': { insegnante: 'Michele Belleri' },
+	'basso-elettrico': { insegnante: 'Michele Belleri' },
+	propedeutico: { insegnante: 'Gianfranco Scalvini' },
 };
 
-/** Durate disponibili, in ordine. La prima è quella mostrata di default. */
+/** Quote dei corsi collettivi: gratuiti per chi segue già uno strumento. */
+const QUOTE_COLLETTIVE = {
+	propedeutico: 200,
+	'musica-insieme': 80,
+	'laboratorio-percussioni': 200,
+};
+
 export const DURATE = [
 	{ minuti: 30, etichetta: '30 minuti' },
 	{ minuti: 45, etichetta: '45 minuti' },
@@ -219,7 +258,13 @@ const campiDefault = {
 	insegnante: DA_CONFERMARE,
 	orari: DA_CONFERMARE,
 	eta: DA_CONFERMARE,
-	prezzi: null,
+};
+
+/** Listino che spetta a un corso in base alla famiglia. */
+const listinoDi = famiglia => {
+	if (['legni', 'ottoni', 'percussioni'].includes(famiglia)) return LISTINO_BANDA;
+	if (famiglia === 'altri') return LISTINO_ALTRI;
+	return null; // i collettivi hanno una quota unica, non una scala
 };
 
 /** Tutti i corsi, arricchiti con i campi organizzativi e gli asset. */
@@ -240,13 +285,17 @@ export const corsi = [
 	...definizioniCollettive,
 ].map(corso => {
 	const dati = { ...campiDefault, ...corso, ...(datiOrganizzativi[corso.slug] ?? {}) };
+	const listino = dati.prezzi ?? listinoDi(corso.famiglia);
 	// Un listino è valido solo se ha tutte e tre le durate: uno parziale
 	// mostrerebbe un buco proprio nella tabella di confronto.
 	const prezziCompleti =
-		dati.prezzi && DURATE.every(d => typeof dati.prezzi[d.minuti] === 'number');
+		listino && DURATE.every(d => typeof listino[d.minuti] === 'number');
+	const quota = QUOTE_COLLETTIVE[corso.slug] ?? null;
 	return {
 		...dati,
-		prezzi: prezziCompleti ? dati.prezzi : null,
+		prezzi: prezziCompleti ? listino : null,
+		quotaAnnuale: quota,
+		inclusoConStrumento: quota !== null,
 		href: `/scuola/corsi/${corso.slug}`,
 		immagine: SLUG_CON_FOTO.has(corso.slug)
 			? `/assets/images/strumenti/${corso.slug}.webp`
@@ -295,18 +344,28 @@ export const formattaPrezzo = valore => {
 		: formatoDecimale.format(valore);
 };
 
+/** Rata mensile ricavata dalla quota annuale: il prospetto conta 8 mesi. */
+export const alMese = annuale =>
+	typeof annuale === 'number' ? Math.round((annuale / MESI_CORSO) * 100) / 100 : null;
+
 /** Applica lo sconto banda e arrotonda ai centesimi. */
 export const conSconto = valore =>
 	typeof valore === 'number' ? Math.round(valore * (1 - SCONTO_BANDA) * 100) / 100 : null;
 
 /** Righe pronte per la tabella della scala prezzi. */
 export const scalaPrezzi = corso =>
-	DURATE.map(d => ({
-		minuti: d.minuti,
-		etichetta: d.etichetta,
-		pieno: corso.prezzi ? corso.prezzi[d.minuti] : null,
-		scontato: corso.prezzi ? conSconto(corso.prezzi[d.minuti]) : null,
-	}));
+	DURATE.map(d => {
+		const anno = corso.prezzi ? corso.prezzi[d.minuti] : null;
+		const annoScontato = conSconto(anno);
+		return {
+			minuti: d.minuti,
+			etichetta: d.etichetta,
+			anno,
+			mese: alMese(anno),
+			annoScontato,
+			meseScontato: alMese(annoScontato),
+		};
+	});
 
 export const etichettaFamiglia = {
 	legni: 'Legni',
