@@ -3,6 +3,10 @@ import { format, isBefore } from 'date-fns';
 import it from 'date-fns/locale/it/index.js';
 import { Container, Button } from '@components/odyssey-theme';
 import Layout from '../../layouts/Page.astro';
+
+// Pagina generata a ogni richiesta: gli eventi arrivano da WindDoc al momento
+// della visita, non alla build. Un evento nuovo compare senza rideploy.
+export const prerender = false;
 import HeroSection from '../../components/sections/heros/HeroSection.astro';
 
 import {
@@ -48,17 +52,31 @@ async function fetchEventi({ pagina = 1 } = {}) {
 }
 
 let eventiLista: any[] = [];
+// Distingue "nessun evento in programma" da "WindDoc non risponde": sono due
+// messaggi diversi per il visitatore, e nel secondo caso non va messo in cache.
+let winddocRaggiungibile = true;
 
 try {
   const data = await fetchEventi({ pagina: 1 });
   if (data && data.success && Array.isArray(data.lista)) {
     eventiLista = data.lista;
   } else {
+    winddocRaggiungibile = false;
     console.warn('[WindDoc lista] struttura inattesa:', data);
   }
 } catch (err) {
+  winddocRaggiungibile = false;
   console.error('[WindDoc lista] errore chiamando API:', err);
 }
+
+// La pagina e' generata a ogni richiesta: la cache CDN tiene 30s cosi' un evento
+// appena pubblicato compare quasi subito senza ridistribuire il sito.
+Astro.response.headers.set(
+  'Cache-Control',
+  winddocRaggiungibile
+    ? 'public, s-maxage=30, stale-while-revalidate=300'
+    : 'no-store'
+);
 
 const eventiRaw = eventiLista.map((evento) => {
   const id = evento.id_associazione_evento;
@@ -131,6 +149,18 @@ const seo = {
 
   <Container>
     <section class="eventi-lista">
+      {!winddocRaggiungibile && (
+        <p class="eventi-avviso">
+          Non riusciamo a leggere il calendario in questo momento. Riprova fra
+          poco: gli eventi sono anche sui nostri canali social.
+        </p>
+      )}
+      {winddocRaggiungibile && eventiRaw.length === 0 && (
+        <p class="eventi-avviso">
+          Al momento non ci sono eventi in programma. Torna a trovarci, oppure
+          seguici sui social per non perdere i prossimi appuntamenti.
+        </p>
+      )}
       {eventiFuturi.length > 0 && (
         <>
           <h2>Prossimi eventi</h2>
@@ -243,6 +273,14 @@ const seo = {
 </Layout>
 
 <style>
+.eventi-avviso {
+  padding: var(--nota-padding);
+  border-left: 3px solid var(--theme-accent);
+  background: var(--theme-surface-1);
+  border-radius: var(--nota-radius);
+  max-width: none;
+}
+
 .evento-card {
   border-radius: var(--radius-lg);
   background: var(--theme-surface-1);

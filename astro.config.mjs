@@ -4,6 +4,7 @@ import mdx from '@astrojs/mdx';
 import icon from 'astro-icon';
 import lit from '@astrojs/lit';
 import tailwindcss from '@tailwindcss/vite';
+import vercel from '@astrojs/vercel';
 
 /*
   Dominio pubblico, usato per canonical URL, tag Open Graph e sitemap.
@@ -42,6 +43,13 @@ const site =
 
 export default defineConfig({
 	site,
+	/*
+	  Il sito resta statico: quasi tutte le pagine sono file HTML scritti alla
+	  build. L'adapter serve alle sole pagine degli eventi, che dichiarano
+	  `prerender = false` e vengono generate a ogni richiesta, così un evento
+	  pubblicato su WindDoc compare subito senza ricostruire il sito.
+	*/
+	adapter: vercel(),
 	integrations: [sitemap(), mdx(), lit(), icon()],
 	vite: {
 		plugins: [tailwindcss()],

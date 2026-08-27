@@ -1,6 +1,7 @@
 # build output
 dist/
 .output/
+.vercel/
 
 # Cartella rigenerata da Astro a ogni avvio: era tracciata e risultava
 # modificata di continuo, col rischio di committarla al posto del proprio

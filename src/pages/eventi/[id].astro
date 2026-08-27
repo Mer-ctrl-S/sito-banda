@@ -10,51 +10,12 @@ import {
   toFormUrlEncoded,
 } from '../../lib/winddoc';
 
-// 1) getStaticPaths: genera le route /blog/eventi/[id_associazione_evento]
-export async function getStaticPaths() {
-  const bodyLista = {
-    method: 'associazioni_eventi_lista',
-    request: {
-      token_key: {
-        token: TOKEN_KEY,
-        token_app: TOKEN_APP,
-      },
-      pagina: 1,
-    },
-  };
+// Pagina generata a ogni richiesta: niente getStaticPaths, l'id arriva
+// dall'URL. Così un evento appena pubblicato è raggiungibile subito, senza
+// che il sito venga ricostruito.
+export const prerender = false;
 
-  const res = await fetch(WINDDOC_URL, {
-    method: 'POST',
-    headers: {
-      Accept: 'application/json',
-      'Content-Type': 'application/x-www-form-urlencoded',
-    },
-    body: toFormUrlEncoded(bodyLista),
-  });
-
-  if (!res.ok) {
-    throw new Error(
-      `Errore richiesta WindDoc lista (getStaticPaths): ${res.status}`
-    );
-  }
-
-  const data = await res.json();
-  const lista =
-    data && data.success && Array.isArray(data.lista) ? data.lista : [];
-
-  const paths = lista
-    .map((evento: any) => {
-      const id = evento.id_associazione_evento?.toString();
-      if (!id) return null;
-      return { params: { id } };
-    })
-    .filter(Boolean);
-
-  console.log('[getStaticPaths] paths generati:', paths);
-  return paths;
-}
-
-// 2) frontmatter: usa Astro.params.id per chiamare il DETTAGLIO
+// L'id viene dall'URL e serve a chiedere il DETTAGLIO a WindDoc
 const { id } = Astro.params;
 
 async function fetchEventoDettaglio(id: string) {
@@ -111,6 +72,19 @@ try {
 } catch (err) {
   console.error('[WindDoc dettaglio] errore:', err);
 }
+
+/*
+  Su una rotta generata a richiesta lo stato HTTP conta: un id inesistente
+  deve rispondere 404, non 200 con scritto "non trovato".
+*/
+const trovato = Boolean(eventoDettaglio && eventoDettaglio.nome);
+if (!trovato) {
+  Astro.response.status = 404;
+}
+Astro.response.headers.set(
+  'Cache-Control',
+  trovato ? 'public, s-maxage=30, stale-while-revalidate=300' : 'no-store'
+);
 
 if (!eventoDettaglio) {
   eventoDettaglio = {
