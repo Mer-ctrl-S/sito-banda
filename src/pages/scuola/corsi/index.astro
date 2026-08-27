@@ -178,7 +178,7 @@ const instrumentData = Object.fromEntries(
 		<section class="collettivi" aria-labelledby="collettiviTitolo">
 			<h2 id="collettiviTitolo">Non solo strumenti</h2>
 			<p class="collettivi__intro">
-				Due corsi che non compaiono nel grafico perché non sono legati a un
+				Corsi che non compaiono nel grafico perché non sono legati a un
 				singolo strumento, ma accompagnano lo studio di tutti.
 			</p>
 
@@ -214,9 +214,9 @@ const instrumentData = Object.fromEntries(
 			<div class="cta-section__content">
 				<h2>Prima di iscriverti</h2>
 				<p>
-					Nel regolamento trovi le quote per ogni durata di lezione, le
-					riduzioni per chi suona in banda e per il secondo figlio, come si
-					paga, il prestito degli strumenti e le regole di frequenza.
+					Ti invitiamo a <strong>leggere il regolamento</strong>.</br>
+					Qui puoi trovare tutte le informazioni generali in merito alla scuola.
+					Trovi anche informazioni riguardanti il prestito degli strumenti, come si paga e le varie regole di frequenza.
 				</p>
 				<div class="cta-section__azione">
 					<Button href="/scuola/regolamento">Leggi il regolamento dei corsi</Button>
@@ -454,17 +454,17 @@ const instrumentData = Object.fromEntries(
 	/* HERO */
 	/* INTRO CARD */
 	.intro-card {
-		margin: 2rem auto 2rem;
+		margin: var(--space-lg) auto var(--space-lg);
 		max-width: 52rem;
 		text-align: center;
 	}
 
 	.intro-card__content {
-		padding: 1.5rem 1rem;
+		padding: var(--space-md) var(--space-sm);
 	}
 
 	.intro-card__hint {
-		margin-top: 0.75rem;
+		margin-top: var(--space-xs);
 		color: var(--theme-on-surface-2);
 	}
 
@@ -480,7 +480,7 @@ const instrumentData = Object.fromEntries(
 	}
 
 	.banda-section__header h3 {
-		margin-bottom: 0.5rem;
+		margin-bottom: var(--space-2xs);
 	}
 
 	.banda-svg-wrapper {
@@ -498,8 +498,8 @@ const instrumentData = Object.fromEntries(
 	/* CTA FINALE */
 	.cta-section {
 		border-top: 1px solid var(--theme-border);
-		padding: 2.5rem 0 3rem;
-		margin-top: 1.5rem;
+		padding: var(--space-lg) 0 var(--space-xl);
+		margin-top: var(--space-md);
 	}
 
 	.cta-section__content {
@@ -536,15 +536,15 @@ const instrumentData = Object.fromEntries(
 
 	@media (max-width: 640px) {
 		.intro-card {
-			margin: 1.5rem auto 1.75rem;
+			margin: var(--space-md) auto var(--space-md);
 		}
 
 		.banda-section {
-			margin-bottom: 2.5rem;
+			margin-bottom: var(--space-lg);
 		}
 
 		.cta-section {
-			padding: 2rem 0 2.5rem;
+			padding: var(--space-lg) 0 var(--space-lg);
 		}
 	}
 
@@ -556,7 +556,7 @@ const instrumentData = Object.fromEntries(
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		padding: 1rem;
+		padding: var(--space-sm);
 	}
 
 	.instrument-modal[hidden] {
@@ -597,13 +597,13 @@ const instrumentData = Object.fromEntries(
 	.instrument-modal__media {
 		width: 100%;
 		aspect-ratio: 1 / 1;
-		border-radius: 0.75rem;
+		border-radius: var(--radius-md);
 		overflow: hidden;
 		background: var(--theme-surface-1);
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		margin-bottom: 1rem;
+		margin-bottom: var(--space-sm);
 	}
 
 	.instrument-modal__image {
@@ -730,7 +730,7 @@ const instrumentData = Object.fromEntries(
 	}
 	.elenco__lista a {
 		display: inline-block;
-		padding: 0.35rem 0.75rem;
+		padding: 0.35rem var(--space-xs);
 		border: 1px solid var(--theme-border-strong);
 		border-radius: var(--radius-sm);
 		font-size: var(--font-size-sm);
@@ -757,9 +757,9 @@ const instrumentData = Object.fromEntries(
 	.instrument-modal__audio {
 		display: inline-flex;
 		align-items: center;
-		gap: 0.5rem;
+		gap: var(--space-2xs);
 		margin: var(--space-sm) auto 0;
-		padding: 0.5rem 1rem 0.5rem 0.8rem;
+		padding: 0.5rem var(--space-sm) 0.5rem 0.8rem;
 		background: transparent;
 		border: 1px solid var(--theme-border-strong);
 		border-radius: var(--radius-sm);

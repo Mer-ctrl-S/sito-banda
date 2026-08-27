@@ -1,7 +1,7 @@
 ---
 import { Icon } from 'astro-icon/components';
 import { Button, Container, TextCardSection } from '@components/odyssey-theme';
-import Layout from '../../layouts/Page.astro';
+import Layout from '../layouts/Page.astro';
 
 const seo = {
 	title: 'Area soci | Corpo Bandistico di Castelcovati',
@@ -59,6 +59,6 @@ const seo = {
 	}
 	.cta-buttons__container :global(a) {
 		margin-right: 1rem;
-		margin-bottom: 1rem;
+		margin-bottom: var(--space-sm);
 	}
 </style>

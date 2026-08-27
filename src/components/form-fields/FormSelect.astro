@@ -55,7 +55,7 @@ const errorId = `${id}-error`;
 	}
 	.form-field__container select {
 		width: 100%;
-		padding: 0.7rem 2.5rem 0.7rem 0.85rem;
+		padding: 0.7rem var(--space-lg) 0.7rem 0.85rem;
 		background-color: var(--theme-bg);
 		border: 1px solid var(--theme-border-strong);
 		color: var(--theme-on-bg);
@@ -74,8 +74,8 @@ const errorId = `${id}-error`;
 		box-shadow: 0 0 0 3px color-mix(in srgb, var(--theme-primary) 18%, transparent);
 	}
 	.form-field__container select[aria-invalid='true'] {
-		border-color: #a8412f;
-		box-shadow: 0 0 0 3px rgba(168, 65, 47, 0.14);
+		border-color: var(--theme-errore);
+		box-shadow: 0 0 0 3px var(--theme-errore-alone);
 	}
 	.form-field__chevron {
 		position: absolute;
@@ -92,6 +92,6 @@ const errorId = `${id}-error`;
 		max-width: none;
 		min-height: 1.2em;
 		font-size: var(--font-size-xs);
-		color: #8f3527;
+		color: var(--theme-errore-ink);
 	}
 </style>

@@ -19,7 +19,7 @@ const {posts} = Astro.props;
   list-style: none;
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 2rem;
+  gap: var(--space-lg);
 }
 @media (max-width: 768px) {
   .blog-posts-list__list {

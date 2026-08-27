@@ -85,7 +85,7 @@ const eventiRaw = eventiLista.map((evento) => {
     place: luogo,
     date: dateObj,
     image,
-    href: id ? `/blog/eventi/${id}` : null,
+    href: id ? `/eventi/${id}` : null,
   };
 });
 
@@ -101,9 +101,9 @@ const eventiPassati = eventiRaw
   .sort((a, b) => (a.date! > b.date! ? -1 : 1)); // dal più recente al più vecchio
 
 const seo = {
-  title: 'Blog & Eventi | Corpo Bandistico di Castelcovati',
+  title: 'Eventi | Corpo Bandistico di Castelcovati',
   description:
-    'Notizie ed eventi del Corpo Bandistico di Castelcovati, aggiornati automaticamente tramite WindDoc.',
+    'I prossimi concerti e servizi del Corpo Bandistico di Castelcovati, e l’archivio di quelli passati.',
 };
 ---
 
@@ -245,23 +245,23 @@ const seo = {
 
 <style>
 .evento-card {
-  border-radius: var(--theme-shape-radius);
+  border-radius: var(--radius-lg);
   background: var(--theme-surface-1);
   box-shadow: var(--theme-elevation-1);
-  padding: 1.5rem;
+  padding: var(--blocco-padding);
   margin: 0 0 1.5rem;
 }
 
 .evento-card__inner {
   display: flex;
-  gap: 1.5rem;
+  gap: var(--space-md);
 }
 
 /* colonna immagine */
 .evento-card__media {
   flex: 0 0 180px;
   max-width: 180px;
-  border-radius: var(--theme-shape-radius);
+  border-radius: var(--radius-lg);
   overflow: hidden;
   align-self: flex-start;
 }
@@ -278,7 +278,7 @@ const seo = {
   flex: 1 1 auto;
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: var(--space-2xs);
 }
 
 .evento-card__title {
@@ -292,7 +292,7 @@ const seo = {
 }
 
 .evento-card__description {
-  margin: 0.25rem 0 0.75rem;
+  margin: 0.25rem 0 var(--space-xs);
 }
 
 .evento-card__actions {
@@ -318,11 +318,11 @@ const seo = {
 }
 
 .evento-card {
-  border-radius: var(--theme-shape-radius);
+  border-radius: var(--radius-lg);
   background: var(--theme-surface-1);       /* 👈 livello diverso dallo sfondo */
   box-shadow: var(--theme-elevation-1);
-  padding: 1.5rem;
+  padding: var(--blocco-padding);
   margin: 0 0 1.5rem;
-  border: 1px solid rgba(0, 0, 0, 0.03);    /* leggero bordo per staccare */
+  border: 1px solid var(--theme-border);    /* leggero bordo per staccare */
 }
 </style>

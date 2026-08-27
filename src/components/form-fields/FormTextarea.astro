@@ -63,14 +63,14 @@ const errorId = `${id}-error`;
 		box-shadow: 0 0 0 3px color-mix(in srgb, var(--theme-primary) 18%, transparent);
 	}
 	.form-field__container textarea[aria-invalid='true'] {
-		border-color: #a8412f;
-		box-shadow: 0 0 0 3px rgba(168, 65, 47, 0.14);
+		border-color: var(--theme-errore);
+		box-shadow: 0 0 0 3px var(--theme-errore-alone);
 	}
 	.form-field__error {
 		margin: 0;
 		max-width: none;
 		min-height: 1.2em;
 		font-size: var(--font-size-xs);
-		color: #8f3527;
+		color: var(--theme-errore-ink);
 	}
 </style>

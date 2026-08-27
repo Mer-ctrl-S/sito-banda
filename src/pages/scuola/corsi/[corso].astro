@@ -51,7 +51,9 @@ const mancanti =
 	(haPrezzi || haQuota ? 0 : 1);
 
 const seo = {
-	title: `${corso.nome} | Corsi del Corpo Bandistico di Castelcovati`,
+	// Il suffisso lungo mandava oltre i 65 caratteri i corsi dal nome esteso
+	// (propedeutico arrivava a 78): Google li tronca.
+	title: `${corso.nome} | Accademia Musicale di Castelcovati`,
 	description: corso.descrizione.slice(0, 155),
 };
 ---
@@ -506,7 +508,7 @@ const seo = {
 		display: inline-flex;
 		align-items: center;
 		gap: 0.55rem;
-		padding: 0.55rem 1rem 0.55rem 0.75rem;
+		padding: 0.55rem var(--space-sm) 0.55rem var(--space-xs);
 		background-color: transparent;
 		border: 1px solid var(--theme-border-strong);
 		border-radius: var(--radius-sm);
@@ -619,7 +621,7 @@ const seo = {
 	}
 	.corso__scala-apri {
 		margin-top: var(--space-2xs);
-		padding: 0.35rem 0.75rem;
+		padding: 0.35rem var(--space-xs);
 		background: transparent;
 		border: 1px solid var(--theme-border-strong);
 		border-radius: var(--radius-sm);
@@ -797,7 +799,7 @@ const seo = {
 		display: block;
 		width: 2.6rem;
 		height: 1.5rem;
-		padding: 0.15rem;
+		padding: var(--space-3xs);
 		border-radius: 999px;
 		background: var(--theme-border-strong);
 		transition: background-color var(--theme-transition);

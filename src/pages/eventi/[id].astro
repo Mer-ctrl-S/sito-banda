@@ -1,5 +1,5 @@
 ---
-import Layout from '../../../layouts/Page.astro';
+import Layout from '../../layouts/Page.astro';
 import { Container, Button } from '@components/odyssey-theme';
 import { format } from 'date-fns';
 import it from 'date-fns/locale/it/index.js';
@@ -8,7 +8,7 @@ import {
   TOKEN_APP,
   TOKEN_KEY,
   toFormUrlEncoded,
-} from '../../../lib/winddoc';
+} from '../../lib/winddoc';
 
 // 1) getStaticPaths: genera le route /blog/eventi/[id_associazione_evento]
 export async function getStaticPaths() {
@@ -187,8 +187,8 @@ const seo = {
   <Container>
     <section class="evento-dettaglio">
       <header class="evento-dettaglio__header">
-        <Button href="/blog" outlined>
-          ← Torna al blog
+        <Button href="/eventi" outlined>
+          ← Torna agli eventi
         </Button>
 
         <h1>{titolo}</h1>
@@ -252,8 +252,8 @@ const seo = {
   .evento-dettaglio__header {
     display: flex;
     flex-direction: column;
-    gap: 0.75rem;
-    margin-bottom: 1.5rem;
+    gap: var(--space-xs);
+    margin-bottom: var(--space-md);
   }
 
   .evento-dettaglio__meta {
@@ -262,8 +262,8 @@ const seo = {
   }
 
   .evento-dettaglio__image {
-    margin: 1.5rem 0;
-    border-radius: var(--theme-shape-radius);
+    margin: var(--space-md) 0;
+    border-radius: var(--radius-lg);
     overflow: hidden;
     box-shadow: var(--theme-elevation-1);
   }
@@ -276,11 +276,11 @@ const seo = {
   }
 
   .evento-dettaglio__content {
-    margin-top: 1rem;
+    margin-top: var(--space-sm);
   }
 
   .evento-dettaglio__content h2 {
-    margin-bottom: 0.5rem;
+    margin-bottom: var(--space-2xs);
   }
 
   .evento-dettaglio__content p {
@@ -288,10 +288,10 @@ const seo = {
   }
 
   .evento-dettaglio__tipo {
-    margin-top: 2rem;
-    padding: 1rem 1.25rem;
-    border-radius: var(--theme-shape-radius);
-    background: rgba(0, 0, 0, 0.02);
+    margin-top: var(--space-lg);
+    padding: var(--blocco-padding);
+    border-radius: var(--radius-lg);
+    background: var(--theme-surface-1);
   }
 
   .evento-dettaglio__tipo-partecipazione,

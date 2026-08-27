@@ -6,14 +6,14 @@ const {href, imgSrc, title} = Astro.props;
   .feature-card__card {
     background-color: var(--theme-surface-1);
     color: var(--theme-on-surface-1);
-    border-radius: var(--theme-shape-radius);
+    border-radius: var(--radius-lg);
   }
   .feature-card__link {
     display: block;
     text-decoration: none;
   }
   .featured-card__content {
-    padding: 1rem 1rem 0 1rem;
+    padding: var(--space-sm) var(--space-sm) 0 var(--space-sm);
      display: flex;
     flex-direction: column;
     align-items: center;

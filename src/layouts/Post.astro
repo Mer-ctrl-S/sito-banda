@@ -24,9 +24,9 @@ const seo = {
     <ul class="post-tags__list">
       {allTagsData.map(tag => (
         <li class="post-tags__tag">
-          <a href={`/blog/tags/${tag.slug}`}>
-            {tag.title}
-          </a>
+          {/* Niente link: /blog/tags/... non è una rotta di questo sito.
+              Rimetterlo solo se un giorno esisterà l'archivio per tag. */}
+          {tag.title}
         </li>
       ))}
     </ul>
@@ -66,7 +66,7 @@ const seo = {
   }
   .post-layout__img {
     margin: 0 auto 1rem auto;
-    border-radius: var(--theme-shape-radius);
+    border-radius: var(--radius-lg);
   }
   .post-layout__date {
     margin-bottom: 1rem;

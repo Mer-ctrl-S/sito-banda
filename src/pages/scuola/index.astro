@@ -130,12 +130,12 @@ const heroImages = [
   }
 
   .trasparenza__header {
-    margin-bottom: 1.5rem;
+    margin-bottom: var(--space-md);
     max-width: 56rem;
   }
 
   .trasparenza__header h2 {
-    margin-bottom: 0.5rem;
+    margin-bottom: var(--space-2xs);
   }
 
   .trasparenza__header p {
@@ -144,11 +144,11 @@ const heroImages = [
   }
 
   .trasparenza__table-wrapper {
-    margin-top: 1rem;
-    border-radius: var(--theme-shape-radius);
+    margin-top: var(--space-sm);
+    border-radius: var(--radius-lg);
     background: var(--theme-surface-1);
     box-shadow: var(--theme-elevation-1);
-    padding: 1rem 1.25rem;
+    padding: var(--blocco-padding);
     overflow-x: auto; /* per mobile */
   }
 
@@ -164,9 +164,9 @@ const heroImages = [
 
   .trasparenza__table th,
   .trasparenza__table td {
-    padding: 0.5rem 0.75rem;
+    padding: var(--space-2xs) var(--space-xs);
     text-align: left;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+    border-bottom: 1px solid var(--theme-border);
   }
 
   .trasparenza__table th {
@@ -175,11 +175,11 @@ const heroImages = [
   }
 
   .trasparenza__table tbody tr:nth-child(even) {
-    background: rgba(0, 0, 0, 0.02);
+    background: var(--theme-surface-1);
   }
 
   .trasparenza__note {
-    margin-top: 0.75rem;
+    margin-top: var(--space-xs);
     font-size: 0.9rem;
     color: var(--theme-on-surface-2);
   }
@@ -187,7 +187,7 @@ const heroImages = [
   @media (max-width: 768px) {
     .trasparenza__table th,
     .trasparenza__table td {
-      padding: 0.4rem 0.5rem;
+      padding: var(--space-2xs);
       font-size: 0.9rem;
     }
   }

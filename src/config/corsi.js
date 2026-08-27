@@ -183,7 +183,7 @@ const definizioniAltri = [
 const definizioniCollettive = [
 	{
 		slug: 'propedeutico',
-		nome: 'Propedeutico — teoria e solfeggio',
+		nome: 'Propedeutico e solfeggio',
 		famiglia: 'collettivo',
 		descrizione:
 			'Leggere e capire la musica: note, ritmo, tempo, misura e i primi elementi di teoria, in piccoli gruppi formati per grado di preparazione. È il primo passo per chi non suona ancora, e la base che rende più rapido lo studio di qualunque strumento.',

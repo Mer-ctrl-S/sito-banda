@@ -37,7 +37,7 @@ const classes = [
 	.btn {
 		--btn-bg: var(--theme-primary);
 		--btn-fg: var(--theme-on-primary);
-		--btn-shadow: 0 1px 2px rgba(26, 30, 25, 0.12);
+		--btn-shadow: var(--theme-elevation-1);
 
 		width: fit-content;
 		padding: 0.7rem 1.35rem;
@@ -67,15 +67,14 @@ const classes = [
 
 	.btn:hover {
 		--btn-bg: var(--theme-primary-hover);
-		--btn-shadow: 0 2px 4px rgba(26, 30, 25, 0.1),
-			0 8px 18px rgba(26, 30, 25, 0.12);
+		--btn-shadow: var(--theme-elevation-2);
 		transform: translateY(-1px);
 	}
 
 	/* Ritorno fisico alla pressione */
 	.btn:active {
 		transform: translateY(0) scale(0.985);
-		--btn-shadow: 0 1px 1px rgba(26, 30, 25, 0.14);
+		--btn-shadow: var(--theme-elevation-1);
 		transition-duration: 60ms;
 	}
 

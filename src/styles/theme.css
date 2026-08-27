@@ -37,6 +37,13 @@
 	--theme-on-surface-2: var(--green-deep);
 
 	--theme-accent: var(--brass);
+
+	/* Errore: un mattone caldo, coerente con la carta e l'ottone.
+	   Era ripetuto a mano come #a8412f in quattro file. */
+	--theme-errore: #a8412f;
+	--theme-errore-ink: #8f3527;
+	--theme-errore-fondo: color-mix(in srgb, var(--theme-errore) 8%, transparent);
+	--theme-errore-alone: color-mix(in srgb, var(--theme-errore) 16%, transparent);
 	--theme-muted: var(--ink-3);
 	--theme-border: color-mix(in srgb, var(--ink) 12%, transparent);
 	--theme-border-strong: color-mix(in srgb, var(--ink) 22%, transparent);
@@ -57,6 +64,16 @@
 		0 12px 28px rgba(26, 30, 25, 0.07);
 	--theme-elevation-3: 0 4px 8px rgba(26, 30, 25, 0.06),
 		0 24px 48px rgba(26, 30, 25, 0.09);
+
+	/*
+	  I due trattamenti di superficie ricorrenti nel sito. Prima ogni pagina
+	  reinventava padding e raggio: valori vicini ma mai identici, destinati a
+	  divergere. Chi disegna un blocco o una nota parte da qui.
+	*/
+	--blocco-padding: var(--space-md);
+	--blocco-radius: var(--radius-lg);
+	--nota-padding: var(--space-sm) var(--space-md);
+	--nota-radius: var(--radius-sm);
 
 	/* ---- Movimento ---- */
 	--ease-out: cubic-bezier(0.16, 1, 0.3, 1);
