@@ -10,6 +10,8 @@ import {
 	DURATA_PREDEFINITA,
 	DURATE,
 	SCONTO_BANDA_ANNUO,
+	SCONTO_FRATELLI_ANNUO,
+	MESI_CORSO as MESI,
 	formattaPrezzo as euro,
 	alMese,
 	MESI_CORSO,
@@ -39,6 +41,7 @@ const durataPredefinita = DURATE.find(d => d.minuti === DURATA_PREDEFINITA);
 const haPrezzi = corso.prezzi !== null;
 const haQuota = corso.quotaAnnuale !== null;
 const risparmioMese = alMese(SCONTO_BANDA_ANNUO);
+const risparmioFratelliMese = alMese(SCONTO_FRATELLI_ANNUO);
 
 // La quota conta come campo: senza, l'avviso diceva "nessuna informazione
 // pubblicata" anche quando il prezzo era già a schermo.
@@ -187,6 +190,9 @@ const seo = {
 					role="dialog"
 					aria-modal="true"
 					aria-labelledby="scalaTitolo"
+					data-sconto-banda={SCONTO_BANDA_ANNUO}
+					data-sconto-fratelli={SCONTO_FRATELLI_ANNUO}
+					data-mesi={MESI}
 				>
 					<button type="button" class="scala__chiudi" data-chiudi aria-label="Chiudi">
 						&times;
@@ -209,17 +215,13 @@ const seo = {
 							{scala.map(riga => (
 								<tr>
 									<th scope="row">{riga.etichetta}</th>
-									<td
-										class="scala__col-prezzo tabular"
-										data-pieno={riga.mese}
-										data-scontato={riga.meseScontato}
-									>
+									<td class="scala__col-prezzo tabular" data-base={riga.anno} data-tipo="mese">
 										{formattaPrezzo(riga.mese)}
 									</td>
 									<td
 										class="scala__col-prezzo scala__col-anno tabular"
-										data-pieno={riga.anno}
-										data-scontato={riga.annoScontato}
+										data-base={riga.anno}
+										data-tipo="anno"
 									>
 										{formattaPrezzo(riga.anno)}
 									</td>
@@ -228,23 +230,50 @@ const seo = {
 						</tbody>
 					</table>
 
-					<div class="scala__sconto">
-						<label class="interruttore" for="scontoBanda">
-							<input type="checkbox" id="scontoBanda" class="interruttore__input" />
-							<span class="interruttore__pista" aria-hidden="true">
-								<span class="interruttore__pallino" />
-							</span>
-							<span class="interruttore__testo">Suono nella banda</span>
-						</label>
-						<p class="scala__sconto-nota">
-							Chi suona attivamente in banda risparmia {euro(SCONTO_BANDA_ANNUO)}
-							sulla quota annuale, cioè {euro(risparmioMese)} al mese.
-						</p>
-					</div>
+					<fieldset class="scala__sconti">
+						<legend class="scala__sconti-titolo">Riduzioni</legend>
 
-					<p class="scala__stato" role="status" aria-live="polite" hidden>
-						Riduzione di {euro(SCONTO_BANDA_ANNUO)} l’anno applicata.
-					</p>
+						<div class="scala__sconto">
+							<label class="interruttore" for="scontoBanda">
+								<input
+									type="checkbox"
+									id="scontoBanda"
+									class="interruttore__input"
+									data-sconto="banda"
+								/>
+								<span class="interruttore__pista" aria-hidden="true">
+									<span class="interruttore__pallino" />
+								</span>
+								<span class="interruttore__testo">Suono nella banda</span>
+							</label>
+							<p class="scala__sconto-nota">
+								Chi suona attivamente in banda risparmia {euro(SCONTO_BANDA_ANNUO)}
+								l’anno, cioè {euro(risparmioMese)} al mese.
+							</p>
+						</div>
+
+						<div class="scala__sconto">
+							<label class="interruttore" for="scontoFratelli">
+								<input
+									type="checkbox"
+									id="scontoFratelli"
+									class="interruttore__input"
+									data-sconto="fratelli"
+								/>
+								<span class="interruttore__pista" aria-hidden="true">
+									<span class="interruttore__pallino" />
+								</span>
+								<span class="interruttore__testo">Dal secondo figlio iscritto</span>
+							</label>
+							<p class="scala__sconto-nota">
+								Dal secondo figlio iscritto la quota annuale scende di
+								{euro(SCONTO_FRATELLI_ANNUO)}, cioè {euro(risparmioFratelliMese)} al
+								mese. Si somma alla riduzione per chi suona in banda.
+							</p>
+						</div>
+					</fieldset>
+
+					<p class="scala__stato" role="status" aria-live="polite" hidden></p>
 				</div>
 			</div>
 		)
@@ -257,13 +286,24 @@ const seo = {
 
 		if (apri && modale) {
 			const box = modale.querySelector('.scala__box');
-			const celle = [...modale.querySelectorAll('[data-pieno]')];
-			const interruttore = modale.querySelector('#scontoBanda');
+			const celle = [...modale.querySelectorAll('[data-base]')];
+			const interruttori = [...modale.querySelectorAll('[data-sconto]')];
 			const stato = modale.querySelector('.scala__stato');
 			let ultimoFocus = null;
 
-			// Stessa formattazione del server: gli interi senza decimali,
-			// gli altri con due. Evita "40,5 €".
+			// Le riduzioni sono importi fissi sulla quota ANNUALE e si sommano.
+			// Il mensile si ricava dopo, altrimenti due sottrazioni arrotondate
+			// separatamente non tornerebbero con l'annuale mostrato accanto.
+			const SCONTI = {
+				banda: Number(box.dataset.scontoBanda),
+				fratelli: Number(box.dataset.scontoFratelli),
+			};
+			const MESI = Number(box.dataset.mesi);
+			const ETICHETTE = {
+				banda: 'chi suona in banda',
+				fratelli: 'secondo figlio',
+			};
+
 			const intero = new Intl.NumberFormat('it-IT', {
 				style: 'currency', currency: 'EUR',
 				minimumFractionDigits: 0, maximumFractionDigits: 0,
@@ -273,31 +313,52 @@ const seo = {
 				minimumFractionDigits: 2, maximumFractionDigits: 2,
 			});
 			const euro = n => (Number.isInteger(n) ? intero : decimale).format(n);
+			const centesimi = n => Math.round(n * 100) / 100;
+
+			function attivi() {
+				return interruttori.filter(i => i.checked).map(i => i.dataset.sconto);
+			}
 
 			function aggiornaPrezzi() {
-				const scontato = interruttore.checked;
+				const scelti = attivi();
+				const totale = scelti.reduce((somma, k) => somma + SCONTI[k], 0);
+
 				celle.forEach(cella => {
-					const pieno = Number(cella.dataset.pieno);
-					cella.classList.toggle('is-scontato', scontato);
+					const baseAnno = Number(cella.dataset.base);
+					const annoScontato = Math.max(0, baseAnno - totale);
+					const mese = cella.dataset.tipo === 'mese';
+					const pieno = mese ? centesimi(baseAnno / MESI) : baseAnno;
+					const nuovo = mese ? centesimi(annoScontato / MESI) : annoScontato;
+
+					cella.classList.toggle('is-scontato', totale > 0);
 					cella.replaceChildren();
-					if (scontato) {
-						// il pieno resta visibile barrato: senza confronto lo sconto
-						// non si legge, i due verdi sono troppo simili fra loro
+					if (totale > 0) {
+						// il pieno resta visibile barrato: senza confronto la
+						// riduzione non si legge
 						const barrato = document.createElement('s');
 						barrato.className = 'scala__pieno';
 						barrato.textContent = euro(pieno);
-						const nuovo = document.createElement('span');
-						nuovo.className = 'scala__nuovo';
-						nuovo.textContent = euro(Number(cella.dataset.scontato));
-						cella.append(barrato, ' ', nuovo);
+						const finale = document.createElement('span');
+						finale.className = 'scala__nuovo';
+						finale.textContent = euro(nuovo);
+						cella.append(barrato, ' ', finale);
 					} else {
 						cella.textContent = euro(pieno);
 					}
 				});
-				stato.hidden = !scontato;
+
+				if (totale === 0) {
+					stato.hidden = true;
+					stato.textContent = '';
+					return;
+				}
+				const quali = scelti.map(k => ETICHETTE[k]).join(' e ');
+				stato.hidden = false;
+				stato.textContent =
+					`Riduzione di ${euro(totale)} l'anno (${euro(centesimi(totale / MESI))} al mese) — ${quali}.`;
 			}
 
-			interruttore.addEventListener('change', aggiornaPrezzi);
+			interruttori.forEach(i => i.addEventListener('change', aggiornaPrezzi));
 
 			function chiudi() {
 				modale.hidden = true;
@@ -309,7 +370,7 @@ const seo = {
 				ultimoFocus = apri;
 				modale.hidden = false;
 				document.body.style.overflow = 'hidden';
-				interruttore.focus();
+				interruttori[0].focus();
 			});
 
 			modale.querySelectorAll('[data-chiudi]').forEach(el =>
@@ -701,8 +762,22 @@ const seo = {
 	}
 
 	/* ---- INTERRUTTORE ---- */
+	.scala__sconti {
+		margin: var(--space-md) 0 0;
+		padding: 0;
+		border: 0;
+	}
+	.scala__sconti-titolo {
+		padding: 0;
+		font-family: var(--theme-font-family-sans);
+		font-size: var(--font-size-xs);
+		font-weight: 600;
+		letter-spacing: var(--tracking-label);
+		text-transform: uppercase;
+		color: var(--theme-muted);
+	}
 	.scala__sconto {
-		margin-top: var(--space-md);
+		margin-top: var(--space-sm);
 	}
 	.interruttore {
 		display: flex;
