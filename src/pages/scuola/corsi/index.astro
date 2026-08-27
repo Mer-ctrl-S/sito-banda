@@ -7,6 +7,7 @@ import HeroSlider from '../../../components/sections/heros/HeroSlider.astro';
 import {
 	corsiPerSlug,
 	corsiStrumento,
+	corsiAltri,
 	corsiCollettivi,
 	daConfermare,
 } from '../../../config/corsi.js';
@@ -148,6 +149,29 @@ const instrumentData = Object.fromEntries(
 				<!-- BandaChart deve generare l'SVG con id="bandaSvg" e i settori cliccabili -->
 				<BandaChart {sections} />
 			</div>
+		</section>
+
+		<!-- STRUMENTI FUORI DALL'ORGANICO: insegnati dalla scuola, assenti dal grafico -->
+		<section class="altri" aria-labelledby="altriTitolo">
+			<h2 id="altriTitolo">Altri strumenti</h2>
+			<p class="altri__intro">
+				Non fanno parte dell’organico della banda, ma si studiano nella nostra
+				scuola con lo stesso percorso e gli stessi insegnanti.
+			</p>
+
+			<ul class="altri__lista">
+				{
+					corsiAltri.map(corso => (
+						<li class="altri__voce">
+							<h3><a href={corso.href}>{corso.nome}</a></h3>
+							<p>{corso.descrizione}</p>
+							{corso.insegnante !== '— da confermare' && (
+								<p class="altri__insegnante">{corso.insegnante}</p>
+							)}
+						</li>
+					))
+				}
+			</ul>
 		</section>
 
 		<!-- CORSI COLLETTIVI: non stanno sul grafico perché non sono strumenti -->
@@ -588,6 +612,53 @@ const instrumentData = Object.fromEntries(
 		font-size: 0.85rem;
 		color: var(--theme-on-surface-2);
 	}
+	/* ALTRI STRUMENTI */
+	.altri {
+		margin: var(--section-margin) auto 0;
+	}
+	.altri__intro {
+		color: var(--theme-muted);
+		margin-bottom: var(--space-lg);
+	}
+	.altri__lista {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+		max-width: none;
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr));
+		gap: var(--space-lg);
+	}
+	.altri__voce {
+		max-width: none;
+		padding-top: var(--space-sm);
+		border-top: 2px solid var(--theme-accent);
+	}
+	.altri__voce h3 {
+		font-size: var(--font-size-md);
+		margin-bottom: var(--space-2xs);
+	}
+	.altri__voce h3 a {
+		text-decoration: none;
+		color: inherit;
+		transition: color var(--theme-transition);
+	}
+	.altri__voce h3 a:hover {
+		color: var(--theme-primary);
+		text-decoration: underline;
+		text-underline-offset: 0.2em;
+	}
+	.altri__voce p {
+		color: var(--theme-muted);
+		margin-bottom: 0;
+		font-size: var(--font-size-sm);
+	}
+	.altri__insegnante {
+		margin-top: var(--space-2xs) !important;
+		font-size: var(--font-size-xs) !important;
+		color: var(--theme-accent) !important;
+	}
+
 	/* CORSI COLLETTIVI + ELENCO */
 	.collettivi,
 	.elenco {

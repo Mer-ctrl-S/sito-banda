@@ -124,6 +124,41 @@ const definizioniStrumento = [
 	},
 ];
 
+/*
+  Strumenti insegnati dalla scuola ma che non fanno parte dell'organico della
+  banda: non compaiono nel grafico della disposizione, hanno una sezione loro.
+*/
+const definizioniAltri = [
+	{
+		slug: 'pianoforte',
+		nome: 'Pianoforte',
+		famiglia: 'altri',
+		descrizione:
+			'Si suona con entrambe le mani su una tastiera di 88 tasti: melodia e accompagnamento insieme, senza bisogno di altri strumenti. È anche il modo più diretto per vedere come funziona l’armonia.',
+	},
+	{
+		slug: 'chitarra-e-basso-elettrico',
+		nome: 'Chitarra e basso elettrico',
+		famiglia: 'altri',
+		descrizione:
+			'Due strumenti a corde amplificati, spesso studiati insieme perché condividono impostazione e linguaggio. La chitarra porta accordi e assoli, il basso tiene il fondo ritmico e armonico del gruppo.',
+	},
+	{
+		slug: 'canto-moderno',
+		nome: 'Canto moderno',
+		famiglia: 'altri',
+		descrizione:
+			'Si lavora sulla voce come strumento: respirazione, intonazione, appoggio e interpretazione, sul repertorio pop, rock e cantautorale.',
+	},
+	{
+		slug: 'violino',
+		nome: 'Violino',
+		famiglia: 'altri',
+		descrizione:
+			'Il più acuto degli archi: il suono nasce dall’arco sulle corde e non ha tasti, quindi l’intonazione la costruisce chi suona. Timbro molto espressivo, vicino alla voce umana.',
+	},
+];
+
 const definizioniCollettive = [
 	{
 		slug: 'musica-insieme',
@@ -159,7 +194,11 @@ const definizioniCollettive = [
       prezzi: { 30: 45, 45: 62, 60: 80 },
   },
 */
-export const datiOrganizzativi = {};
+export const datiOrganizzativi = {
+	pianoforte: { insegnante: 'Gabriele Moraschi' },
+	'chitarra-e-basso-elettrico': { insegnante: 'Michele Belleri' },
+	'teoria-solfeggio': { insegnante: 'Gianfranco Scalvini' },
+};
 
 /** Durate disponibili, in ordine. La prima è quella mostrata di default. */
 export const DURATE = [
@@ -184,7 +223,22 @@ const campiDefault = {
 };
 
 /** Tutti i corsi, arricchiti con i campi organizzativi e gli asset. */
-export const corsi = [...definizioniStrumento, ...definizioniCollettive].map(corso => {
+/*
+  Slug che hanno una foto in public/assets/images/strumenti/. Elenco esplicito:
+  costruire il percorso a partire dallo slug faceva chiedere al browser file
+  inesistenti per i corsi senza foto. Aggiungi qui lo slug quando arriva l'immagine.
+*/
+const SLUG_CON_FOTO = new Set([
+	'clarinetto', 'clarinetto-basso', 'oboe', 'fagotto', 'flauto', 'ottavino',
+	'corno', 'tromba', 'trombone', 'sax-contralto', 'sax-tenore', 'sax-baritono',
+	'percussioni', 'tuba', 'euphonium',
+]);
+
+export const corsi = [
+	...definizioniStrumento,
+	...definizioniAltri,
+	...definizioniCollettive,
+].map(corso => {
 	const dati = { ...campiDefault, ...corso, ...(datiOrganizzativi[corso.slug] ?? {}) };
 	// Un listino è valido solo se ha tutte e tre le durate: uno parziale
 	// mostrerebbe un buco proprio nella tabella di confronto.
@@ -194,17 +248,21 @@ export const corsi = [...definizioniStrumento, ...definizioniCollettive].map(cor
 		...dati,
 		prezzi: prezziCompleti ? dati.prezzi : null,
 		href: `/scuola/corsi/${corso.slug}`,
-		immagine:
-			corso.famiglia === 'collettivo'
-				? null
-				: `/assets/images/strumenti/${corso.slug}.webp`,
+		immagine: SLUG_CON_FOTO.has(corso.slug)
+			? `/assets/images/strumenti/${corso.slug}.webp`
+			: null,
 	};
 });
 
 export const corsiPerSlug = Object.fromEntries(corsi.map(c => [c.slug, c]));
 
-/** Corsi di strumento, con href e campi organizzativi. */
-export const corsiStrumento = corsi.filter(c => c.famiglia !== 'collettivo');
+/** Strumenti dell'organico della banda: sono quelli del grafico. */
+export const corsiStrumento = corsi.filter(c =>
+	['legni', 'ottoni', 'percussioni'].includes(c.famiglia)
+);
+
+/** Strumenti insegnati dalla scuola ma fuori dall'organico della banda. */
+export const corsiAltri = corsi.filter(c => c.famiglia === 'altri');
 
 /** Corsi non legati a uno strumento, con href e campi organizzativi. */
 export const corsiCollettivi = corsi.filter(c => c.famiglia === 'collettivo');
@@ -254,5 +312,6 @@ export const etichettaFamiglia = {
 	legni: 'Legni',
 	ottoni: 'Ottoni',
 	percussioni: 'Percussioni',
+	altri: 'Altri strumenti',
 	collettivo: 'Corso collettivo',
 };
