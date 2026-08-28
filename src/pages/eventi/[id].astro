@@ -199,15 +199,15 @@ const seo = {
         {iscrizione.stato === 'aperta' && (
           <div class="evento-dettaglio__iscrizione">
             <Button href={iscrizione.link} newTab>Iscriviti all’evento</Button>
-            <p class="evento-dettaglio__iscrizione-nota">
-              {iscrizione.scadenza
-                ? `Il modulo si apre su WindDoc. Iscrizioni entro ${format(
-                    iscrizione.scadenza,
-                    "d MMMM yyyy, HH:mm",
-                    { locale: it }
-                  )}.`
-                : 'Il modulo si apre su WindDoc.'}
-            </p>
+            {iscrizione.scadenza && (
+              <p class="evento-dettaglio__iscrizione-nota">
+                Iscrizioni entro {format(
+                  iscrizione.scadenza,
+                  "d MMMM yyyy, HH:mm",
+                  { locale: it }
+                )}.
+              </p>
+            )}
           </div>
         )}
 
