@@ -95,6 +95,22 @@ function quotaSintetica(corso) {
 	return `da ${formattaPrezzo(alMese(annuale))} al mese`;
 }
 
+/**
+ * L'organico raggruppato per famiglia. L'icona e' per famiglia e non per
+ * strumento: lucide non ha un clarinetto o una tuba, e ripetere la stessa
+ * notina venti volte sarebbe decorazione. Cosi' invece dice qualcosa.
+ */
+const FAMIGLIE = [
+	{ chiave: 'legni', etichetta: 'Legni', icona: 'lucide:wind' },
+	{ chiave: 'ottoni', etichetta: 'Ottoni', icona: 'lucide:megaphone' },
+	{ chiave: 'percussioni', etichetta: 'Percussioni', icona: 'lucide:drum' },
+];
+
+const famiglieStrumenti = FAMIGLIE.map(famiglia => ({
+	...famiglia,
+	corsi: corsiStrumento.filter(corso => corso.famiglia === famiglia.chiave),
+})).filter(famiglia => famiglia.corsi.length > 0);
+
 // Dati passati al modal: nessun campo inventato, i segnaposto arrivano cos\u00ec come sono.
 const instrumentData = Object.fromEntries(
 	sections.map(settore => {
@@ -174,6 +190,35 @@ const instrumentData = Object.fromEntries(
 			</div>
 		</section>
 
+		<!-- ELENCO DELL'ORGANICO: il grafico e' il modo bello di arrivarci, questo e'
+		     quello raggiungibile da tastiera, dai lettori di schermo e dai motori di
+		     ricerca. Sta subito sotto al grafico perche' e' la stessa informazione. -->
+		<section class="organico" aria-labelledby="organicoTitolo">
+			<h2 id="organicoTitolo">Tutti i corsi di strumento</h2>
+			<p class="organico__intro">
+				Gli strumenti dell’organico, famiglia per famiglia. Ognuno ha la sua
+				pagina, con insegnante, quota e come funziona il corso.
+			</p>
+
+			{
+				famiglieStrumenti.map(famiglia => (
+					<div class="organico__famiglia">
+						<h3 class="organico__nome">
+							<Icon name={famiglia.icona} width="20" height="20" aria-hidden="true" />
+							<span>{famiglia.etichetta}</span>
+						</h3>
+						<ul class="organico__lista">
+							{famiglia.corsi.map(corso => (
+								<li>
+									<a href={corso.href}>{corso.nome}</a>
+								</li>
+							))}
+						</ul>
+					</div>
+				))
+			}
+		</section>
+
 		<!-- STRUMENTI FUORI DALL'ORGANICO: insegnati dalla scuola, assenti dal grafico -->
 		<section class="altri" aria-labelledby="altriTitolo">
 			<h2 id="altriTitolo">Altri strumenti</h2>
@@ -211,21 +256,6 @@ const instrumentData = Object.fromEntries(
 						<li class="collettivi__voce">
 							<h3><a href={corso.href}>{corso.nome}</a></h3>
 							<p>{corso.descrizione}</p>
-						</li>
-					))
-				}
-			</ul>
-		</section>
-
-		<!-- ELENCO TESTUALE: il grafico è il modo bello di arrivarci, questo è quello
-		     raggiungibile da tastiera, dai lettori di schermo e dai motori di ricerca -->
-		<section class="elenco" aria-labelledby="elencoTitolo">
-			<h2 id="elencoTitolo">Tutti i corsi di strumento</h2>
-			<ul class="elenco__lista">
-				{
-					corsiStrumento.map(corso => (
-						<li>
-							<a href={corso.href}>{corso.nome}</a>
 						</li>
 					))
 				}
@@ -699,9 +729,6 @@ const instrumentData = Object.fromEntries(
 
 	/* CORSI COLLETTIVI + ELENCO */
 	.collettivi,
-	.elenco {
-		margin: var(--section-margin) auto 0;
-	}
 	.collettivi__intro {
 		color: var(--theme-muted);
 		margin-bottom: var(--space-lg);
@@ -739,19 +766,62 @@ const instrumentData = Object.fromEntries(
 		margin-bottom: 0;
 	}
 
-	.elenco__lista {
+	/* ORGANICO: l'elenco degli strumenti, raggruppato per famiglia */
+	.organico {
+		margin: var(--space-2xl) auto 0;
+	}
+	.organico__intro {
+		color: var(--theme-muted);
+		margin-bottom: var(--space-lg);
+	}
+
+	/*
+	  Una riga per famiglia: etichetta a sinistra, strumenti a destra. Con 9
+	  legni, 5 ottoni e 1 percussione, tre colonne affiancate darebbero blocchi
+	  di altezze molto diverse; a righe la sproporzione non si vede.
+	*/
+	.organico__famiglia {
+		display: grid;
+		grid-template-columns: minmax(0, 10rem) minmax(0, 1fr);
+		gap: var(--space-sm) var(--space-lg);
+		align-items: start;
+		padding: var(--space-md) 0;
+		border-top: 1px solid var(--theme-border);
+	}
+	.organico__famiglia:last-child {
+		border-bottom: 1px solid var(--theme-border);
+	}
+
+	.organico__nome {
+		display: flex;
+		align-items: center;
+		gap: var(--space-2xs);
+		margin: 0;
+		font-family: var(--theme-font-family-sans);
+		font-size: var(--font-size-xs);
+		font-weight: 600;
+		letter-spacing: var(--tracking-label);
+		text-transform: uppercase;
+		color: var(--theme-muted);
+	}
+	.organico__nome svg {
+		flex: none;
+		color: var(--theme-accent);
+	}
+
+	.organico__lista {
 		list-style: none;
-		margin: var(--space-md) 0 0;
+		margin: 0;
 		padding: 0;
 		max-width: none;
 		display: flex;
 		flex-wrap: wrap;
 		gap: var(--space-2xs) var(--space-xs);
 	}
-	.elenco__lista li {
+	.organico__lista li {
 		max-width: none;
 	}
-	.elenco__lista a {
+	.organico__lista a {
 		display: inline-block;
 		padding: 0.35rem var(--space-xs);
 		border: 1px solid var(--theme-border-strong);
@@ -762,9 +832,16 @@ const instrumentData = Object.fromEntries(
 		transition: background-color var(--theme-transition),
 			border-color var(--theme-transition);
 	}
-	.elenco__lista a:hover {
+	.organico__lista a:hover {
 		background-color: var(--theme-surface-1);
 		border-color: var(--theme-primary);
+	}
+
+	@media (max-width: 640px) {
+		.organico__famiglia {
+			grid-template-columns: minmax(0, 1fr);
+			gap: var(--space-2xs);
+		}
 	}
 
 	/* MODAL: audio, scheda, CTA */
