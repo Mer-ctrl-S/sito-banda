@@ -1,0 +1,61 @@
+---
+/**
+ * Sottile barra in cima alla finestra che mostra quanto si e' scorso della
+ * pagina. Pensata per le pagine lunghe (Chi siamo): per aggiungerla altrove
+ * basta importarla e metterla dentro <Layout>.
+ */
+---
+
+<div class="indicatore" aria-hidden="true">
+	<span class="indicatore__barra"></span>
+</div>
+
+<script>
+	const barra = document.querySelector('.indicatore__barra');
+
+	if (barra instanceof HTMLElement) {
+		let inCoda = false;
+
+		const aggiorna = () => {
+			inCoda = false;
+			const scorribile =
+				document.documentElement.scrollHeight - window.innerHeight;
+			// Pagina piu' corta della finestra: non c'e' progresso da mostrare.
+			const quota = scorribile > 0 ? window.scrollY / scorribile : 0;
+			barra.style.transform = `scaleX(${Math.min(Math.max(quota, 0), 1)})`;
+		};
+
+		// Lo scroll arriva a raffica: un solo aggiornamento per fotogramma.
+		const programma = () => {
+			if (inCoda) return;
+			inCoda = true;
+			requestAnimationFrame(aggiorna);
+		};
+
+		aggiorna();
+		window.addEventListener('scroll', programma, { passive: true });
+		window.addEventListener('resize', programma, { passive: true });
+	}
+</script>
+
+<style>
+	.indicatore {
+		position: fixed;
+		inset: 0 0 auto 0;
+		height: 3px;
+		/* Sopra l'header agganciato, sotto le finestre modali. */
+		z-index: calc(var(--z-sticky) + 1);
+		pointer-events: none;
+	}
+
+	.indicatore__barra {
+		display: block;
+		width: 100%;
+		height: 100%;
+		background-color: var(--theme-accent);
+		border-radius: 0 999px 999px 0;
+		/* scaleX invece della larghezza: non ricalcola il layout a ogni pixel. */
+		transform: scaleX(0);
+		transform-origin: left center;
+	}
+</style>

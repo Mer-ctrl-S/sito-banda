@@ -3,6 +3,7 @@ import { TextSection } from '@components/odyssey-theme';
 import Layout from '../../layouts/Page.astro';
 import HeroSection from '../../components/sections/heros/HeroSection.astro';
 import VerticalTimeline from '../../components/VerticalTimeline/VerticalTimeline.astro';
+import IndicatoreScorrimento from '../../components/core/IndicatoreScorrimento.astro';
 const seo = {
 	title: 'Chi siamo | Corpo Bandistico di Castelcovati',
 	description: 'La storia del Corpo Bandistico di Castelcovati: fondazione, concerti, progetti e traguardi anno per anno.',
@@ -206,6 +207,8 @@ const timelineItems = [
 ---
 
 <Layout {seo}>
+	<IndicatoreScorrimento />
+
 	<HeroSection>
 		<div slot="text-container">
 			<h1>Corpo Bandistico di Castelcovati</h1>
