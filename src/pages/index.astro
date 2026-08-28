@@ -1,6 +1,6 @@
 ---
 import { Icon } from 'astro-icon/components';
-import { AnnouncementBar, Button, CustomerQuoteSection, ThreeColumnTextSection, CtaCardSection } from '@components/odyssey-theme';
+import { Button, CustomerQuoteSection, ThreeColumnTextSection, CtaCardSection } from '@components/odyssey-theme';
 import Layout from '../layouts/Page.astro';
 import TextAndImageHero from '../components/sections/heros/TextAndImageHero.astro';
 import HeroSlider from '../components/sections/heros/HeroSlider.astro';
@@ -46,12 +46,6 @@ const heroImages = [
 	},
 ];
 ---
-
-<AnnouncementBar
-	text="Non perderti i nostri eventi. Visita il Blog!"
-	href="/eventi"
-	slot="announcement-bar"
-/>
 
 <Layout {seo}>
 	<TextAndImageHero reversed>

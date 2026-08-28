@@ -16,16 +16,33 @@ const {text, href, newTab} = Astro.props;
 
 <style>
 .announcement-banner__container {
-  padding: 0.5rem;
+  padding: var(--space-2xs) var(--space-sm);
   display: flex;
   flex-direction: column;
   align-items: center;
   background-color: var(--theme-primary);
   color: var(--theme-on-primary);
   position: relative;
-  z-index: 100;
+  z-index: var(--z-sticky);
+  /* Stesso raggio delle immagini e delle card. Solo gli angoli in basso:
+     la striscia tocca il bordo alto della finestra, e il footer usa lo
+     stesso trattamento specchiato. */
+  border-bottom-left-radius: var(--radius-lg);
+  border-bottom-right-radius: var(--radius-lg);
 }
 .announcement-banner__container p {
   margin: 0 auto;
+  max-width: none;
+  font-family: var(--theme-font-family-sans);
+  font-size: var(--font-size-sm);
+  text-align: center;
+}
+.announcement-banner__container a {
+  color: inherit;
+  text-decoration: none;
+}
+.announcement-banner__container a:hover {
+  text-decoration: underline;
+  text-underline-offset: 0.25em;
 }
 </style>

@@ -21,6 +21,13 @@ export default {
 	email: 'corpobandistico.castelcovati@gmail.com',
 	// Attestazione RUNTS richiesta, in attesa di riscontro.
 	runts: 'Attestazione in corso',
+	// Striscia sopra l'header, presente su ogni pagina. Metti `annuncio: null`
+	// per toglierla da tutto il sito.
+	annuncio: {
+		testo: 'Non perderti i nostri eventi. Scopri i prossimi appuntamenti!',
+		href: '/eventi',
+	},
+
 	enableThemeSwitcher: false,
 	showPlug: false, // Disable this if you want to remove the plug from the footer. (╯°□°)╯︵ ┻━┻
 };
