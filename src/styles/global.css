@@ -6,11 +6,13 @@ html {
 	scroll-padding-top: calc(var(--navbar-height) + 1rem);
 }
 
-html,
-body {
-	height: 100%;
-}
-
+/*
+  Niente `height: 100%` su html/body: fisserebbe l'altezza del body a una
+  schermata, e la position: sticky dell'header e' vincolata al proprio blocco
+  contenitore — finito il body, l'header viene spinto fuori a meta' pagina.
+  Per "pagina piena anche con poco contenuto" c'e' gia' `min-height: 100dvh`
+  in reset.css, che non mette un tetto.
+*/
 body {
 	max-width: 1920px;
 	margin: 0 auto;
