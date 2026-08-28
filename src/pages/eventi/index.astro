@@ -8,6 +8,7 @@ import Layout from '../../layouts/Page.astro';
 // della visita, non alla build. Un evento nuovo compare senza rideploy.
 export const prerender = false;
 import HeroSection from '../../components/sections/heros/HeroSection.astro';
+import TipoPartecipazione from '../../components/eventi/TipoPartecipazione.astro';
 
 import {
   WINDDOC_URL,
@@ -84,6 +85,8 @@ const eventiRaw = eventiLista.map((evento) => {
   const descrizioneHtml = evento.descrizione ?? '';
   const descrizioneTesto = stripHtml(descrizioneHtml);
   const luogo = evento.indirizzo ?? '';
+  // Radio "Iscrizione" della scheda evento WindDoc, decodificato dal componente.
+  const tipoIscrizione = evento.tipo_iscrizione_socio;
   const rawDate = evento.data_evento;
   const dateObj = rawDate ? new Date(rawDate) : null;
 
@@ -100,6 +103,7 @@ const eventiRaw = eventiLista.map((evento) => {
     descriptionHtml: descrizioneHtml,
     descriptionText: descrizioneTesto,
     place: luogo,
+    tipoIscrizione,
     date: dateObj,
     image,
     href: id ? `/eventi/${id}` : null,
@@ -182,6 +186,8 @@ const seo = {
                 <div class="evento-card__body">
                   <h3 class="evento-card__title">{evento.title}</h3>
 
+                  <TipoPartecipazione valore={evento.tipoIscrizione} />
+
                   {evento.date && (
                     <p class="evento-card__meta">
                       {format(
@@ -235,6 +241,8 @@ const seo = {
 
                 <div class="evento-card__body">
                   <h3 class="evento-card__title">{evento.title}</h3>
+
+                  <TipoPartecipazione valore={evento.tipoIscrizione} />
 
                   {evento.date && (
                     <p class="evento-card__meta">

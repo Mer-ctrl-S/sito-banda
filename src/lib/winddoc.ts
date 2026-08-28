@@ -46,3 +46,55 @@ export function toFormUrlEncoded(data: Record<string, any>): string {
 
 	return params.toString();
 }
+
+// --- Tipo di partecipazione (radio "Iscrizione" nella scheda evento WindDoc) ---
+//
+// WindDoc espone la scelta nel campo `tipo_iscrizione_socio`, numerato da 1
+// nell'ordine in cui le opzioni compaiono nel pannello. Da non confondere con
+// `iscrizione_evento`, che e' il menu a tendina accanto ("Attiva fino ad una
+// data specifica") e riguarda QUANDO le iscrizioni sono aperte, non CHI puo'
+// partecipare.
+//
+//   1  Riservato a soci con Iscrizione
+//   2  Libero senza iscrizione
+//   3  Libero con possibile iscrizione
+//   4  Solo per soci gia' iscritti all'associazione
+//
+// Gli eventi creati prima che l'impostazione esistesse riportano 0: in quel
+// caso non mostriamo niente, meglio il silenzio di un'etichetta inventata.
+export type TipoPartecipazione = {
+	/** Chi puo' partecipare. */
+	accesso: 'soci' | 'libero';
+	/** Etichetta pronta per l'accesso. */
+	etichettaAccesso: string;
+	/** true se per partecipare bisogna iscriversi all'evento. */
+	iscrizioneRichiesta: boolean;
+};
+
+const TIPI_PARTECIPAZIONE: Record<string, TipoPartecipazione> = {
+	'1': {
+		accesso: 'soci',
+		etichettaAccesso: 'Riservato ai soci',
+		iscrizioneRichiesta: true,
+	},
+	'2': {
+		accesso: 'libero',
+		etichettaAccesso: 'Partecipazione libera',
+		iscrizioneRichiesta: false,
+	},
+	'3': {
+		accesso: 'libero',
+		etichettaAccesso: 'Partecipazione libera',
+		iscrizioneRichiesta: true,
+	},
+	'4': {
+		accesso: 'soci',
+		etichettaAccesso: 'Riservato ai soci',
+		iscrizioneRichiesta: false,
+	},
+};
+
+export function tipoPartecipazione(valore: unknown): TipoPartecipazione | null {
+	if (valore === null || valore === undefined) return null;
+	return TIPI_PARTECIPAZIONE[String(valore).trim()] ?? null;
+}

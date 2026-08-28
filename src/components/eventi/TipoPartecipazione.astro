@@ -1,0 +1,67 @@
+---
+import { tipoPartecipazione } from '../../lib/winddoc';
+
+export interface Props {
+	/** Il valore grezzo di `tipo_iscrizione_socio` restituito da WindDoc. */
+	valore: unknown;
+	/** `sm` per le card in elenco, `md` per la pagina di dettaglio. */
+	dimensione?: 'sm' | 'md';
+}
+
+const { valore, dimensione = 'sm' } = Astro.props as Props;
+const tipo = tipoPartecipazione(valore);
+---
+
+{tipo && (
+	<ul class:list={['partecipazione', `partecipazione--${dimensione}`]}>
+		<li class:list={['partecipazione__tag', `partecipazione__tag--${tipo.accesso}`]}>
+			{tipo.etichettaAccesso}
+		</li>
+		{tipo.iscrizioneRichiesta && (
+			<li class="partecipazione__tag partecipazione__tag--iscrizione">
+				Iscrizione obbligatoria
+			</li>
+		)}
+	</ul>
+)}
+
+<style>
+	.partecipazione {
+		display: flex;
+		flex-wrap: wrap;
+		gap: var(--space-3xs);
+		margin: 0;
+		padding: 0;
+		list-style: none;
+	}
+
+	.partecipazione__tag {
+		display: inline-flex;
+		align-items: center;
+		border: 1px solid var(--theme-border);
+		border-radius: var(--radius-xs);
+		padding: 0.15em 0.55em;
+		font-family: var(--theme-font-family-sans);
+		font-size: 0.78rem;
+		line-height: 1.5;
+		letter-spacing: 0.02em;
+		color: var(--theme-on-surface-2);
+		white-space: nowrap;
+	}
+
+	.partecipazione--md .partecipazione__tag {
+		font-size: 0.85rem;
+	}
+
+	/* "Riservato ai soci" e' un limite all'accesso: e' l'informazione che il
+	   visitatore deve cogliere per prima, quindi e' l'unica che riempie. */
+	.partecipazione__tag--soci {
+		border-color: var(--theme-border-strong);
+		background-color: var(--theme-surface-2);
+	}
+
+	.partecipazione__tag--libero,
+	.partecipazione__tag--iscrizione {
+		background-color: transparent;
+	}
+</style>

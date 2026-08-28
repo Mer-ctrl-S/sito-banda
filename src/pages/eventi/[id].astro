@@ -2,6 +2,7 @@
 import Layout from '../../layouts/Page.astro';
 import { Container, Button } from '@components/odyssey-theme';
 import { format } from 'date-fns';
+import TipoPartecipazione from '../../components/eventi/TipoPartecipazione.astro';
 import it from 'date-fns/locale/it/index.js';
 import {
   WINDDOC_URL,
@@ -113,40 +114,20 @@ const image =
 
 console.log('[WindDoc dettaglio] image:', image, 'typeof image:', typeof image);
 
-// 🔎 informazioni su iscrizione e quota
-const iscrizioneEvento = eventoDettaglio.iscrizione_evento;  // es. "0", "1", "2"
-const quotaRaw = eventoDettaglio.quota;                      // stringa "0.0000", "15.0000", ecc.
-const tipoQuota = eventoDettaglio.tipo_quota;                // es. "0" o "1" (non usato ma tenuto per futuro)
+// Quota e tipo di partecipazione.
+//
+// Il tipo di partecipazione arriva da `tipo_iscrizione_socio` (il gruppo di
+// radio nella scheda evento) e viene decodificato dal componente. In
+// precedenza qui si leggeva `iscrizione_evento`, che e' un'altra cosa: dice
+// da quando a quando le iscrizioni sono aperte, non chi puo' partecipare.
+const tipoIscrizioneSocio = eventoDettaglio.tipo_iscrizione_socio;
 
+const quotaRaw = eventoDettaglio.quota; // stringa tipo "0.0000" o "15.0000"
 const quotaNumber = quotaRaw ? Number.parseFloat(quotaRaw) : 0;
-
-let tipoPartecipazione = 'Partecipazione libera';
-let dettaglioQuota = 'Evento gratuito';
-
-if (quotaNumber > 0) {
-  dettaglioQuota = `Quota di partecipazione: ${quotaNumber.toFixed(2)} €`;
-} else {
-  dettaglioQuota = 'Evento gratuito';
-}
-
-// Adatta questi testi ai significati reali di iscrizione_evento in WindDoc
-switch (iscrizioneEvento) {
-  case '0':
-    tipoPartecipazione = 'Riservato ai soci tesserati (senza iscrizione obbligatoria)';
-    break;
-  case '1':
-    tipoPartecipazione = 'Partecipazione libera (senza iscrizione obbligatoria)';
-    break;
-  case '2':
-    tipoPartecipazione = 'Partecipazione libera (Iscrizione obbligatoria)';
-    break;
-  case '3':
-    tipoPartecipazione = 'Riservato ai soci tesserati (iscrizione obbligatoria)';
-    break;
-  default:
-    tipoPartecipazione = 'Partecipazione libera';
-    break;
-}
+const dettaglioQuota =
+  quotaNumber > 0
+    ? `Quota di partecipazione: ${quotaNumber.toFixed(2)} €`
+    : 'Evento gratuito';
 
 const seo = {
   title: `${titolo} | Evento`,
@@ -205,9 +186,7 @@ const seo = {
       <div class="evento-dettaglio__content evento-dettaglio__tipo">
         <h2>Tipo di evento</h2>
 
-        <p class="evento-dettaglio__tipo-partecipazione">
-          {tipoPartecipazione}
-        </p>
+        <TipoPartecipazione valore={tipoIscrizioneSocio} dimensione="md" />
 
         <p class="evento-dettaglio__tipo-quota">
           {dettaglioQuota}
@@ -268,9 +247,12 @@ const seo = {
     background: var(--theme-surface-1);
   }
 
-  .evento-dettaglio__tipo-partecipazione,
+  .evento-dettaglio__tipo h2 {
+    margin: 0 0 var(--space-2xs);
+  }
+
   .evento-dettaglio__tipo-quota {
-    margin: 0.25rem 0;
+    margin: var(--space-2xs) 0 0;
     line-height: 1.5;
     font-size: 0.98rem;
   }
