@@ -15,7 +15,6 @@ import {
   TOKEN_APP,
   TOKEN_KEY,
   toFormUrlEncoded,
-  statoIscrizione,
 } from '../../lib/winddoc'; // 👈 percorso da src/pages/blog
 
 function stripHtml(html: string): string {
@@ -80,10 +79,6 @@ Astro.response.headers.set(
     : 'no-store'
 );
 
-// Un solo istante di riferimento per tutta la pagina: cosi' la divisione
-// futuri/passati e lo stato delle iscrizioni non possono discordare.
-const adesso = new Date();
-
 const eventiRaw = eventiLista.map((evento) => {
   const id = evento.id_associazione_evento;
   const titolo = evento.nome ?? 'Evento senza titolo';
@@ -94,7 +89,6 @@ const eventiRaw = eventiLista.map((evento) => {
   const tipoIscrizione = evento.tipo_iscrizione_socio;
   const rawDate = evento.data_evento;
   const dateObj = rawDate ? new Date(rawDate) : null;
-  const iscrizione = statoIscrizione(evento, dateObj, adesso);
 
   const image =
       evento.logo &&
@@ -110,14 +104,14 @@ const eventiRaw = eventiLista.map((evento) => {
     descriptionText: descrizioneTesto,
     place: luogo,
     tipoIscrizione,
-    iscrizione,
     date: dateObj,
     image,
     href: id ? `/eventi/${id}` : null,
   };
 });
 
-const now = adesso;
+// Filtra solo quelli con una data valida
+const now = new Date();
 
 const eventiFuturi = eventiRaw
   .filter((e) => e.date && e.date >= now)
@@ -213,18 +207,13 @@ const seo = {
                     </p>
                   )}
 
-                  <div class="evento-card__actions">
-                    {evento.iscrizione.stato === 'aperta' && (
-                      <Button href={evento.iscrizione.link} newTab>
-                        Iscriviti
-                      </Button>
-                    )}
-                    {evento.href && (
+                  {evento.href && (
+                    <div class="evento-card__actions">
                       <Button href={evento.href} outlined>
                         Dettagli
                       </Button>
-                    )}
-                  </div>
+                    </div>
+                  )}
                 </div>
               </div>
             </article>
@@ -352,9 +341,6 @@ const seo = {
 }
 
 .evento-card__actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-2xs);
   margin-top: auto;
 }
 
