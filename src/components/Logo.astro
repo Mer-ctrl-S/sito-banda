@@ -1,12 +1,42 @@
 ---
+import { Image } from 'astro:assets';
+import marchio from '../assets/logo-banda.png';
+
+// Nota: il marchio e' un disegno a tratto NERO. Header e footer sono entrambi
+// su fondo chiaro, quindi si vede. Se un giorno il footer tornasse verde
+// (e' il default del componente Footer, qui sovrascritto in Page.astro),
+// servira' un filtro `brightness(0) invert(1)` per portarlo a bianco.
 ---
 
-<p class="odyssey-logo">CB Castelcovati aps</p>
+<span class="logo">
+	<Image
+		class="logo__marchio"
+		src={marchio}
+		alt=""
+		widths={[48, 96, 144]}
+		sizes="48px"
+		loading="eager"
+	/>
+	<span class="logo__nome">CB Castelcovati aps</span>
+</span>
 
 <style>
-	.odyssey-logo {
+	.logo {
+		display: inline-flex;
+		align-items: center;
+		gap: var(--space-2xs);
 		width: fit-content;
-		margin: 0;
+		color: inherit;
+	}
+
+	.logo__marchio {
+		flex: none;
+		width: auto;
+		height: 3rem;
+		object-fit: contain;
+	}
+
+	.logo__nome {
 		font-family: var(--theme-font-family-serif);
 		font-size: var(--font-size-md);
 		font-weight: 600;
@@ -14,20 +44,22 @@
 		line-height: 1.1;
 		/* il nome non deve mai spezzarsi su piu' righe nell'header */
 		white-space: nowrap;
-		color: inherit;
 	}
+
 	@media (max-width: 600px) {
-		.odyssey-logo {
+		.logo__marchio {
+			height: 2rem;
+		}
+		.logo__nome {
 			font-size: var(--font-size-base);
 		}
 	}
 	@media (max-width: 380px) {
-		.odyssey-logo {
+		.logo__marchio {
+			height: 1.75rem;
+		}
+		.logo__nome {
 			font-size: var(--font-size-sm);
 		}
-	}
-	.odyssey-logo:hover {
-		text-decoration: underline;
-		cursor: pointer;
 	}
 </style>
