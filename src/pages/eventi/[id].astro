@@ -9,6 +9,7 @@ import {
   TOKEN_APP,
   TOKEN_KEY,
   toFormUrlEncoded,
+  statoIscrizione,
 } from '../../lib/winddoc';
 
 // Pagina generata a ogni richiesta: niente getStaticPaths, l'id arriva
@@ -122,6 +123,9 @@ console.log('[WindDoc dettaglio] image:', image, 'typeof image:', typeof image);
 // da quando a quando le iscrizioni sono aperte, non chi puo' partecipare.
 const tipoIscrizioneSocio = eventoDettaglio.tipo_iscrizione_socio;
 
+// Modulo d'iscrizione: solo su eventi futuri che lo richiedono davvero.
+const iscrizione = statoIscrizione(eventoDettaglio, dateObj, new Date());
+
 const quotaRaw = eventoDettaglio.quota; // stringa tipo "0.0000" o "15.0000"
 const quotaNumber = quotaRaw ? Number.parseFloat(quotaRaw) : 0;
 const dettaglioQuota =
@@ -191,6 +195,31 @@ const seo = {
         <p class="evento-dettaglio__tipo-quota">
           {dettaglioQuota}
         </p>
+
+        {iscrizione.stato === 'aperta' && (
+          <div class="evento-dettaglio__iscrizione">
+            <Button href={iscrizione.link} newTab>Iscriviti all’evento</Button>
+            <p class="evento-dettaglio__iscrizione-nota">
+              {iscrizione.scadenza
+                ? `Il modulo si apre su WindDoc. Iscrizioni entro ${format(
+                    iscrizione.scadenza,
+                    "d MMMM yyyy, HH:mm",
+                    { locale: it }
+                  )}.`
+                : 'Il modulo si apre su WindDoc.'}
+            </p>
+          </div>
+        )}
+
+        {iscrizione.stato === 'chiusa' && (
+          <p class="evento-dettaglio__iscrizione-nota">
+            Le iscrizioni si sono chiuse il {format(
+              iscrizione.scadenza,
+              "d MMMM yyyy",
+              { locale: it }
+            )}.
+          </p>
+        )}
       </div>
     </section>
   </Container>
@@ -249,6 +278,16 @@ const seo = {
 
   .evento-dettaglio__tipo h2 {
     margin: 0 0 var(--space-2xs);
+  }
+
+  .evento-dettaglio__iscrizione {
+    margin-top: var(--space-sm);
+  }
+
+  .evento-dettaglio__iscrizione-nota {
+    margin: var(--space-2xs) 0 0;
+    font-size: 0.9rem;
+    color: var(--theme-on-surface-2);
   }
 
   .evento-dettaglio__tipo-quota {

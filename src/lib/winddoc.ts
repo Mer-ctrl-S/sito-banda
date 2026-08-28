@@ -49,19 +49,21 @@ export function toFormUrlEncoded(data: Record<string, any>): string {
 
 // --- Tipo di partecipazione (radio "Iscrizione" nella scheda evento WindDoc) ---
 //
-// WindDoc espone la scelta nel campo `tipo_iscrizione_socio`, numerato da 1
+// WindDoc espone la scelta nel campo `tipo_iscrizione_socio`, numerato da 0
 // nell'ordine in cui le opzioni compaiono nel pannello. Da non confondere con
 // `iscrizione_evento`, che e' il menu a tendina accanto ("Attiva fino ad una
 // data specifica") e riguarda QUANDO le iscrizioni sono aperte, non CHI puo'
 // partecipare.
 //
-//   1  Riservato a soci con Iscrizione
-//   2  Libero senza iscrizione
-//   3  Libero con possibile iscrizione
-//   4  Solo per soci gia' iscritti all'associazione
+//   0  Riservato a soci con Iscrizione
+//   1  Libero senza iscrizione
+//   2  Libero con possibile iscrizione
+//   3  Solo per soci gia' iscritti all'associazione
 //
-// Gli eventi creati prima che l'impostazione esistesse riportano 0: in quel
-// caso non mostriamo niente, meglio il silenzio di un'etichetta inventata.
+// Attenzione: 0 e' anche il valore che hanno gli eventi in cui il radio non e'
+// mai stato toccato, quindi non e' distinguibile da una scelta esplicita della
+// prima voce. Se un evento pubblico si presenta come riservato ai soci, la
+// causa e' questa: basta impostare il radio in WindDoc.
 export type TipoPartecipazione = {
 	/** Chi puo' partecipare. */
 	accesso: 'soci' | 'libero';
@@ -72,22 +74,22 @@ export type TipoPartecipazione = {
 };
 
 const TIPI_PARTECIPAZIONE: Record<string, TipoPartecipazione> = {
-	'1': {
+	'0': {
 		accesso: 'soci',
 		etichettaAccesso: 'Riservato ai soci',
 		iscrizioneRichiesta: true,
 	},
-	'2': {
+	'1': {
 		accesso: 'libero',
 		etichettaAccesso: 'Partecipazione libera',
 		iscrizioneRichiesta: false,
 	},
-	'3': {
+	'2': {
 		accesso: 'libero',
 		etichettaAccesso: 'Partecipazione libera',
 		iscrizioneRichiesta: true,
 	},
-	'4': {
+	'3': {
 		accesso: 'soci',
 		etichettaAccesso: 'Riservato ai soci',
 		iscrizioneRichiesta: false,
@@ -97,4 +99,58 @@ const TIPI_PARTECIPAZIONE: Record<string, TipoPartecipazione> = {
 export function tipoPartecipazione(valore: unknown): TipoPartecipazione | null {
 	if (valore === null || valore === undefined) return null;
 	return TIPI_PARTECIPAZIONE[String(valore).trim()] ?? null;
+}
+
+// --- Iscrizione all'evento ---
+//
+// `link_form` e' il link pubblico al modulo d'iscrizione, diverso per ogni
+// evento (verificato: risponde 200 senza login e si intitola "Iscrizione
+// evento"). Lo espongono sia la lista sia il dettaglio.
+//
+// `data_iscrizione_evento` e' il termine ultimo, quando impostato.
+export type StatoIscrizione =
+	| { stato: 'aperta'; link: string; scadenza: Date | null }
+	| { stato: 'chiusa'; scadenza: Date }
+	| { stato: 'assente' };
+
+/**
+ * Decide se proporre il modulo d'iscrizione per un evento.
+ *
+ * Volutamente prudente: propone il link solo se l'evento e' futuro, se il tipo
+ * di partecipazione dice che l'iscrizione serve, e se WindDoc ha davvero dato
+ * un link. Non prova a interpretare `iscrizione_evento`, i cui valori non sono
+ * documentati: l'unico vincolo temporale che applica e' la scadenza esplicita.
+ */
+export function statoIscrizione(
+	evento: {
+		link_form?: unknown;
+		data_iscrizione_evento?: unknown;
+		tipo_iscrizione_socio?: unknown;
+	},
+	dataEvento: Date | null,
+	adesso: Date
+): StatoIscrizione {
+	const tipo = tipoPartecipazione(evento.tipo_iscrizione_socio);
+	if (!tipo?.iscrizioneRichiesta) return { stato: 'assente' };
+
+	// Su un evento gia' passato non ha senso proporre l'iscrizione.
+	if (!dataEvento || dataEvento < adesso) return { stato: 'assente' };
+
+	const link =
+		typeof evento.link_form === 'string' ? evento.link_form.trim() : '';
+	if (!link.startsWith('https://')) return { stato: 'assente' };
+
+	const grezza = evento.data_iscrizione_evento;
+	const scadenza =
+		typeof grezza === 'string' && grezza.trim()
+			? new Date(grezza.replace(' ', 'T'))
+			: null;
+	const scadenzaValida =
+		scadenza && !Number.isNaN(scadenza.getTime()) ? scadenza : null;
+
+	if (scadenzaValida && scadenzaValida < adesso) {
+		return { stato: 'chiusa', scadenza: scadenzaValida };
+	}
+
+	return { stato: 'aperta', link, scadenza: scadenzaValida };
 }
