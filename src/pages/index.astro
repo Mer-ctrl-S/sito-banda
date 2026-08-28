@@ -1,6 +1,11 @@
 ---
 import { Icon } from 'astro-icon/components';
-import { Button, CustomerQuoteSection, ThreeColumnTextSection, CtaCardSection } from '@components/odyssey-theme';
+import {
+	Button,
+	CustomerQuoteSection,
+	ThreeColumnTextSection,
+	CtaCardSection,
+} from '@components/odyssey-theme';
 import Layout from '../layouts/Page.astro';
 import TextAndImageHero from '../components/sections/heros/TextAndImageHero.astro';
 import HeroSlider from '../components/sections/heros/HeroSlider.astro';
@@ -81,7 +86,8 @@ const heroImages = [
 				c'è posto anche per te.
 			</p>
 		</div>
-		<Button slot="column-1-cta" href="/scuola">Scopri la scuola</Button>
+		<Button slot="column-1-cta" href="/scuola" outlined>Scopri la scuola</Button
+		>
 
 		<div slot="column-2-body">
 			<h2>Come?</h2>
@@ -103,7 +109,9 @@ const heroImages = [
 			<h2>Cosa mi serve?</h2>
 			<p>Tanta voglia di imparare qualcosa di nuovo, ma senza stress!</p>
 		</div>
-		<Button slot="column-3-cta" href="/scuola/regolamento">Maggiori informazioni</Button>
+		<Button slot="column-3-cta" href="/scuola/regolamento" outlined>
+			Maggiori informazioni
+		</Button>
 	</ThreeColumnTextSection>
 
 	<CtaCardSection

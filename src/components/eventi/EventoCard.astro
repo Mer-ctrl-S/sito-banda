@@ -15,9 +15,15 @@ export interface Props {
 		href?: string | null;
 		tipoIscrizione?: unknown;
 	};
+	/**
+	 * Evento ancora da venire. Ne cambia il peso del pulsante: pieno per i
+	 * prossimi, dove aprire la scheda e' l'azione che ci si aspetta; contornato
+	 * per quelli passati, che sono archivio da consultare.
+	 */
+	futuro?: boolean;
 }
 
-const { evento } = Astro.props as Props;
+const { evento, futuro = false } = Astro.props as Props;
 
 // Il riquadro dei tag occupa una riga della griglia: se non c'e' nessun tag da
 // mostrare non va reso affatto, altrimenti lascia il proprio margine a vuoto.
@@ -62,7 +68,7 @@ const descrizione =
 
 	{evento.href && (
 		<div class="evento-card__actions">
-			<Button href={evento.href} outlined>Dettagli</Button>
+			<Button href={evento.href} outlined={!futuro}>Dettagli</Button>
 		</div>
 	)}
 </article>
