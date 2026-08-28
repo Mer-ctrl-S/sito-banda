@@ -1,0 +1,181 @@
+---
+import { format } from 'date-fns';
+import it from 'date-fns/locale/it/index.js';
+import { Button } from '@components/odyssey-theme';
+import TipoPartecipazione from './TipoPartecipazione.astro';
+import { tipoPartecipazione } from '../../lib/winddoc';
+
+export interface Props {
+	evento: {
+		title: string;
+		descriptionText?: string;
+		place?: string;
+		date: Date | null;
+		image?: string | null;
+		href?: string | null;
+		tipoIscrizione?: unknown;
+	};
+}
+
+const { evento } = Astro.props as Props;
+
+// Il riquadro dei tag occupa una riga della griglia: se non c'e' nessun tag da
+// mostrare non va reso affatto, altrimenti lascia il proprio margine a vuoto.
+const haTipo = Boolean(tipoPartecipazione(evento.tipoIscrizione));
+
+const descrizione =
+	evento.descriptionText && evento.descriptionText.length > 200
+		? evento.descriptionText.slice(0, 200) + '…'
+		: evento.descriptionText;
+---
+
+<article
+	class:list={['evento-card', !evento.image && 'evento-card--senza-media']}
+>
+	<h3 class="evento-card__title">{evento.title}</h3>
+
+	{haTipo && (
+		<div class="evento-card__tipo">
+			<TipoPartecipazione valore={evento.tipoIscrizione} />
+		</div>
+	)}
+
+	{evento.date && (
+		<p class="evento-card__meta">
+			{format(evento.date, 'EEEE d MMMM yyyy', { locale: it })}
+			{evento.place && ` · ${evento.place}`}
+		</p>
+	)}
+
+	{evento.image && (
+		<div class="evento-card__media">
+			<img
+				src={evento.image}
+				alt={evento.title}
+				loading="lazy"
+				decoding="async"
+			/>
+		</div>
+	)}
+
+	{descrizione && <p class="evento-card__description">{descrizione}</p>}
+
+	{evento.href && (
+		<div class="evento-card__actions">
+			<Button href={evento.href} outlined>Dettagli</Button>
+		</div>
+	)}
+</article>
+
+<style>
+	/*
+	  Una griglia sola con aree nominate. Serve perche' l'immagine deve stare a
+	  destra di TUTTO il testo su schermo largo, e invece infilarsi fra la data e
+	  la descrizione sul telefono: con due contenitori annidati una delle due
+	  disposizioni sarebbe impossibile senza duplicare il markup.
+
+	  row-gap: 0 di proposito. Le righe vuote (un evento senza tag, senza
+	  descrizione...) esistono comunque nella griglia, e un row-gap lascerebbe
+	  la loro spaziatura a vuoto. La distanza verticale la mettono i margini
+	  dei singoli elementi, che spariscono insieme a loro.
+	*/
+	.evento-card {
+		display: grid;
+		grid-template-columns: minmax(0, 1fr) minmax(0, 200px);
+		grid-template-rows: auto auto auto 1fr auto;
+		grid-template-areas:
+			'titolo media'
+			'tipo   media'
+			'meta   media'
+			'testo  media'
+			'azioni media';
+		column-gap: var(--space-md);
+		row-gap: 0;
+		border-radius: var(--radius-lg);
+		background: var(--theme-surface-1);
+		box-shadow: var(--theme-elevation-1);
+		border: 1px solid var(--theme-border);
+		padding: var(--blocco-padding);
+		margin: 0 0 1.5rem;
+	}
+
+	/* Senza immagine la seconda colonna resterebbe riservata e vuota. */
+	.evento-card--senza-media {
+		grid-template-columns: minmax(0, 1fr);
+		grid-template-areas:
+			'titolo'
+			'tipo'
+			'meta'
+			'testo'
+			'azioni';
+	}
+
+	.evento-card__title {
+		grid-area: titolo;
+		margin: 0 0 var(--space-2xs);
+	}
+
+	.evento-card__tipo {
+		grid-area: tipo;
+		margin-bottom: var(--space-2xs);
+	}
+
+	.evento-card__meta {
+		grid-area: meta;
+		margin: 0 0 var(--space-2xs);
+		font-size: 0.95rem;
+		color: var(--theme-on-surface-2);
+	}
+
+	.evento-card__media {
+		grid-area: media;
+		align-self: start;
+		border-radius: var(--radius-lg);
+		overflow: hidden;
+	}
+
+	.evento-card__media img {
+		display: block;
+		width: 100%;
+		height: 180px;
+		object-fit: cover;
+	}
+
+	.evento-card__description {
+		grid-area: testo;
+		margin: 0 0 var(--space-sm);
+	}
+
+	.evento-card__actions {
+		grid-area: azioni;
+		align-self: end;
+	}
+
+	@media (max-width: 700px) {
+		/*
+		  Una colonna, con l'immagine fra la data e la descrizione. Vale anche per
+		  la variante senza immagine: quella riga resta semplicemente vuota, e con
+		  row-gap 0 non occupa spazio.
+		*/
+		.evento-card,
+		.evento-card--senza-media {
+			grid-template-columns: minmax(0, 1fr);
+			grid-template-rows: auto auto auto auto auto auto;
+			grid-template-areas:
+				'titolo'
+				'tipo'
+				'meta'
+				'media'
+				'testo'
+				'azioni';
+		}
+
+		.evento-card__media {
+			margin-bottom: var(--space-sm);
+		}
+
+		.evento-card__media img {
+			height: auto;
+		}
+	}
+</style>

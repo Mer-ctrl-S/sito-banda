@@ -1,21 +1,19 @@
 ---
-import { format, isBefore } from 'date-fns';
-import it from 'date-fns/locale/it/index.js';
-import { Container, Button } from '@components/odyssey-theme';
+import { Container } from '@components/odyssey-theme';
 import Layout from '../../layouts/Page.astro';
 
 // Pagina generata a ogni richiesta: gli eventi arrivano da WindDoc al momento
 // della visita, non alla build. Un evento nuovo compare senza rideploy.
 export const prerender = false;
 import HeroSection from '../../components/sections/heros/HeroSection.astro';
-import TipoPartecipazione from '../../components/eventi/TipoPartecipazione.astro';
+import EventoCard from '../../components/eventi/EventoCard.astro';
 
 import {
   WINDDOC_URL,
   TOKEN_APP,
   TOKEN_KEY,
   toFormUrlEncoded,
-} from '../../lib/winddoc'; // 👈 percorso da src/pages/blog
+} from '../../lib/winddoc';
 
 function stripHtml(html: string): string {
   if (!html) return '';
@@ -170,53 +168,7 @@ const seo = {
           <h2>Prossimi eventi</h2>
 
           {eventiFuturi.map((evento) => (
-            <article class="evento-card">
-              <div class="evento-card__inner">
-                {evento.image && (
-                  <div class="evento-card__media">
-                    <img
-                      src={evento.image}
-                      alt={evento.title}
-                      loading="lazy"
-                      decoding="async"
-                    />
-                  </div>
-                )}
-
-                <div class="evento-card__body">
-                  <h3 class="evento-card__title">{evento.title}</h3>
-
-                  <TipoPartecipazione valore={evento.tipoIscrizione} />
-
-                  {evento.date && (
-                    <p class="evento-card__meta">
-                      {format(
-                        evento.date,
-                        "EEEE d MMMM yyyy",
-                        { locale: it }
-                      )}
-                      {evento.place && ` · ${evento.place}`}
-                    </p>
-                  )}
-
-                  {evento.descriptionText && (
-                    <p class="evento-card__description">
-                      {evento.descriptionText.length > 200
-                        ? evento.descriptionText.slice(0, 200) + '…'
-                        : evento.descriptionText}
-                    </p>
-                  )}
-
-                  {evento.href && (
-                    <div class="evento-card__actions">
-                      <Button href={evento.href} outlined>
-                        Dettagli
-                      </Button>
-                    </div>
-                  )}
-                </div>
-              </div>
-            </article>
+            <EventoCard {evento} />
           ))}
         </>
       )}
@@ -226,53 +178,7 @@ const seo = {
           <h2>Eventi passati</h2>
 
           {eventiPassati.map((evento) => (
-            <article class="evento-card">
-              <div class="evento-card__inner">
-                {evento.image && (
-                  <div class="evento-card__media">
-                    <img
-                      src={evento.image}
-                      alt={evento.title}
-                      loading="lazy"
-                      decoding="async"
-                    />
-                  </div>
-                )}
-
-                <div class="evento-card__body">
-                  <h3 class="evento-card__title">{evento.title}</h3>
-
-                  <TipoPartecipazione valore={evento.tipoIscrizione} />
-
-                  {evento.date && (
-                    <p class="evento-card__meta">
-                      {format(
-                        evento.date,
-                        "EEEE d MMMM yyyy",
-                        { locale: it }
-                      )}
-                      {evento.place && ` · ${evento.place}`}
-                    </p>
-                  )}
-
-                  {evento.descriptionText && (
-                    <p class="evento-card__description">
-                      {evento.descriptionText.length > 200
-                        ? evento.descriptionText.slice(0, 200) + '…'
-                        : evento.descriptionText}
-                    </p>
-                  )}
-
-                  {evento.href && (
-                    <div class="evento-card__actions">
-                      <Button href={evento.href} outlined>
-                        Dettagli
-                      </Button>
-                    </div>
-                  )}
-                </div>
-              </div>
-            </article>
+            <EventoCard {evento} />
           ))}
         </>
       )}
@@ -287,87 +193,5 @@ const seo = {
   background: var(--theme-surface-1);
   border-radius: var(--nota-radius);
   max-width: none;
-}
-
-.evento-card {
-  border-radius: var(--radius-lg);
-  background: var(--theme-surface-1);
-  box-shadow: var(--theme-elevation-1);
-  padding: var(--blocco-padding);
-  margin: 0 0 1.5rem;
-}
-
-.evento-card__inner {
-  display: flex;
-  gap: var(--space-md);
-}
-
-/* colonna immagine */
-.evento-card__media {
-  flex: 0 0 180px;
-  max-width: 180px;
-  border-radius: var(--radius-lg);
-  overflow: hidden;
-  align-self: flex-start;
-}
-
-.evento-card__media img {
-  display: block;
-  width: 100%;
-  height: 180px;
-  object-fit: cover;  /* usa contain se vuoi l'immagine intera */
-}
-
-/* colonna testo */
-.evento-card__body {
-  flex: 1 1 auto;
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2xs);
-}
-
-.evento-card__title {
-  margin: 0;
-}
-
-.evento-card__meta {
-  font-size: 0.95rem;
-  color: var(--theme-on-surface-2);
-  margin: 0;
-}
-
-.evento-card__description {
-  margin: 0.25rem 0 var(--space-xs);
-}
-
-.evento-card__actions {
-  margin-top: auto;
-}
-
-/* Responsive */
-@media (max-width: 700px) {
-  .evento-card__inner {
-    flex-direction: column;
-  }
-
-  .evento-card__media {
-    flex: 0 0 auto;
-    max-width: 100%;
-  }
-
-  .evento-card__media img {
-    width: 100%;
-    height: auto;
-    object-fit: contain;
-  }
-}
-
-.evento-card {
-  border-radius: var(--radius-lg);
-  background: var(--theme-surface-1);       /* 👈 livello diverso dallo sfondo */
-  box-shadow: var(--theme-elevation-1);
-  padding: var(--blocco-padding);
-  margin: 0 0 1.5rem;
-  border: 1px solid var(--theme-border);    /* leggero bordo per staccare */
 }
 </style>
