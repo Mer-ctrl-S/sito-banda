@@ -89,7 +89,16 @@ const isCurrent = (slug) => {
 										href={navItem.slug}
 										aria-current={isCurrent(navItem.slug) ? 'page' : undefined}
 									>
-										{navItem.title}
+										{navItem.icona && (
+											<Icon
+												class="nav-icona"
+												name={navItem.icona}
+												width="22"
+												height="22"
+												aria-hidden="true"
+											/>
+										)}
+										<span>{navItem.title}</span>
 									</a>
 								</li>
 							))}
@@ -189,6 +198,12 @@ const isCurrent = (slug) => {
 	nav ul li {
 		max-width: none;
 	}
+	/* Nella barra del desktop le icone sarebbero rumore: compaiono solo nel
+	   menu a tutto schermo del telefono. */
+	.nav-icona {
+		display: none;
+	}
+
 	nav ul li a {
 		position: relative;
 		display: block;
@@ -245,15 +260,25 @@ const isCurrent = (slug) => {
 		header[mobile-menu-open] .header-nav__container {
 			display: flex;
 		}
+		/* stretch, non center: cosi' le voci sono larghe uguali e le icone
+		   formano una colonna invece di sfalsarsi seguendo il testo. */
 		header[mobile-menu-open] nav ul {
-			align-items: center;
+			align-items: stretch;
 			flex-direction: column;
 			gap: var(--space-md);
 		}
 		header[mobile-menu-open] nav ul li a {
+			display: flex;
+			align-items: center;
+			gap: var(--space-sm);
 			font-family: var(--theme-font-family-serif);
 			font-size: var(--font-size-lg);
 			font-weight: 600;
+		}
+		header[mobile-menu-open] .nav-icona {
+			display: block;
+			flex: none;
+			color: var(--theme-accent);
 		}
 	}
 
