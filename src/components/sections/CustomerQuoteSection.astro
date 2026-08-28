@@ -4,8 +4,8 @@ import Container from '../core/Container.astro';
 const { quoteText, customerName } = Astro.props;
 ---
 
-<section class="customer-quote__section">
-	<Container>
+<Container>
+	<section class="customer-quote__section">
 		<figure class="customer-quote__figure">
 			<span class="customer-quote__mark" aria-hidden="true">&ldquo;</span>
 			<blockquote data-quote-text>{quoteText}</blockquote>
@@ -14,17 +14,24 @@ const { quoteText, customerName } = Astro.props;
 				<span data-quote-name>{customerName}</span>
 			</figcaption>
 		</figure>
-	</Container>
-</section>
+	</section>
+</Container>
 
 <style>
 	/*
 	  Prima: margine calc(--section-margin * 2), che con la scala fluida
 	  diventava oltre 300px sopra e sotto e apriva un vuoto nella pagina.
 	*/
+	/*
+	  Il <Container> sta FUORI dalla sezione, come in CtaCardSection e
+	  ThreeColumnTextSection. Se sta dentro, la card colorata arriva ai bordi
+	  dello schermo mentre tutto il resto della pagina e' rientrato, e da
+	  telefono la differenza si vede eccome. Il rientro laterale del testo ora
+	  lo mette la card stessa.
+	*/
 	.customer-quote__section {
 		margin: var(--section-margin) auto;
-		padding: clamp(2.5rem, 6vw, 5rem) 0;
+		padding: clamp(2.5rem, 6vw, 5rem) clamp(1.25rem, 4vw, 3rem);
 		background-color: var(--theme-surface-1);
 		border-radius: var(--radius-lg);
 	}
@@ -84,5 +91,23 @@ const { quoteText, customerName } = Astro.props;
 		height: 1px;
 		flex: none;
 		background-color: var(--theme-accent);
+	}
+
+	/*
+	  Su schermo stretto il segno di apertura passa SOPRA il testo invece che
+	  al suo fianco. Ora che la card e' rientrata come le altre sezioni, tenerlo
+	  di lato costerebbe altri 32px di gronda e la citazione, che e' un serif
+	  grande, andrebbe a capo ogni tre parole.
+	*/
+	@media (max-width: 640px) {
+		.customer-quote__figure {
+			padding-left: 0;
+			padding-top: 2.6rem;
+		}
+
+		.customer-quote__mark {
+			top: 0;
+			font-size: 3.5rem;
+		}
 	}
 </style>
