@@ -14,7 +14,13 @@ export interface Props {
 const title = Astro.props.title || settings.title;
 const description = Astro.props.description || settings.description;
 const canonicalURL = Astro.props.canonicalURL || new URL(Astro.url.pathname, Astro.site);
-const image = new URL(Astro.props.image || './social.png', Astro.site);
+// Anteprima mostrata da WhatsApp, Facebook, Telegram... Era rimasta
+// l'immagine promozionale del tema Odyssey, che e' quella che comparve
+// incollando il link. Ora e' una foto della banda, 1200x630.
+const image = new URL(
+	Astro.props.image || './assets/social/anteprima.jpg',
+	Astro.site
+);
 
 // Vedi astro.config.mjs: si attiva con SITE_INDEXABLE=true fra le variabili
 // di build. Il meta noindex vale anche se qualcuno linka la pagina da fuori.
@@ -39,6 +45,15 @@ const indicizzabile = import.meta.env.SITE_INDEXABLE === 'true';
 <meta property="og:title" content={title} />
 <meta property="og:description" content={description} />
 <meta property="og:image" content={image} />
+<meta property="og:image:type" content="image/jpeg" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta
+	property="og:image:alt"
+	content="Il Corpo Bandistico di Castelcovati al completo, sul palco"
+/>
+<meta property="og:site_name" content={settings.name} />
+<meta property="og:locale" content="it_IT" />
 
 <!-- Twitter -->
 <meta property="twitter:card" content="summary_large_image" />
