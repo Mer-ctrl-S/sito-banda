@@ -19,6 +19,7 @@
 		"@astrojs/sitemap": "^3.7.2",
 		"@astrojs/vercel": "^10.0.8",
 		"@iconify-json/ic": "^1.1.17",
+		"@iconify-json/lucide": "^1.2.126",
 		"@iconify-json/mdi": "^1.1.64",
 		"@webcomponents/template-shadowroot": "^0.2.1",
 		"astro": "^6.0.0",

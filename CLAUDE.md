@@ -56,7 +56,7 @@ object and the define silently wins, which broke this flag once already.
 
 **Stack:** Astro 6 (static output), Tailwind CSS 4 via `@tailwindcss/vite`,
 daisyUI 5, Lit for web components (`@astrojs/lit`), MDX, `astro-icon` (Iconify
-`ic` + `mdi` sets), `@astrojs/sitemap`.
+`ic` + `mdi` + `lucide` sets), `@astrojs/sitemap`.
 
 **Layout nesting:** `Base.astro` (html shell, `<BaseHead>`, named slots for
 announcement-bar / header / footer) → `Page.astro` (wires in `Header` with
