@@ -18,26 +18,21 @@ const heroImages = [
   },
 ];
 
-// Per ora metto un array statico di esempio.
-// In seguito puoi caricarlo da JSON/API o da file CSV.
-const contributiPubblici = [
-  {
-    anno: 2024,
-    enteErogante: 'Comune di Castelcovati',
-    causale: 'Contributo annuale attività musicale',
-    importo: 3000.0,
-    dataIncasso: '2024-03-15',
-    estremiAtto: 'Delibera n. 12 del 10/03/2024',
-  },
-  {
-    anno: 2024,
-    enteErogante: 'Regione Lombardia',
-    causale: 'Bando cultura per bande musicali',
-    importo: 5000.0,
-    dataIncasso: '2024-07-20',
-    estremiAtto: 'Decreto n. 1234 del 30/06/2024',
-  },
-];
+// Elenco dei contributi pubblici da pubblicare.
+// I dati reali verranno inseriti in seguito: lasciare l'array vuoto finché
+// non sono disponibili (la tabella mostra un avviso al posto delle righe).
+// In seguito si può caricarlo da JSON/API o da file CSV.
+//
+// Struttura di ogni riga (esempio commentato come modello):
+// {
+//   anno: 2024,
+//   enteErogante: 'Comune di Castelcovati',
+//   causale: 'Contributo annuale attività musicale',
+//   importo: 3000.0,
+//   dataIncasso: '2024-03-15',
+//   estremiAtto: 'Delibera n. 12 del 10/03/2024',
+// },
+const contributiPubblici = [];
 ---
 
 <Layout {seo}>
@@ -85,23 +80,31 @@ const contributiPubblici = [
             </tr>
           </thead>
           <tbody>
-            {contributiPubblici.map((riga) => (
+            {contributiPubblici.length === 0 ? (
               <tr>
-                <td>{riga.anno}</td>
-                <td>{riga.enteErogante}</td>
-                <td>{riga.causale}</td>
-                <td>
-                  {riga.importo.toLocaleString('it-IT', {
-                    style: 'currency',
-                    currency: 'EUR',
-                  })}
+                <td colspan="6" class="trasparenza__empty">
+                  Dati in fase di inserimento.
                 </td>
-                <td>
-                  {new Date(riga.dataIncasso).toLocaleDateString('it-IT')}
-                </td>
-                <td>{riga.estremiAtto}</td>
               </tr>
-            ))}
+            ) : (
+              contributiPubblici.map((riga) => (
+                <tr>
+                  <td>{riga.anno}</td>
+                  <td>{riga.enteErogante}</td>
+                  <td>{riga.causale}</td>
+                  <td>
+                    {riga.importo.toLocaleString('it-IT', {
+                      style: 'currency',
+                      currency: 'EUR',
+                    })}
+                  </td>
+                  <td>
+                    {new Date(riga.dataIncasso).toLocaleDateString('it-IT')}
+                  </td>
+                  <td>{riga.estremiAtto}</td>
+                </tr>
+              ))
+            )}
           </tbody>
         </table>
       </div>
@@ -166,6 +169,12 @@ const contributiPubblici = [
 
   .trasparenza__table tbody tr:nth-child(even) {
     background: var(--theme-surface-1);
+  }
+
+  .trasparenza__empty {
+    text-align: center;
+    font-style: italic;
+    color: var(--theme-on-surface-2);
   }
 
   .trasparenza__note {
