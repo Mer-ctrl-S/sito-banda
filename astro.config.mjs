@@ -20,16 +20,14 @@ const dominioProduzioneVercel = process.env.VERCEL_PROJECT_PRODUCTION_URL;
 
 /*
   Dominio ufficiale dell'associazione, dal regolamento del 1 settembre 2025.
-  Lasciato commentato: c'è già un altro deploy attivo su questo indirizzo e
-  attivarlo qui farebbe dichiarare a questo sito di essere quello ufficiale
-  (canonical, Open Graph, sitemap). Togli il commento quando questo sito
-  prende il posto dell'altro.
+  Questo sito prende il posto del vecchio deploy su questo indirizzo, quindi
+  può dichiararsi canonico (canonical, Open Graph, sitemap).
 */
-// const DOMINIO_UFFICIALE = 'https://www.bandacastelcovati.it';
+const DOMINIO_UFFICIALE = 'https://www.bandacastelcovati.it';
 
 const site =
 	process.env.SITE_URL ||
-	// DOMINIO_UFFICIALE ||
+	DOMINIO_UFFICIALE ||
 	(dominioProduzioneVercel ? `https://${dominioProduzioneVercel}` : null) ||
 	'https://example.com';
 
