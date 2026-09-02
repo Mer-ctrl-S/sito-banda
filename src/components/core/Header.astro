@@ -241,6 +241,26 @@ const isCurrent = (slug) => {
 	}
 
 	@media (max-width: 600px) {
+		/* Sul telefono la colonna centrale della griglia (la nav) e' un overlay
+		   position: fixed: lasciata nella griglia sprecava due gap e spingeva il
+		   nome del sito sotto il pulsante "Area soci". Qui torno a un flex a due
+		   voci e lascio che il logo si stringa. */
+		header.header--right {
+			display: flex;
+			gap: var(--space-xs);
+		}
+		.header-logo-menu__container {
+			min-width: 0;
+			flex: 1 1 auto;
+		}
+		.header-logo__link {
+			width: auto;
+			min-width: 0;
+			overflow: hidden;
+		}
+		.header-action-item__container {
+			flex: none;
+		}
 		#menuButton {
 			display: block;
 			z-index: var(--z-sticky);

@@ -25,9 +25,7 @@ const { seo } = Astro.props as Props;
 		/>
 	)}
 	<Header rightMenu navData={nav} slot="header">
-		<span slot="logo">
-			<Logo />
-		</span>
+		<Logo slot="logo" />
 		<Button slot="action-item" href="/area-soci">Area soci</Button>
 	</Header>
 	<div id="page">

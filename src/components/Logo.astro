@@ -47,19 +47,35 @@ import marchio from '../assets/logo-banda.png';
 	}
 
 	@media (max-width: 600px) {
+		.logo {
+			/* fit-content impedirebbe al nome di stringersi sotto la sua
+			   larghezza naturale sugli schermi piu' stretti */
+			width: auto;
+			min-width: 0;
+		}
 		.logo__marchio {
 			height: 2rem;
 		}
 		.logo__nome {
 			font-size: var(--font-size-base);
+			/* se lo spazio non basta si tronca con i puntini invece di finire
+			   sotto il pulsante "Area soci" */
+			min-width: 0;
+			overflow: hidden;
+			text-overflow: ellipsis;
+		}
+	}
+	/* Su tutti i telefoni (non solo i piu' stretti) il nome scende di un
+	   gradino: a corpo base non ci sta accanto al pulsante "Area soci" e
+	   verrebbe troncato dai puntini. */
+	@media (max-width: 430px) {
+		.logo__nome {
+			font-size: var(--font-size-sm);
 		}
 	}
 	@media (max-width: 380px) {
 		.logo__marchio {
 			height: 1.75rem;
-		}
-		.logo__nome {
-			font-size: var(--font-size-sm);
 		}
 	}
 </style>
