@@ -49,6 +49,23 @@ export default defineConfig({
 	*/
 	adapter: vercel(),
 	integrations: [sitemap(), mdx(), lit(), icon()],
+	/*
+	  URL del vecchio sito, ancora indicizzate da Google (scansionate l'ultima
+	  volta il 7 agosto 2026, prima del passaggio a questo sito) ma senza più
+	  una pagina corrispondente qui: le mandiamo alla home invece di lasciarle
+	  rispondere 404, per non perdere del tutto il valore SEO dei vecchi link.
+	*/
+	redirects: {
+		'/consiglio': '/',
+		'/dona': '/',
+		'/direttore': '/',
+		'/storia': '/',
+		'/accademia': '/',
+		'/accademia/insegnanti': '/',
+		'/accademia/insegnante': '/',
+		'/contatti': '/',
+		'/accademia/contatti': '/',
+	},
 	vite: {
 		plugins: [tailwindcss()],
 	},
